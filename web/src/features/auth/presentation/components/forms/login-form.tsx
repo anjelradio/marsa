@@ -1,48 +1,21 @@
 "use client";
 
 import { useRef } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { FieldGroup } from "@/components/ui/field";
 import TextFormField from "@/features/shared/presentation/components/forms/text-form-field";
-import { authClient } from "@/lib/auth-client";
 import { appToast } from "@/features/shared/presentation/components/notifications/toast";
-import { getAuthErrorMessage } from "@/lib/auth-errors";
 import SubmitButton from "@/features/shared/presentation/components/custom-buttons/submit-button";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
 
-  const handleSubmit = async (formData: FormData) => {
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
-    await authClient.signIn.email(
-      {
-        email,
-        password,
-        callbackURL: "/home",
-        rememberMe: false,
-      },
-      {
-        onSuccess: () => {
-          formRef.current?.reset();
-          appToast.success("¡Bienvenido de vuelta!");
-          router.push("/home");
-        },
-        onError: (ctx) => {
-          appToast.error(
-            "Error al iniciar sesión",
-            getAuthErrorMessage(ctx.error.code),
-          );
-        },
-      },
-    );
+  const handleSubmit = async () => {
+    appToast.error("Autenticación no disponible", "Aún no hay un proveedor de autenticación configurado.");
   };
 
   return (

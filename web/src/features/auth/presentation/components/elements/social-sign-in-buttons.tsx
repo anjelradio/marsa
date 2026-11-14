@@ -1,7 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
-import { authClient } from "@/lib/auth-client";
 
 function GoogleIcon() {
   return (
@@ -39,34 +38,13 @@ function GitHubIcon() {
 }
 
 export default function SocialSignInButtons() {
-  const handleGoogleSignIn = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/home",
-      /**
-       * Si el flujo OAuth falla (ej: cuenta no vinculada), Better Auth
-       * redirige aquí en vez de mostrar su propia pantalla de error interna.
-       * El query param ?error=social permite mostrar un toast informativo.
-       */
-      errorCallbackURL: "/auth/login?error=social",
-    });
-  };
-
-  const handleGitHubSignIn = async () => {
-    await authClient.signIn.social({
-      provider: "github",
-      callbackURL: "/home",
-      errorCallbackURL: "/auth/login?error=social",
-    });
-  };
-
   return (
     <Field className="grid gap-4 sm:grid-cols-2">
-      <Button variant="outline" type="button" onClick={handleGitHubSignIn}>
+      <Button variant="outline" type="button" disabled>
         <GitHubIcon />
         Continuar con GitHub
       </Button>
-      <Button variant="outline" type="button" onClick={handleGoogleSignIn}>
+      <Button variant="outline" type="button" disabled>
         <GoogleIcon />
         Continuar con Google
       </Button>

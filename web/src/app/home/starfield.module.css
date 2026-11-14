@@ -1,0 +1,94 @@
+.distantStars {
+  background-image:
+    radial-gradient(1px 1px at 8% 13%, #759dd988, transparent),
+    radial-gradient(1px 1px at 18% 39%, #b4d4ff88, transparent),
+    radial-gradient(1px 1px at 31% 25%, #5689ce94, transparent),
+    radial-gradient(1px 1px at 46% 47%, #648bd267, transparent),
+    radial-gradient(1px 1px at 44% 76%, #aec8f690, transparent),
+    radial-gradient(1px 1px at 66% 64%, #a8d1fda3, transparent),
+    radial-gradient(1px 1px at 76% 22%, #689ce0a3, transparent),
+    radial-gradient(1px 1px at 82% 49%, #5373af85, transparent),
+    radial-gradient(1px 1px at 89% 84%, #7498d982, transparent),
+    radial-gradient(2px 2px at 36% 15%, #24559487, transparent),
+    radial-gradient(2px 2px at 61% 11%, #3b68a88c, transparent),
+    radial-gradient(2px 2px at 21% 83%, #264d9278, transparent),
+    radial-gradient(2px 2px at 55% 91%, #26486e85, transparent),
+    radial-gradient(2px 2px at 22% 55%, #214c86bd, transparent),
+    radial-gradient(2px 2px at 84% 74%, #152e57bc, transparent),
+    radial-gradient(1px 1px at 98% 45%, #5775af94, transparent);
+  background-size:
+    113px 179px, 133px 129px, 97px 143px, 153px 107px,
+    131px 171px, 117px 197px, 191px 145px, 129px 153px,
+    151px 133px, 161px 159px, 163px 139px, 109px 173px,
+    131px 109px, 183px 163px, 127px 107px, 137px 167px;
+}
+
+.nearStars {
+  background-image:
+    radial-gradient(5px 5px at 28% 69%, #dfedff 3%, #719fe4 18%, #21386085 45%, transparent 92%),
+    radial-gradient(4px 4px at 68% 18%, #c2ddff 4%, #4779ba 22%, #1e385c85 50%, transparent 92%),
+    radial-gradient(4px 4px at 40% 39%, #cbdeff 4%, #4677ba 20%, transparent 91%),
+    radial-gradient(3px 3px at 77% 84%, #a3cfff 2%, #315b9a 28%, transparent 95%),
+    radial-gradient(3px 3px at 13% 23%, #729ce5 12%, #123e73 26%, transparent 90%);
+  background-size: 457px 357px, 389px 299px, 413px 389px, 327px 231px, 327px 257px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .distantStars {
+    animation: drift 36s ease-in-out infinite alternate;
+    --star-offset: 13px -8px;
+  }
+
+  .nearStars {
+    animation: drift 14s ease-in-out infinite alternate;
+    animation-delay: -4s;
+    --star-offset: 24px -14px;
+  }
+
+  .comets::before,
+  .comets::after {
+    position: absolute;
+    width: clamp(3rem, 9vw, 7rem);
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #eef8ff, #9bcbfbd9 14%, #567cb666 45%, transparent);
+    filter: drop-shadow(0 0 4px #7ebcff);
+    animation: comet-flight 15s linear infinite;
+    opacity: 0;
+    content: "";
+  }
+
+  .comets::before {
+    top: 23%;
+    left: 94%;
+  }
+
+  .comets::after {
+    top: 31%;
+    left: 25%;
+    animation-delay: -7s;
+  }
+}
+
+@keyframes drift {
+  to {
+    translate: var(--star-offset);
+  }
+}
+
+@keyframes comet-flight {
+  0% {
+    transform: translate(0, 0) rotate(-31deg);
+    opacity: 0;
+  }
+
+  3% {
+    opacity: 0.9;
+  }
+
+  10%,
+  100% {
+    transform: translate(-140px, 84px) rotate(-31deg);
+    opacity: 0;
+  }
+}

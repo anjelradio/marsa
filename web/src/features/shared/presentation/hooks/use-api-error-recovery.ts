@@ -2,7 +2,6 @@
 
 import { startTransition } from "react";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
 import {
   classifyApiError,
   type ApiErrorLike,
@@ -21,15 +20,6 @@ export function useApiErrorRecovery() {
     switch (classifyApiError(error)) {
       case "unauthenticated": {
         clearJWT();
-
-        const { error: signOutError } = await authClient.signOut();
-        if (signOutError) {
-          appToast.error(
-            "Sesión no válida",
-            "No pudimos cerrar tu sesión. Intenta nuevamente.",
-          );
-          return true;
-        }
 
         startTransition(() => {
           router.replace("/auth/login?reason=session-expired");

@@ -24,7 +24,7 @@ export default function Home() {
             </h1>
             <p className="mx-auto max-w-xl text-lg leading-relaxed text-muted-foreground">
               Un scaffold de Next.js diseñado para partir rápido. Incluye
-              autenticación con Better Auth, componentes con shadcn/ui y una
+              componentes con shadcn/ui y una
               arquitectura limpia basada en features.
             </p>
           </section>
@@ -50,10 +50,10 @@ export default function Home() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>🔐 Better Auth</CardTitle>
+                  <CardTitle>🔐 Autenticación</CardTitle>
                   <CardDescription>
-                    Autenticación lista con login, registro, verificación de
-                    email y manejo de sesiones seguras con cookies HTTP-Only.
+                    Pantallas de login, registro, verificación de
+                    email y recuperación de contraseña.
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -110,7 +110,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t border-border/40 py-6 text-center text-xs text-muted-foreground">
-        next-scaffoldcito — hecho con Next.js, Better Auth y shadcn/ui
+        next-scaffoldcito — hecho con Next.js y shadcn/ui
       </footer>
     </div>
   );

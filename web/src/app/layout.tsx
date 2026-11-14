@@ -7,7 +7,7 @@ import { appFontVariables } from "@/styles/fonts";
 export const metadata: Metadata = {
   title: "next-scaffoldcito",
   description:
-    "Scaffold de Next.js con Better Auth, shadcn/ui y Clean Architecture",
+    "Scaffold de Next.js con shadcn/ui y Clean Architecture",
 };
 
 export default function RootLayout({
