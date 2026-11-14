@@ -58,6 +58,11 @@ async def lifespan(app: FastAPI):
     if settings.ENVIRONMENT == "DEV" and settings.is_sqlite:
         logger.info("DEV + SQLite — inicializando tablas con SQLModel...")
         init_db()
+        # Sembrar datos iniciales (Tierra, Marte, datasets y características)
+        from sqlmodel import Session
+        from app.shared.infrastructure.db.seed import seed_initial_data
+        with Session(engine) as session:
+            seed_initial_data(session)
     else:
         logger.info(
             "Modo %s con %s — las migraciones deben ejecutarse con Alembic.",
