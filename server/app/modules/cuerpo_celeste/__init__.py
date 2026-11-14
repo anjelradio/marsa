@@ -1,0 +1,1 @@
+"""Módulo cuerpo_celeste."""
