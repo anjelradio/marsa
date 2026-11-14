@@ -1,0 +1,12 @@
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+export async function proxy(_request: NextRequest) {
+  return NextResponse.next();
+}
+
+export const config = {
+  // El matcher define en que rutas se ejecuta el proxy
+  matcher: ["/home/:path*"],
+};
+
