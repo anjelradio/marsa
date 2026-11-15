@@ -24,19 +24,18 @@ export const POINT_IMAGE_SOURCES = {
 /** URL de la imagen orbital pública (sin clave) para el punto y la escala elegidos. */
 export function pointImageUrl(planet: PointImagePlanet, view: PointImageView, point: GeoPoint) {
   if (planet === "earth") {
-    const bbox = boundingBox(point, view === "regional" ? 10 : 1);
+    // Escala regional (12°) o detalle (3°)
+    const bbox = boundingBox(point, view === "regional" ? 12 : 3);
     const params = new URLSearchParams({
       SERVICE: "WMS",
       VERSION: "1.1.1",
       REQUEST: "GetMap",
-      LAYERS: "MODIS_Terra_CorrectedReflectance_TrueColor",
+      LAYERS: "BlueMarble_NextGeneration",
       SRS: "EPSG:4326",
       BBOX: bbox.join(","),
       WIDTH: "512",
       HEIGHT: "512",
       FORMAT: "image/jpeg",
-      // GIBS publica con ~1-2 días de retraso; sin TIME devuelve una imagen vacía.
-      TIME: new Date(Date.now() - 3 * 86_400_000).toISOString().slice(0, 10),
     });
     return `${EARTH_WMS}?${params}`;
   }

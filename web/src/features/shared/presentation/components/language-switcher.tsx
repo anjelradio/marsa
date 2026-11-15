@@ -41,7 +41,6 @@ export function LanguageSwitcher({
           aria-label="Change language"
         >
           <Globe className="size-4 shrink-0 opacity-80" />
-          <span className="text-base leading-none">{currentLanguage.flag}</span>
           {showLabel && (
             <span className="text-xs uppercase tracking-wider font-semibold">
               {currentLanguage.code}

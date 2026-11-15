@@ -1,0 +1,62 @@
+[
+  {
+    "celda_id": "L_N00_E023",
+    "region_referencia": "Mare Tranquillitatis (Zona Apolo 11)",
+    "limites": {"lat_min": -5, "lat_max": 10, "lon_min": 15, "lon_max": 35},
+    "categorias_area_pct": {"basalto_mar": 88.0, "brecha_tierras_altas": 12.0},
+    "minerales_kaguya_detectados": ["Ilmenita (alta en titanio)", "Clinopiroxeno (augita/palomasita)", "Plagioclasa cálcica (anortita)", "Olivino"],
+    "rocas_principales": ["Basalto rico en titanio (High-Ti mare basalt)", "Brecha de regolito lunar"],
+    "cobertura_pct": 100.0,
+    "unidad_geologica_usgs": "Imbrian Mare Basalt (Imb_t) - Flujos basálticos ricos en ilmenita"
+  },
+  {
+    "celda_id": "L_S09_E015",
+    "region_referencia": "Descartes Highlands (Zona Apolo 16)",
+    "limites": {"lat_min": -15, "lat_max": 0, "lon_min": 10, "lon_max": 25},
+    "categorias_area_pct": {"anortosita_tierras_altas": 85.0, "brecha_impacto": 15.0},
+    "minerales_kaguya_detectados": ["Plagioclasa cálcica (Anortita >90%)", "Ortopiroxeno", "Olivino forsterítico traza"],
+    "rocas_principales": ["Anortosita ferroana (FAN - Ferroan Anorthosite)", "Brechas de impacto de eyección de Imbrium"],
+    "cobertura_pct": 100.0,
+    "unidad_geologica_usgs": "Nectarian Cayley & Descartes Formations (Nf/Nc)"
+  },
+  {
+    "celda_id": "L_N20_E030",
+    "region_referencia": "Valle Taurus-Littrow (Zona Apolo 17)",
+    "limites": {"lat_min": 15, "lat_max": 25, "lon_min": 25, "lon_max": 35},
+    "categorias_area_pct": {"basalto_mar": 60.0, "anortosita_tierras_altas": 40.0},
+    "minerales_kaguya_detectados": ["Vidrio piroclástico anaranjado (rico en Ti)", "Ilmenita", "Plagioclasa", "Piroxeno"],
+    "rocas_principales": ["Basalto con vidrio volcánico piroclástico", "Troctolita cumular profunda", "Brechas noríticas"],
+    "cobertura_pct": 99.5,
+    "unidad_geologica_usgs": "Taurus-Littrow Mare & Massif Units (Im/Nt)"
+  },
+  {
+    "celda_id": "L_N26_W003",
+    "region_referencia": "Montes Apenninus / Hadley Rille (Zona Apolo 15)",
+    "limites": {"lat_min": 20, "lat_max": 30, "lon_min": -10, "lon_max": 5},
+    "categorias_area_pct": {"anortosita_tierras_altas": 55.0, "basalto_mar": 45.0},
+    "minerales_kaguya_detectados": ["Plagioclasa anortosítica", "Piroxeno pigeonítico", "Olivino", "Tridimita/Cuarzo lunar traza"],
+    "rocas_principales": ["Génesis Rock (Anortosita primitiva de la corteza)", "Basalto olivínico de rille"],
+    "cobertura_pct": 99.1,
+    "unidad_geologica_usgs": "Fra Mauro & Montes Apenninus Formations (It/Im)"
+  },
+  {
+    "celda_id": "L_N18_W057",
+    "region_referencia": "Oceanus Procellarum / Mons Rümker (Zona Chang'e 5)",
+    "limites": {"lat_min": 10, "lat_max": 25, "lon_min": -65, "lon_max": -45},
+    "categorias_area_pct": {"basalto_mar": 95.0, "brecha_impacto": 5.0},
+    "minerales_kaguya_detectados": ["Piroxeno ferrosilita", "Plagioclasa", "Fayalita (Olivino rico en Fe)", "Ilmenita media"],
+    "rocas_principales": ["Basalto lunar joven (1.96-2.0 Ga, Eratosthenian)", "Flujos basálticos muy evolucionados"],
+    "cobertura_pct": 100.0,
+    "unidad_geologica_usgs": "Eratosthenian Mare Basalt (Em) - Vulcanismo lunar tardío"
+  },
+  {
+    "celda_id": "L_S89_E000",
+    "region_referencia": "Polo Sur Lunar / Cráter Shackleton",
+    "limites": {"lat_min": -90, "lat_max": -80, "lon_min": -180, "lon_max": 180},
+    "categorias_area_pct": {"anortosita_tierras_altas": 75.0, "hielo_volatiles_trampa": 25.0},
+    "minerales_kaguya_detectados": ["Hielo de agua en regiones de sombra permanente (PSR)", "Plagioclasa pura (PAN)", "Ortopiroxeno"],
+    "rocas_principales": ["Megabrecha de impacto polar", "Regolito anortosítico criogénico"],
+    "cobertura_pct": 95.0,
+    "unidad_geologica_usgs": "South Pole-Aitken Basin Rim Anorthositic Terrane (pNb)"
+  }
+]

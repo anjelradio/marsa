@@ -146,3 +146,56 @@ app.include_router(
 )
 app.include_router(medicion_router, prefix="/api/medicion", tags=["Medicion"])
 app.include_router(analogia_router, prefix="/api/analogia", tags=["Analogia"])
+
+# Rutas de compatibilidad directa para API v1 de análogos geológicos
+from app.modules.analogia.infrastructure.api.schemas.geology_schemas import (
+    RespuestaComparacion,
+    RespuestaMacrostratPuntual,
+)
+from app.modules.analogia.infrastructure.geology_service import (
+    comparar_analogo_tierra,
+    consultar_macrostrat,
+)
+from app.modules.analogia.infrastructure.api.schemas.geology_schemas import MetadatosFuente
+from fastapi import Query
+from typing import Optional
+
+
+@app.get(
+    "/api/v1/tierra/macrostrat",
+    response_model=RespuestaMacrostratPuntual,
+    tags=["Geologia v1"],
+    summary="API v1: Macrostrat en tiempo real",
+)
+async def api_v1_macrostrat(
+    lat: float = Query(..., ge=-90.0, le=90.0),
+    lng: float = Query(..., ge=-180.0, le=180.0),
+    scale: Optional[str] = Query(None),
+):
+    unidades = await consultar_macrostrat(lat, lng, scale)
+    return RespuestaMacrostratPuntual(
+        coordenadas={"lat": lat, "lng": lng},
+        total_unidades=len(unidades),
+        unidades=unidades,
+        atribucion=MetadatosFuente(
+            fuente="Macrostrat API (macrostrat.org)",
+            licencia="CC BY 4.0",
+            resolucion_o_escala="Continental a Local (1:250k - 1:5M)",
+            nota_metodologica="Consulta en tiempo real al punto geográfico seleccionado en el mapa.",
+        ),
+    )
+
+
+@app.get(
+    "/api/v1/comparar-analogo",
+    response_model=RespuestaComparacion,
+    tags=["Geologia v1"],
+    summary="API v1: Comparar análogo Tierra-Marte/Luna",
+)
+async def api_v1_comparar_analogo(
+    lat: float = Query(..., ge=-90.0, le=90.0),
+    lng: float = Query(..., ge=-180.0, le=180.0),
+    destino: str = Query("marte"),
+):
+    return await comparar_analogo_tierra(lat, lng, destino)
+

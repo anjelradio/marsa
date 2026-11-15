@@ -25,6 +25,7 @@ import { MarsImageGallery } from "./mars-image-gallery";
 import { AnalogsPanel } from "./analogs-panel";
 import { earthLandmarks, GlobeMarkers, targetLandmarks } from "./analogs-globe";
 import { PlanetExplorationPanels } from "./planet-exploration-panels";
+import { PointGeologyPanel } from "./point-geology-panel";
 import { EarthPlanet } from "@/features/earth/presentation/components/earth-planet";
 import { MoonPlanet } from "@/features/moon/presentation/components/moon-planet";
 import type { ProjectedLandmark } from "@/features/shared/domain/geographic-coordinates";
@@ -42,6 +43,7 @@ export default function HomePage() {
   const [isExploring, setIsExploring] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [selectedPoint, setSelectedPoint] = useState<MarsCoordinates | null>(null);
+  const [explorationView, setExplorationView] = useState<"geology" | "climate">("geology");
 
   const selectPoint = useCallback((point: MarsCoordinates) => {
     setIsExploring(true);
@@ -160,17 +162,6 @@ export default function HomePage() {
 
       {/* Top right utility navigation */}
       <div className="absolute top-4 right-4 z-40 flex items-center gap-2">
-        <Button
-          asChild
-          variant="ghost"
-          size="sm"
-          className="text-white/80 hover:text-white hover:bg-white/10 rounded-full"
-        >
-          <Link href="/">
-            <ArrowLeft className="size-4 mr-1.5" />
-            Home
-          </Link>
-        </Button>
         <LanguageSwitcher
           variant="outline"
           size="sm"
@@ -231,9 +222,6 @@ export default function HomePage() {
                 {value}
                 <span className="mt-1 block text-xs font-normal tracking-normal text-app-secondary/65">
                   {unit}
-                </span>
-                <span className="mt-1.5 block text-[0.62rem] font-normal tracking-normal text-app-secondary/50 font-mono">
-                  {detail}
                 </span>
               </p>
             </Card>
@@ -356,7 +344,21 @@ export default function HomePage() {
           >
             {planet === "mars" ? (
               <>
-                <MarsClimatePanel point={selectedPoint} onClose={() => setSelectedPoint(null)} />
+                {explorationView === "geology" ? (
+                  <PointGeologyPanel
+                    cuerpo="Marte"
+                    point={selectedPoint}
+                    onClose={() => setSelectedPoint(null)}
+                    viewMode="geology"
+                    onToggleViewMode={setExplorationView}
+                  />
+                ) : (
+                  <MarsClimatePanel
+                    point={selectedPoint}
+                    onClose={() => setSelectedPoint(null)}
+                    onToggleViewMode={setExplorationView}
+                  />
+                )}
                 <MarsImageGallery point={selectedPoint} />
               </>
             ) : (
@@ -364,6 +366,8 @@ export default function HomePage() {
                 planet={planet}
                 point={selectedPoint}
                 onClose={() => setSelectedPoint(null)}
+                explorationView={explorationView}
+                onToggleViewMode={setExplorationView}
               />
             )}
           </div>

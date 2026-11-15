@@ -120,7 +120,7 @@ export const es: TranslationDict = {
       selectView: "Escala de la imagen",
       views: { regional: "Vista regional", detail: "Detalle orbital" },
       error: "No se pudo cargar esta imagen.",
-      source: "MODIS Terra color real · NASA GIBS (pasada diaria reciente)",
+      source: "NASA Earth Observatory · Mosaico satelital continuo sin franjas orbitales",
     },
     facts: {
       distanceToSun: "Distancia al Sol",

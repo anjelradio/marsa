@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Cloud, Gauge, MapPin, Thermometer, Wind, X, Sun } from "lucide-react";
+import { Cloud, Gauge, MapPin, Mountain, Thermometer, Wind, X, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useTranslation } from "@/i18n/context";
@@ -14,9 +14,11 @@ import {
 export function MarsClimatePanel({
   point,
   onClose,
+  onToggleViewMode,
 }: {
   point: MarsCoordinates;
   onClose: () => void;
+  onToggleViewMode?: (mode: "geology" | "climate") => void;
 }) {
   const { dict, locale } = useTranslation();
   const copy = dict.mars.climate;
@@ -46,9 +48,29 @@ export function MarsClimatePanel({
   return (
     <aside
       aria-labelledby="mars-climate-title"
-      className="min-w-0 rounded-3xl sm:col-start-2 sm:row-start-1 lg:col-start-3"
+      className="min-w-0 rounded-3xl max-sm:order-first sm:col-start-2 sm:row-start-1 lg:col-start-3"
     >
       <Card className="gap-4 rounded-3xl border border-white/15 bg-linear-to-br from-[#281810]/95 to-[#120d0b]/95 p-4 text-white shadow-2xl backdrop-blur-md">
+        {onToggleViewMode && (
+          <div className="grid grid-cols-2 gap-1 rounded-2xl border border-white/10 bg-black/50 p-1 text-xs">
+            <button
+              type="button"
+              onClick={() => onToggleViewMode("geology")}
+              className="flex items-center justify-center gap-1.5 rounded-xl py-1.5 font-medium text-white/60 hover:text-white transition-colors"
+            >
+              <Mountain className="size-3.5 text-[#ffab57]" />
+              <span>Rocas y Minerales</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onToggleViewMode("climate")}
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-orange-600/80 py-1.5 font-medium text-white shadow transition-colors"
+            >
+              <Thermometer className="size-3.5 text-white" />
+              <span>Clima y Atmósfera</span>
+            </button>
+          </div>
+        )}
         <div className="flex items-start justify-between gap-2">
           <div>
             <h2 id="mars-climate-title" className="flex items-center gap-2 font-headline text-base font-medium text-white">

@@ -1,0 +1,104 @@
+[
+  {
+    "muestra_id": "Rocknest_Scoop_5",
+    "cuerpo": "Marte",
+    "ubicacion": "Cráter Gale (Marte)",
+    "coordenadas": {"lat": -4.59, "lon": 137.44},
+    "tipo_material": "Regolito eólico basáltico no consolidado",
+    "minerales": [
+      {"nombre": "Plagioclasa", "formula": "CaAl2Si2O8 - NaAlSi3O8", "abundancia": 40.7, "unidad": "% peso (wt%)"},
+      {"nombre": "Forsterita (Olivino)", "formula": "Mg2SiO4", "abundancia": 22.4, "unidad": "% peso (wt%)"},
+      {"nombre": "Augita (Clinopiroxeno)", "formula": "(Ca,Mg,Fe,Ti,Al)2(Si,Al)2O6", "abundancia": 14.6, "unidad": "% peso (wt%)"},
+      {"nombre": "Pigeonita (Piroxeno bajo en Ca)", "formula": "(Mg,Fe,Ca)(Mg,Fe)Si2O6", "abundancia": 10.3, "unidad": "% peso (wt%)"},
+      {"nombre": "Magnetita / Óxidos férricos", "formula": "Fe3O4", "abundancia": 2.1, "unidad": "% peso (wt%)"},
+      {"nombre": "Anhidrita / Sulfatos de calcio", "formula": "CaSO4", "abundancia": 1.7, "unidad": "% peso (wt%)"}
+    ],
+    "fase_amorfa_pct": 27.0,
+    "instrumento": "CheMin XRD (X-ray Diffraction) - MSL Curiosity Rover",
+    "fuente_pds": "https://pds-geosciences.wustl.edu/missions/msl/chemin.htm"
+  },
+  {
+    "muestra_id": "John_Klein_Drill",
+    "cuerpo": "Marte",
+    "ubicacion": "Bahía de Yellowknife, Cráter Gale (Marte)",
+    "coordenadas": {"lat": -4.59, "lon": 137.44},
+    "tipo_material": "Lutita / Mudstone lacustre de ambiente habitable antiguo",
+    "minerales": [
+      {"nombre": "Esmectita saponita (Arcilla trioctaédrica)", "formula": "(Ca/2,Na)0.3(Mg,Fe)3(Si,Al)4O10(OH)2", "abundancia": 22.0, "unidad": "% peso (wt%)"},
+      {"nombre": "Plagioclasa", "formula": "CaAl2Si2O8", "abundancia": 22.4, "unidad": "% peso (wt%)"},
+      {"nombre": "Augita / Piroxeno", "formula": "Ca(Mg,Fe)Si2O6", "abundancia": 14.8, "unidad": "% peso (wt%)"},
+      {"nombre": "Magnetita", "formula": "Fe3O4", "abundancia": 5.7, "unidad": "% peso (wt%)"},
+      {"nombre": "Anhidrita / Basanita", "formula": "CaSO4 · 0.5H2O", "abundancia": 4.3, "unidad": "% peso (wt%)"},
+      {"nombre": "Pirrotita (Sulfuro de hierro)", "formula": "Fe(1-x)S", "abundancia": 1.1, "unidad": "% peso (wt%)"}
+    ],
+    "fase_amorfa_pct": 28.0,
+    "instrumento": "CheMin XRD (X-ray Diffraction) - MSL Curiosity Rover",
+    "fuente_pds": "https://pds-geosciences.wustl.edu/missions/msl/chemin.htm"
+  },
+  {
+    "muestra_id": "Mojave_2_Drill",
+    "cuerpo": "Marte",
+    "ubicacion": "Pahrump Hills, Mount Sharp, Cráter Gale (Marte)",
+    "coordenadas": {"lat": -4.66, "lon": 137.38},
+    "tipo_material": "Lutita basal rica en jarosita",
+    "minerales": [
+      {"nombre": "Jarosita (Sulfato de potasio y hierro)", "formula": "KFe3(SO4)2(OH)6", "abundancia": 15.3, "unidad": "% peso (wt%)"},
+      {"nombre": "Plagioclasa", "formula": "NaAlSi3O8 - CaAl2Si2O8", "abundancia": 26.5, "unidad": "% peso (wt%)"},
+      {"nombre": "Piroxeno (Augita/Pigeonita)", "formula": "(Ca,Mg,Fe)2Si2O6", "abundancia": 17.2, "unidad": "% peso (wt%)"},
+      {"nombre": "Hematita", "formula": "Fe2O3", "abundancia": 4.1, "unidad": "% peso (wt%)"},
+      {"nombre": "Halita traza", "formula": "NaCl", "abundancia": 0.8, "unidad": "% peso (wt%)"}
+    ],
+    "fase_amorfa_pct": 34.0,
+    "instrumento": "CheMin XRD - MSL Curiosity Rover",
+    "fuente_pds": "https://pds-geosciences.wustl.edu/missions/msl/chemin.htm"
+  },
+  {
+    "muestra_id": "Apollo_11_10017",
+    "cuerpo": "Luna",
+    "ubicacion": "Mare Tranquillitatis (Luna)",
+    "coordenadas": {"lat": 0.67, "lon": 23.47},
+    "tipo_material": "Basalto lunar de grano fino rico en Ti y bajo en K",
+    "minerales": [
+      {"nombre": "Clinopiroxeno (Augita titanífera)", "formula": "Ca(Mg,Fe,Ti)(Si,Al)2O6", "abundancia": 48.0, "unidad": "% peso (wt%)"},
+      {"nombre": "Plagioclasa cálcica (Anortita An85)", "formula": "CaAl2Si2O8", "abundancia": 27.5, "unidad": "% peso (wt%)"},
+      {"nombre": "Ilmenita", "formula": "FeTiO3", "abundancia": 18.2, "unidad": "% peso (wt%)"},
+      {"nombre": "Troilita / Sulfuros", "formula": "FeS", "abundancia": 1.2, "unidad": "% peso (wt%)"},
+      {"nombre": "Cristobalita / Cuarzo lunar", "formula": "SiO2", "abundancia": 1.5, "unidad": "% peso (wt%)"}
+    ],
+    "fase_amorfa_pct": 0.0,
+    "instrumento": "Análisis Petrográfico y Difracción de Rayos X (NASA Lunar Sample Compendium)",
+    "fuente_pds": "https://curator.jsc.nasa.gov/lunar/lsc/index.cfm"
+  },
+  {
+    "muestra_id": "Apollo_16_60015",
+    "cuerpo": "Luna",
+    "ubicacion": "Descartes Highlands (Luna)",
+    "coordenadas": {"lat": -8.97, "lon": 15.50},
+    "tipo_material": "Anortosita ferroana cataclástica (FAN - Primitiva corteza lunar)",
+    "minerales": [
+      {"nombre": "Plagioclasa anortita (An96-98)", "formula": "CaAl2Si2O8", "abundancia": 84.5, "unidad": "% peso (wt%)"},
+      {"nombre": "Ortopiroxeno", "formula": "(Mg,Fe)2Si2O6", "abundancia": 9.2, "unidad": "% peso (wt%)"},
+      {"nombre": "Olivino magnesiano", "formula": "(Mg,Fe)2SiO4", "abundancia": 4.1, "unidad": "% peso (wt%)"},
+      {"nombre": "Ilmenita traza", "formula": "FeTiO3", "abundancia": 0.4, "unidad": "% peso (wt%)"}
+    ],
+    "fase_amorfa_pct": 0.0,
+    "instrumento": "NASA Johnson Space Center Astromaterials Laboratory",
+    "fuente_pds": "https://curator.jsc.nasa.gov/lunar/lsc/index.cfm"
+  },
+  {
+    "muestra_id": "Apollo_17_76535",
+    "cuerpo": "Luna",
+    "ubicacion": "Taurus-Littrow Valley (Luna)",
+    "coordenadas": {"lat": 20.19, "lon": 30.77},
+    "tipo_material": "Troctolita cumular profunda (roca plutónica máfica pristina)",
+    "minerales": [
+      {"nombre": "Plagioclasa anortita (An96)", "formula": "CaAl2Si2O8", "abundancia": 58.0, "unidad": "% peso (wt%)"},
+      {"nombre": "Olivino magnesiano (Fo88)", "formula": "Mg2SiO4", "abundancia": 37.0, "unidad": "% peso (wt%)"},
+      {"nombre": "Bronzita / Ortopiroxeno", "formula": "(Mg,Fe)SiO3", "abundancia": 4.0, "unidad": "% peso (wt%)"},
+      {"nombre": "Apatito lunar traza", "formula": "Ca5(PO4)3(F,Cl)", "abundancia": 0.5, "unidad": "% peso (wt%)"}
+    ],
+    "fase_amorfa_pct": 0.0,
+    "instrumento": "NASA Johnson Space Center Astromaterials Laboratory",
+    "fuente_pds": "https://curator.jsc.nasa.gov/lunar/lsc/index.cfm"
+  }
+]

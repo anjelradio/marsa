@@ -22,11 +22,24 @@ export function PointImagesPanel({ planet, point }: { planet: PointImagePlanet; 
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const url = pointImageUrl(planet, view, point);
 
+  const theme =
+    planet === "earth"
+      ? {
+          card: "border-sky-500/25 bg-linear-to-br from-[#0c1f36]/95 via-[#081525]/95 to-[#040a12]/95",
+          icon: "text-sky-400",
+          pressed: "aria-pressed:bg-sky-500/20 aria-pressed:text-sky-200",
+        }
+      : {
+          card: "border-slate-400/25 bg-linear-to-br from-[#1c212a]/95 via-[#13161c]/95 to-[#0a0c0f]/95",
+          icon: "text-slate-300",
+          pressed: "aria-pressed:bg-slate-400/20 aria-pressed:text-slate-100",
+        };
+
   return (
-    <aside aria-labelledby="point-images-title" className="min-w-0 rounded-3xl sm:col-start-1 sm:row-start-1">
-      <Card className="gap-3 rounded-3xl border border-[#ffab57]/25 bg-linear-to-br from-[#302016]/95 to-[#110c0a]/95 p-4 text-white shadow-2xl backdrop-blur-md">
+    <aside aria-labelledby="point-images-title" className="min-w-0 rounded-3xl max-sm:order-last sm:col-start-1 sm:row-start-1 lg:col-start-1">
+      <Card className={`gap-3 rounded-3xl border p-4 text-white shadow-2xl backdrop-blur-md ${theme.card}`}>
         <h2 id="point-images-title" className="flex items-center gap-2 text-base font-medium text-white">
-          <Images aria-hidden="true" className="size-4 shrink-0 text-[#ffab57]" />
+          <Images aria-hidden="true" className={`size-4 shrink-0 ${theme.icon}`} />
           {copy.title}
         </h2>
 
@@ -43,7 +56,7 @@ export function PointImagesPanel({ planet, point }: { planet: PointImagePlanet; 
               size="sm"
               aria-pressed={view === option}
               onClick={() => setView(option)}
-              className="h-auto min-h-8 rounded-[0.6rem] px-1.5 py-1.5 text-center text-xs whitespace-normal text-white/80 hover:bg-white/10 hover:text-white aria-pressed:bg-[#ffab57]/15 aria-pressed:text-[#ffd1a4]"
+              className={`h-auto min-h-8 rounded-[0.6rem] px-1.5 py-1.5 text-center text-xs whitespace-normal text-white/80 hover:bg-white/10 hover:text-white ${theme.pressed}`}
             >
               {copy.views[option]}
             </Button>

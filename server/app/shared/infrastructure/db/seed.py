@@ -105,6 +105,54 @@ def seed_initial_data(session: Session) -> None:
             "url": "https://www-mars.lmd.jussieu.fr/mars/info_web/index.html",
             "resolucion": 330000.0,
         },
+        {
+            "nombre": "Macrostrat API",
+            "agencia": "Macrostrat / NSF / UW-Madison",
+            "url": "https://macrostrat.org/api/v2/geologic_units/map",
+            "resolucion": 1000.0,
+        },
+        {
+            "nombre": "GLiM (Global Lithological Map)",
+            "agencia": "Univ. Hamburg / Hartmann & Moosdorf",
+            "url": "https://doi.pangaea.de/10.1594/PANGAEA.788537",
+            "resolucion": 50000.0,
+        },
+        {
+            "nombre": "USGS SIM 3292 Mars Geologic Map",
+            "agencia": "USGS / NASA",
+            "url": "https://pubs.usgs.gov/sim/3292/",
+            "resolucion": 20000.0,
+        },
+        {
+            "nombre": "ESA Mars Express OMEGA Mineralogy",
+            "agencia": "ESA / OMEGA Team",
+            "url": "https://www.cosmos.esa.int/web/psa/mars-express",
+            "resolucion": 2000.0,
+        },
+        {
+            "nombre": "NASA MSL Curiosity CheMin XRD",
+            "agencia": "NASA / PDS Geosciences",
+            "url": "https://pds-geosciences.wustl.edu/missions/msl/chemin.htm",
+            "resolucion": 0.01,
+        },
+        {
+            "nombre": "USGS Unified Geologic Map of the Moon",
+            "agencia": "USGS / NASA / LPI",
+            "url": "https://astrogeology.usgs.gov/search/map/Moon/Geology/Unified_Geologic_Map_of_the_Moon",
+            "resolucion": 5000.0,
+        },
+        {
+            "nombre": "JAXA Kaguya Multiband Imager (MI)",
+            "agencia": "JAXA / SELENE",
+            "url": "https://darts.isas.jaxa.jp/planet/pdap/selene/",
+            "resolucion": 20.0,
+        },
+        {
+            "nombre": "NASA Apollo Lunar Sample Compendium",
+            "agencia": "NASA Johnson Space Center",
+            "url": "https://curator.jsc.nasa.gov/lunar/lsc/index.cfm",
+            "resolucion": 0.001,
+        },
     ]
     for d in datasets_extra:
         if not session.exec(
@@ -130,6 +178,7 @@ def seed_initial_data(session: Session) -> None:
     logger.info("Datos iniciales de Cuerpos, Datasets, Características y Sitios asegurados.")
 
 
+
 # Rango y mínimo usados para normalizar a [0, 1] cada característica.
 CARACTERISTICAS = [
     {"nombre": "Temperatura Superficial", "unidad": "K", "rango": 350.0, "peso": 0.25},
@@ -146,6 +195,57 @@ CARACTERISTICAS = [
     {"nombre": "Rugosidad del Terreno", "unidad": "m", "rango": 100.0, "peso": 0.15},
 ]
 _MINIMO = {"Elevación": -8000.0}
+
+CARACTERISTICAS_MINERALOGICAS = [
+    {"nombre": "Plagioclasa", "unidad": "% wt", "rango": 100.0, "peso": 0.15},
+    {"nombre": "Piroxeno (Augita/Pigeonita)", "unidad": "% wt", "rango": 100.0, "peso": 0.15},
+    {"nombre": "Olivino (Forsterita)", "unidad": "% wt", "rango": 100.0, "peso": 0.15},
+    {"nombre": "Óxidos Férricos (Hematita/Magnetita)", "unidad": "% wt", "rango": 100.0, "peso": 0.15},
+    {"nombre": "Filosilicatos / Minerales Hidratados", "unidad": "% wt", "rango": 100.0, "peso": 0.15},
+    {"nombre": "Ilmenita", "unidad": "% wt", "rango": 100.0, "peso": 0.15},
+    {"nombre": "Sulfatos (Jarosita/Yeso)", "unidad": "% wt", "rango": 100.0, "peso": 0.10},
+]
+
+# Mediciones mineralógicas reales/de referencia por sitio (% wt)
+MEDICIONES_MINERALOGICAS = {
+    "Desierto de Atacama (Yungay)": {
+        "dataset": "GLiM (Global Lithological Map)",
+        "minerales": {"Plagioclasa": 35.0, "Piroxeno (Augita/Pigeonita)": 18.0, "Olivino (Forsterita)": 5.0, "Óxidos Férricos (Hematita/Magnetita)": 12.0, "Filosilicatos / Minerales Hidratados": 8.0, "Ilmenita": 1.5, "Sulfatos (Jarosita/Yeso)": 20.5}
+    },
+    "Salar de Uyuni": {
+        "dataset": "GLiM (Global Lithological Map)",
+        "minerales": {"Plagioclasa": 10.0, "Piroxeno (Augita/Pigeonita)": 5.0, "Olivino (Forsterita)": 0.5, "Óxidos Férricos (Hematita/Magnetita)": 2.0, "Filosilicatos / Minerales Hidratados": 15.0, "Ilmenita": 0.5, "Sulfatos (Jarosita/Yeso)": 67.0}
+    },
+    "Valles Secos de McMurdo": {
+        "dataset": "GLiM (Global Lithological Map)",
+        "minerales": {"Plagioclasa": 42.0, "Piroxeno (Augita/Pigeonita)": 26.0, "Olivino (Forsterita)": 12.0, "Óxidos Férricos (Hematita/Magnetita)": 6.0, "Filosilicatos / Minerales Hidratados": 9.0, "Ilmenita": 2.0, "Sulfatos (Jarosita/Yeso)": 3.0}
+    },
+    "Tarso Toussidé": {
+        "dataset": "GLiM (Global Lithological Map)",
+        "minerales": {"Plagioclasa": 45.0, "Piroxeno (Augita/Pigeonita)": 30.0, "Olivino (Forsterita)": 15.0, "Óxidos Férricos (Hematita/Magnetita)": 7.0, "Filosilicatos / Minerales Hidratados": 1.0, "Ilmenita": 1.5, "Sulfatos (Jarosita/Yeso)": 0.5}
+    },
+    "Cueva de los Verdes (Lanzarote)": {
+        "dataset": "GLiM (Global Lithological Map)",
+        "minerales": {"Plagioclasa": 48.0, "Piroxeno (Augita/Pigeonita)": 28.0, "Olivino (Forsterita)": 18.0, "Óxidos Férricos (Hematita/Magnetita)": 4.5, "Filosilicatos / Minerales Hidratados": 0.5, "Ilmenita": 1.0, "Sulfatos (Jarosita/Yeso)": 0.0}
+    },
+    "Cráter Gale": {
+        "dataset": "NASA MSL Curiosity CheMin XRD",
+        "minerales": {"Plagioclasa": 38.0, "Piroxeno (Augita/Pigeonita)": 16.0, "Olivino (Forsterita)": 18.0, "Óxidos Férricos (Hematita/Magnetita)": 4.0, "Filosilicatos / Minerales Hidratados": 14.0, "Ilmenita": 0.8, "Sulfatos (Jarosita/Yeso)": 9.2}
+    },
+    "Meridiani Planum": {
+        "dataset": "ESA Mars Express OMEGA Mineralogy",
+        "minerales": {"Plagioclasa": 18.0, "Piroxeno (Augita/Pigeonita)": 12.0, "Olivino (Forsterita)": 4.0, "Óxidos Férricos (Hematita/Magnetita)": 18.0, "Filosilicatos / Minerales Hidratados": 8.0, "Ilmenita": 1.0, "Sulfatos (Jarosita/Yeso)": 39.0}
+    },
+    "Mare Tranquillitatis": {
+        "dataset": "NASA Apollo Lunar Sample Compendium",
+        "minerales": {"Plagioclasa": 28.0, "Piroxeno (Augita/Pigeonita)": 47.0, "Olivino (Forsterita)": 4.5, "Óxidos Férricos (Hematita/Magnetita)": 1.0, "Filosilicatos / Minerales Hidratados": 0.0, "Ilmenita": 18.5, "Sulfatos (Jarosita/Yeso)": 0.0}
+    },
+    "Borde del cráter Shackleton": {
+        "dataset": "JAXA Kaguya Multiband Imager (MI)",
+        "minerales": {"Plagioclasa": 82.0, "Piroxeno (Augita/Pigeonita)": 12.0, "Olivino (Forsterita)": 4.0, "Óxidos Férricos (Hematita/Magnetita)": 0.5, "Filosilicatos / Minerales Hidratados": 0.0, "Ilmenita": 0.5, "Sulfatos (Jarosita/Yeso)": 0.0}
+    },
+}
+
 
 # (cuerpo, nombre, tipo, lon, lat, valores en el orden de CARACTERISTICAS)
 # Valores de referencia aproximados a partir de literatura publicada; sustituir

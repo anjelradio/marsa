@@ -107,16 +107,18 @@ export function PlanetMissionPanels({ planet = "mars", isExploring = false }: Pl
           />
 
           {/* Key astronomical markers: far point (peak) & near point (base) */}
-          <span className="absolute top-1.5 left-1/2 -translate-x-1/2 rounded bg-black/60 px-1.5 py-0.5 text-[0.62rem] font-mono text-white/90">
+          <span className="absolute top-1.5 left-1/2 -translate-x-1/2 rounded-full bg-black/40 px-2 py-0.5 text-[0.62rem] font-mono text-white/90 backdrop-blur-xs">
             {p.aphelion}
           </span>
-          <span className="absolute bottom-1.5 left-2 rounded bg-black/60 px-1.5 py-0.5 text-[0.62rem] font-mono text-[#ffdb8a]">
-            {p.perihelion}
-          </span>
 
-          <p className="absolute right-2 bottom-1.5 rounded-md bg-black/60 px-2 py-0.5 text-[0.65rem] font-mono text-app-secondary">
-            {p.distanceRange}
-          </p>
+          <div className="absolute inset-x-2 bottom-1.5 flex items-center justify-between text-[0.65rem] font-mono">
+            <span className="text-[#ffdb8a]/90 drop-shadow-xs">
+              {p.perihelion}
+            </span>
+            <span className="text-white/70 drop-shadow-xs">
+              {p.distanceRange}
+            </span>
+          </div>
         </div>
 
         {/* Vis-viva orbital velocity section */}

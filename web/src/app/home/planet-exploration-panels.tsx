@@ -14,9 +14,18 @@ import {
 import type { GeoPoint } from "@/features/shared/domain/geographic-coordinates";
 import { useTranslation } from "@/i18n/context";
 import { PointConditionsPanel, type ConditionMetric } from "./point-conditions-panel";
+import { PointGeologyPanel } from "./point-geology-panel";
 import { PointImagesPanel } from "./point-images-panel";
 
-function EarthClimatePanel({ point, onClose }: { point: GeoPoint; onClose: () => void }) {
+function EarthClimatePanel({
+  point,
+  onClose,
+  onToggleViewMode,
+}: {
+  point: GeoPoint;
+  onClose: () => void;
+  onToggleViewMode?: (mode: "geology" | "climate") => void;
+}) {
   const { dict, locale } = useTranslation();
   const copy = dict.earth.climate;
   const [result, setResult] = useState<EarthClimate | "error" | null>(null);
@@ -46,6 +55,7 @@ function EarthClimatePanel({ point, onClose }: { point: GeoPoint; onClose: () =>
     <PointConditionsPanel
       title={copy.title}
       point={point}
+      planet="earth"
       status={result === null ? "loading" : result === "error" ? "error" : "ready"}
       metrics={metrics}
       labels={copy}
@@ -54,11 +64,12 @@ function EarthClimatePanel({ point, onClose }: { point: GeoPoint; onClose: () =>
         setAttempt((previous) => previous + 1);
       }}
       onClose={onClose}
+      onToggleViewMode={onToggleViewMode}
       footer={
         result && result !== "error" ? (
           <a
             href="https://power.larc.nasa.gov/"
-            className="text-[#ffbd80] underline underline-offset-2"
+            className="text-sky-300 underline underline-offset-2"
             target="_blank"
             rel="noreferrer"
           >
@@ -70,7 +81,15 @@ function EarthClimatePanel({ point, onClose }: { point: GeoPoint; onClose: () =>
   );
 }
 
-function MoonConditionsPanel({ point, onClose }: { point: GeoPoint; onClose: () => void }) {
+function MoonConditionsPanel({
+  point,
+  onClose,
+  onToggleViewMode,
+}: {
+  point: GeoPoint;
+  onClose: () => void;
+  onToggleViewMode?: (mode: "geology" | "climate") => void;
+}) {
   const { dict, locale } = useTranslation();
   const copy = dict.moon.climate;
   const { noonK, nightK } = moonConditions(point);
@@ -87,31 +106,47 @@ function MoonConditionsPanel({ point, onClose }: { point: GeoPoint; onClose: () 
     <PointConditionsPanel
       title={copy.title}
       point={point}
+      planet="moon"
       status="ready"
       metrics={metrics}
       labels={copy}
       onClose={onClose}
+      onToggleViewMode={onToggleViewMode}
       footer={copy.model}
     />
   );
 }
 
-/** Paneles de clima/condiciones e imágenes del punto elegido en la Tierra o la Luna. */
+/** Paneles de geología/minerales o clima/condiciones e imágenes del punto elegido en la Tierra o la Luna. */
 export function PlanetExplorationPanels({
   planet,
   point,
   onClose,
+  explorationView = "geology",
+  onToggleViewMode,
 }: {
   planet: "earth" | "moon";
   point: GeoPoint;
   onClose: () => void;
+  explorationView?: "geology" | "climate";
+  onToggleViewMode?: (mode: "geology" | "climate") => void;
 }) {
+  const cuerpo = planet === "earth" ? "Tierra" : "Luna";
+
   return (
     <>
-      {planet === "earth" ? (
-        <EarthClimatePanel point={point} onClose={onClose} />
+      {explorationView === "geology" ? (
+        <PointGeologyPanel
+          cuerpo={cuerpo}
+          point={point}
+          onClose={onClose}
+          viewMode="geology"
+          onToggleViewMode={onToggleViewMode}
+        />
+      ) : planet === "earth" ? (
+        <EarthClimatePanel point={point} onClose={onClose} onToggleViewMode={onToggleViewMode} />
       ) : (
-        <MoonConditionsPanel point={point} onClose={onClose} />
+        <MoonConditionsPanel point={point} onClose={onClose} onToggleViewMode={onToggleViewMode} />
       )}
       <PointImagesPanel planet={planet} point={point} />
     </>

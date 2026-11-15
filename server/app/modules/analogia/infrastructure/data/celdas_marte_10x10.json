@@ -1,0 +1,72 @@
+[
+  {
+    "celda_id": "M_S05_E137",
+    "region_referencia": "Cráter Gale (Zona MSL Curiosity)",
+    "limites": {"lat_min": -10, "lat_max": 0, "lon_min": 130, "lon_max": 140},
+    "categorias_area_pct": {"sedimentario": 55.0, "volcanico": 30.0, "evaporitas": 15.0},
+    "minerales_omega_detectados": ["Esmectitas (arcillas)", "Piroxeno", "Óxidos férricos (hematita)", "Sulfatos"],
+    "rocas_principales": ["Mudstone / Lutita lacustre", "Basalto toleítico", "Arenisca eólica"],
+    "cobertura_pct": 99.4,
+    "unidad_geologica_usgs": "Hesperian Gale Crater Interior Units (Ahd/Hvm)"
+  },
+  {
+    "celda_id": "M_N18_E077",
+    "region_referencia": "Cráter Jezero (Zona Mars 2020 Perseverance)",
+    "limites": {"lat_min": 10, "lat_max": 20, "lon_min": 70, "lon_max": 80},
+    "categorias_area_pct": {"sedimentario": 60.0, "carbonatado": 20.0, "volcanico": 20.0},
+    "minerales_omega_detectados": ["Carbonatos de magnesio", "Filosilicatos Fe/Mg", "Olivino", "Piroxeno"],
+    "rocas_principales": ["Conglomerado deltaico", "Carbonatitas/rocas carbonatadas", "Basalto olivínico"],
+    "cobertura_pct": 98.8,
+    "unidad_geologica_usgs": "Noachian Deltaic & Volcanic Floor Units (Nf)"
+  },
+  {
+    "celda_id": "M_S15_E175",
+    "region_referencia": "Cráter Gusev / Columbia Hills (Spirit)",
+    "limites": {"lat_min": -20, "lat_max": -10, "lon_min": 170, "lon_max": 180},
+    "categorias_area_pct": {"volcanico": 70.0, "sedimentario": 18.0, "evaporitas": 12.0},
+    "minerales_omega_detectados": ["Olivino", "Piroxeno rico en Mg", "Sílice opalina hidrotermal", "Óxidos férricos"],
+    "rocas_principales": ["Basalto picrítico", "Tobas volcánicas", "Depósitos de sílice hidrotermal"],
+    "cobertura_pct": 100.0,
+    "unidad_geologica_usgs": "Hesperian Plains Volcanics (Hp)"
+  },
+  {
+    "celda_id": "M_S02_W006",
+    "region_referencia": "Meridiani Planum (Opportunity)",
+    "limites": {"lat_min": -10, "lat_max": 0, "lon_min": -10, "lon_max": 0},
+    "categorias_area_pct": {"evaporitas": 65.0, "sedimentario": 25.0, "volcanico": 10.0},
+    "minerales_omega_detectados": ["Hematita gris cristalina", "Jarosita (sulfato)", "Yeso", "Piroxeno"],
+    "rocas_principales": ["Arenisca sulfatada rica en hierro", "Brecha de impacto con esférulas de hematita ('blueberries')"],
+    "cobertura_pct": 99.8,
+    "unidad_geologica_usgs": "Burns Formation (Late Noachian / Early Hesperian)"
+  },
+  {
+    "celda_id": "M_S10_W070",
+    "region_referencia": "Valles Marineris (Candor & Melas Chasma)",
+    "limites": {"lat_min": -20, "lat_max": 0, "lon_min": -80, "lon_max": -60},
+    "categorias_area_pct": {"sedimentario": 40.0, "evaporitas": 35.0, "volcanico": 25.0},
+    "minerales_omega_detectados": ["Sulfatos hidratados (kieserita, polihidratados)", "Filosilicatos", "Óxidos férricos"],
+    "rocas_principales": ["Depósitos estratificados interiores (ILD)", "Muros de basalto fisural"],
+    "cobertura_pct": 97.5,
+    "unidad_geologica_usgs": "Hesperian Interior Layered Deposits (Hvid)"
+  },
+  {
+    "celda_id": "M_N18_W133",
+    "region_referencia": "Tharsis Montes / Olympus Mons",
+    "limites": {"lat_min": 10, "lat_max": 30, "lon_min": -140, "lon_max": -120},
+    "categorias_area_pct": {"volcanico": 92.0, "sedimentario": 8.0},
+    "minerales_omega_detectados": ["Piroxeno alto en Ca", "Piroxeno bajo en Ca", "Olivino", "Magnetita"],
+    "rocas_principales": ["Flujos de basalto en manto", "Escoria y tefra volcánica basáltica"],
+    "cobertura_pct": 100.0,
+    "unidad_geologica_usgs": "Amazonian Volcanic Shield Edifice (At4)"
+  },
+  {
+    "celda_id": "M_S42_E070",
+    "region_referencia": "Cuenca de Impacto Hellas Planitia",
+    "limites": {"lat_min": -50, "lat_max": -30, "lon_min": 60, "lon_max": 80},
+    "categorias_area_pct": {"sedimentario": 48.0, "volcanico": 32.0, "evaporitas": 20.0},
+    "minerales_omega_detectados": ["Esmectitas Fe/Mg (nontronita)", "Sulfatos de magnesio", "Polvo óxido férrico"],
+    "rocas_principales": ["Brechas polimícticas de megacráter", "Depósitos fluviolacustres antiguos"],
+    "cobertura_pct": 96.2,
+    "unidad_geologica_usgs": "Early Noachian Basin Floor (eNb)"
+  }
+]

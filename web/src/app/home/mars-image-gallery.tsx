@@ -74,7 +74,7 @@ export function MarsImageGallery({ point }: { point: MarsCoordinates }) {
   if (!gallery && !error) return null;
 
   return (
-    <aside aria-labelledby="mars-gallery-title" className="min-w-0 rounded-3xl sm:col-start-1 sm:row-start-1">
+    <aside aria-labelledby="mars-gallery-title" className="min-w-0 rounded-3xl max-sm:order-last sm:col-start-1 sm:row-start-1 lg:col-start-1">
       <Card className="gap-3 rounded-3xl border border-[#ffab57]/25 bg-linear-to-br from-[#302016]/95 to-[#110c0a]/95 p-4 text-white shadow-2xl backdrop-blur-md">
         <h2 id="mars-gallery-title" className="flex items-center gap-2 text-base font-medium text-white">
           <Images aria-hidden="true" className="size-4 shrink-0 text-[#ffab57]" />

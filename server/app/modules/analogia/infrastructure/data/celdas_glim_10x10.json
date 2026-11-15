@@ -1,0 +1,72 @@
+{
+  "T_S30_W070": {
+    "nombre_region": "Desierto de Atacama / Puna Andina",
+    "limites": { "lat_min": -30, "lat_max": -20, "lon_min": -70, "lon_max": -60 },
+    "categorias_area_pct": { "volcanico": 62.5, "sedimentario": 25.0, "evaporitas": 12.5 },
+    "litologias_dominantes": ["Basalto", "Andesita", "Yeso", "Halita"],
+    "cobertura_pct": 98.4
+  },
+  "T_S20_W070": {
+    "nombre_region": "Altiplano Andino / Salar de Uyuni",
+    "limites": { "lat_min": -20, "lat_max": -10, "lon_min": -70, "lon_max": -60 },
+    "categorias_area_pct": { "volcanico": 45.0, "sedimentario": 20.0, "evaporitas": 35.0 },
+    "litologias_dominantes": ["Halita", "Ulexita", "Toba volcánica", "Dacita"],
+    "cobertura_pct": 99.1
+  },
+  "T_S80_E160": {
+    "nombre_region": "Valles Secos de McMurdo (Antártida)",
+    "limites": { "lat_min": -80, "lat_max": -70, "lon_min": 160, "lon_max": 170 },
+    "categorias_area_pct": { "sedimentario": 45.0, "plutonico": 35.0, "metamorfico": 20.0 },
+    "litologias_dominantes": ["Arenisca de cuarzo", "Dolerita de Ferrar", "Granito"],
+    "cobertura_pct": 96.5
+  },
+  "T_N20_E010": {
+    "nombre_region": "Macizo de Tibesti / Tarso Toussidé (Chad)",
+    "limites": { "lat_min": 20, "lat_max": 30, "lon_min": 10, "lon_max": 20 },
+    "categorias_area_pct": { "volcanico": 75.0, "sedimentario": 25.0 },
+    "litologias_dominantes": ["Basalto alcalino", "Riolita", "Areniscas saharianas"],
+    "cobertura_pct": 97.2
+  },
+  "T_N20_W020": {
+    "nombre_region": "Parque Timanfaya / Lanzarote (Canarias)",
+    "limites": { "lat_min": 20, "lat_max": 30, "lon_min": -20, "lon_max": -10 },
+    "categorias_area_pct": { "volcanico": 95.0, "sedimentario": 5.0 },
+    "litologias_dominantes": ["Basalto olivínico", "Piroclastos", "Lapilli"],
+    "cobertura_pct": 100.0
+  },
+  "T_N40_W090": {
+    "nombre_region": "Upper Midwest / Cuenca Sedimentaria (EE.UU.)",
+    "limites": { "lat_min": 40, "lat_max": 50, "lon_min": -90, "lon_max": -80 },
+    "categorias_area_pct": { "sedimentario": 80.0, "plutonico": 15.0, "metamorfico": 5.0 },
+    "litologias_dominantes": ["Arenisca", "Dolomita", "Caliza", "Lutita"],
+    "cobertura_pct": 99.5
+  },
+  "T_N30_W120": {
+    "nombre_region": "Valle de la Muerte / Desierto de Mojave",
+    "limites": { "lat_min": 30, "lat_max": 40, "lon_min": -120, "lon_max": -110 },
+    "categorias_area_pct": { "sedimentario": 48.0, "volcanico": 35.0, "evaporitas": 17.0 },
+    "litologias_dominantes": ["Bórax", "Yeso", "Basalto", "Fangolita"],
+    "cobertura_pct": 98.8
+  },
+  "T_N60_W020": {
+    "nombre_region": "Campos de lava de Islandia",
+    "limites": { "lat_min": 60, "lat_max": 70, "lon_min": -20, "lon_max": -10 },
+    "categorias_area_pct": { "volcanico": 98.0, "sedimentario": 2.0 },
+    "litologias_dominantes": ["Basalto toleítico", "Hialoclastita", "Obsidiana"],
+    "cobertura_pct": 100.0
+  },
+  "T_N10_W160": {
+    "nombre_region": "Volcanes de Hawái (Kilauea / Mauna Loa)",
+    "limites": { "lat_min": 10, "lat_max": 20, "lon_min": -160, "lon_max": -150 },
+    "categorias_area_pct": { "volcanico": 100.0 },
+    "litologias_dominantes": ["Basalto almohadillado", "Picrita", "Olivino"],
+    "cobertura_pct": 100.0
+  },
+  "T_S20_E130": {
+    "nombre_region": "Desierto Rojo / Pilbara (Australia)",
+    "limites": { "lat_min": -30, "lat_max": -20, "lon_min": 130, "lon_max": 140 },
+    "categorias_area_pct": { "sedimentario": 65.0, "metamorfico": 25.0, "evaporitas": 10.0 },
+    "litologias_dominantes": ["Formaciones de hierro bandeado (BIF)", "Cuarcita", "Laterita"],
+    "cobertura_pct": 98.0
+  }
+}

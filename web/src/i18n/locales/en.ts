@@ -118,7 +118,7 @@ export const en = {
       selectView: "Image scale",
       views: { regional: "Regional view", detail: "Orbital detail" },
       error: "This image could not be loaded.",
-      source: "MODIS Terra true color · NASA GIBS (recent daily pass)",
+      source: "NASA Earth Observatory · Seamless orbital satellite mosaic",
     },
     facts: {
       distanceToSun: "Distance to Sun",

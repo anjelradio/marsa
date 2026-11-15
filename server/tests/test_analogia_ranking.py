@@ -55,28 +55,6 @@ def test_calcular_similitud_sin_datos_comunes_es_cero() -> None:
     assert r.cobertura == 0.0
 
 
-@pytest.fixture()
-def client():
-    engine = create_engine(
-        "sqlite://",
-        connect_args={"check_same_thread": False},
-        poolclass=StaticPool,
-    )
-    SQLModel.metadata.create_all(engine)
-    with Session(engine) as session:
-        seed_initial_data(session)
-
-    def override_get_session():
-        with Session(engine) as session:
-            yield session
-
-    app.dependency_overrides[get_session] = override_get_session
-    try:
-        yield TestClient(app)
-    finally:
-        app.dependency_overrides.clear()
-
-
 @pytest.mark.parametrize("destino", ["marte", "luna"])
 def test_ranking_ordenado_y_con_explicacion(client: TestClient, destino: str) -> None:
     response = client.get("/api/analogia/ranking", params={"destino": destino})
