@@ -664,3 +664,11 @@ export function parseNaturalQueryClient(query: string): {
     summary: `Objetivo: ${isMoon ? "Shackleton Rim (Luna)" : "Cráter Jezero (Marte)"} · Perfil: ${MISSION_PROFILES[missionProfile].title}`,
   };
 }
+
+export const FALLBACK_CATALOG_REGIONS = REGIONS_CATALOG;
+export const FALLBACK_DEFAULT_RANKINGS = evaluateAndRankLocal(
+  REGIONS_CATALOG[0],
+  REGIONS_CATALOG.filter((r) => r.body === "earth"),
+  MISSION_PROFILES.rover_mobility.defaultWeights,
+);
+

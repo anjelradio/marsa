@@ -28,11 +28,15 @@
 - [x] Created `web/src/features/explorer/domain/explorer-types.ts` and `explorer-catalog.ts` with embedded offline-first catalog fallback.
 - [x] Created `web/src/features/explorer/infrastructure/explorer-client.ts` connecting to FastAPI (`/api/compare`, `/api/earth-aoi/analyze`) with seamless offline fallback.
 - [x] Built `InteractiveAnalogMap` (`web/src/features/explorer/presentation/components/interactive-analog-map.tsx`) with WGS84 equirectangular projection, AOI footprints, ranking badges, and click-to-query coordinate inspection.
-- [x] Built `PlanetaryAnalogExplorerDashboard` (`web/src/features/explorer/presentation/components/planetary-analog-explorer-dashboard.tsx`) integrating:
-  - **Flow A**: Mars (`mars-jezero` + 3D `MarsPlanet` globe + MCD v6.2 telemetry) & Moon (`moon-shackleton-rim`), mission profile selector (`rover_mobility`, `surface_geology`, `environmental_testing`), interactive weight sliders, ranked candidate cards, side-by-side accessible comparison table, and audited scientific ficha.
-  - **Flow B**: Coordinate & AOI coverage verifier (honestly reports `out_of_coverage` for points outside validated AOIs such as the Pacific Ocean).
-  - **Flow C**: Natural language semantic filter parser with auditable filter summary.
-- [x] Linked `/` (Explorer DSS) and `/home` (Immersive 3D Mars view).
+- [x] Built `PlanetaryAnalogExplorerDashboard` (`web/src/features/explorer/presentation/components/planetary-analog-explorer-dashboard.tsx`) integrating Flows A, B, and C.
+- [x] Merged `origin/main` (`7544bcd`) into `dev`, adopting the cosmic 3D landing page (`web/src/app/page.tsx`) with cross-fading `EarthScene` and `MarsPlanet`.
+- [x] Built interactive 3D Moon Globe (`<MoonPlanet />` in `web/src/features/moon/`) and 3D Earth Globe (`<EarthPlanet />` in `web/src/features/earth/`) with drag-to-rotate interaction, crater/regolith shaders, and atmospheric glow.
+- [x] Built `MoonMissionPanels` (Keplerian Earth-Moon orbit, Artemis III Shackleton Rim LOLA Site04 card, 3 physical gauges) and `EarthMissionPanels` (1 AU heliocentric orbit, NASA Terrestrial Analogs card, 3 gauges).
+- [x] Built `SideBySideComparison` (`web/src/features/explorer/presentation/components/side-by-side-comparison.tsx`) offering:
+  - **Ficha Visual (Default)**: Site photography, plain-text scientific rationale, telemetry comparisons (MCD v6.2 / LOLA vs ERA5), similarity score (raw_score) and coverage, fidelity breakdown.
+  - **Vista 3D Dual**: Dual synchronized interactive 3D globes side-by-side with coordinate focal markers.
+- [x] Integrated Celestial Body switcher (`Marte` | `Luna` | `Tierra`) and View Mode switcher (`Globo 3D` | `Mapa 2D`) in `web/src/app/home/page.tsx`.
+- [x] Created dedicated route `/explorer` for the full-screen DSS and added direct cross-navigation from Landing (`/`), Atlas (`/home`), and POI cards.
 
 ---
 

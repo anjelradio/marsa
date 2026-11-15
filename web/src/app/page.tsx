@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Globe2, Info, Moon, Orbit, Rocket, Sun } from "lucide-react";
+import { ArrowRight, Globe2, Info, Moon, Orbit, Rocket, Sparkles, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { LandingScenes } from "@/features/landing/presentation/components/landing-scenes";
@@ -56,6 +56,12 @@ export default function LandingPage() {
             <Button asChild variant="ghost" className={cn(styles.glassButton, styles.exploreButton, "h-10 rounded-full px-5 sm:px-6")}>
               <a href="#marte"><Rocket aria-hidden="true" /> Explorar Marte <ArrowRight aria-hidden="true" /></a>
             </Button>
+            <Button asChild variant="ghost" className={cn(styles.glassButton, "h-10 rounded-full px-5 sm:px-6 border-[#ffab57]/40 bg-[#ffab57]/10 text-white hover:bg-[#ffab57]/20")}>
+              <Link href="/home"><Orbit aria-hidden="true" /> Atlas 3D (Marte · Luna · Tierra) <ArrowRight aria-hidden="true" /></Link>
+            </Button>
+            <Button asChild variant="ghost" className={cn(styles.glassButton, "h-10 rounded-full px-5 sm:px-6 border-[#8de3ff]/40 bg-[#8de3ff]/10 text-white hover:bg-[#8de3ff]/20")}>
+              <Link href="/explorer"><Sparkles aria-hidden="true" /> DSS Análogos Terrestres <ArrowRight aria-hidden="true" /></Link>
+            </Button>
             <div className="flex gap-2 sm:gap-3">
               <Button asChild variant="ghost" className={iconLink}>
                 <a href="#tierra" aria-label="Sobre la Tierra"><Globe2 aria-hidden="true" /></a>
@@ -97,9 +103,14 @@ function MarsLandingContent() {
       <p className="mt-5 max-w-md text-sm leading-relaxed text-zinc-300 sm:text-base">
         Acércate al planeta rojo. Recorre su relieve, descubre cómo cambia su distancia al Sol y ubica el cráter Gale, donde aterrizó Curiosity.
       </p>
-      <Button asChild variant="ghost" className={cn(styles.glassButton, "mt-8 h-12 rounded-full px-6")}>
-        <Link href="/home">Abrir atlas de Marte <ArrowRight aria-hidden="true" /></Link>
-      </Button>
+      <div className="mt-8 flex flex-wrap items-center gap-3">
+        <Button asChild variant="ghost" className={cn(styles.glassButton, "h-12 rounded-full px-6")}>
+          <Link href="/home">Abrir Atlas 3D <ArrowRight aria-hidden="true" /></Link>
+        </Button>
+        <Button asChild variant="ghost" className={cn(styles.glassButton, "h-12 rounded-full px-6 border-[#ffab57]/50 bg-[#ffab57]/15 text-white hover:bg-[#ffab57]/25")}>
+          <Link href="/explorer">Explorar Análogos Terrestres <ArrowRight aria-hidden="true" /></Link>
+        </Button>
+      </div>
     </div>
   );
 }

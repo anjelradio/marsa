@@ -212,7 +212,14 @@ export function PlanetaryAnalogExplorerDashboard() {
               className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 font-medium text-white transition hover:bg-white/10"
             >
               <Sparkles className="size-3.5 text-amber-400" />
-              Vista Inmersiva Marte 3D
+              Atlas 3D (Marte · Luna · Tierra)
+            </Link>
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 font-medium text-white transition hover:bg-white/10"
+            >
+              <Globe2 className="size-3.5 text-cyan-400" />
+              Landing
             </Link>
           </div>
         </div>
