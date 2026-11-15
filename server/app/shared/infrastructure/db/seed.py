@@ -1,6 +1,9 @@
 """Semillas de datos iniciales para cuerpos celestes, características y datasets."""
 
+import json
 import logging
+from pathlib import Path
+
 from sqlmodel import Session, select
 
 from app.modules.caracteristica.infrastructure.persistence.models.caracteristica_model import (
@@ -84,6 +87,24 @@ def seed_initial_data(session: Session) -> None:
             "url": "https://pds-geosciences.wustl.edu/mgs/",
             "resolucion": 463.0,
         },
+        {
+            "nombre": "NASA POWER (MERRA-2)",
+            "agencia": "NASA",
+            "url": "https://power.larc.nasa.gov/docs/services/api/",
+            "resolucion": 55000.0,
+        },
+        {
+            "nombre": "OpenTopoData SRTM 30 m",
+            "agencia": "NASA / USGS",
+            "url": "https://www.opentopodata.org/datasets/srtm/",
+            "resolucion": 30.0,
+        },
+        {
+            "nombre": "LMD Mars Climate Database",
+            "agencia": "LMD / CNES / ESA",
+            "url": "https://www-mars.lmd.jussieu.fr/mars/info_web/index.html",
+            "resolucion": 330000.0,
+        },
     ]
     for d in datasets_extra:
         if not session.exec(
@@ -158,12 +179,25 @@ _DATASET_POR_CUERPO = {
 }
 
 
+_REALES = Path(__file__).with_name("real_measurements.json")
+
+
+def _cargar_mediciones_reales() -> dict[str, dict[str, dict]]:
+    """Lee las mediciones descargadas por scripts/fetch_real_measurements.py."""
+    if not _REALES.exists():
+        return {}
+    return json.loads(_REALES.read_text(encoding="utf-8")).get("sitios", {})
+
+
 def _seed_sitios_y_mediciones(session: Session) -> None:
     """Crea sitios, mediciones y analogías persistidas si no existen."""
     from app.modules.analogia.application.queries.ranking_query import (
         mejor_coincidencia,
     )
-    from app.modules.analogia.domain.services.similarity import CaracteristicaSpec
+    from app.modules.analogia.domain.services.similarity import (
+        METODO,
+        CaracteristicaSpec,
+    )
     from app.modules.analogia.infrastructure.persistence.models.analogia_model import (
         AnalogiaModel,
     )
@@ -174,6 +208,7 @@ def _seed_sitios_y_mediciones(session: Session) -> None:
         SitioModel,
     )
 
+    reales = _cargar_mediciones_reales()
     cuerpos = {c.nombre: c.id for c in session.exec(select(CuerpoCelesteModel)).all()}
     datasets = {d.nombre: d.id for d in session.exec(select(DatasetModel)).all()}
     cars = {c.nombre: c for c in session.exec(select(CaracteristicaModel)).all()}
@@ -196,26 +231,35 @@ def _seed_sitios_y_mediciones(session: Session) -> None:
             session.flush()
         for car_nombre, valor in zip(orden, valores):
             car = cars[car_nombre]
-            dataset_id = datasets[_DATASET_POR_CUERPO[cuerpo]]
-            if session.exec(
+            dataset_nombre = _DATASET_POR_CUERPO[cuerpo]
+            real = reales.get(nombre, {}).get(car_nombre)
+            if real is not None:  # dato descargado de la fuente real
+                valor = real["valor"]
+                dataset_nombre = real["dataset"]
+            dataset_id = datasets[dataset_nombre]
+            minimo = _MINIMO.get(car_nombre, 0.0)
+            normalizado = max(0.0, min(1.0, (valor - minimo) / car.rango))
+            existente = session.exec(
                 select(MedicionModel).where(
                     MedicionModel.sitio_id == sitio.id,
                     MedicionModel.caracteristica_id == car.id,
-                    MedicionModel.dataset_id == dataset_id,
                 )
-            ).first():
-                continue
-            minimo = _MINIMO.get(car_nombre, 0.0)
-            normalizado = max(0.0, min(1.0, (valor - minimo) / car.rango))
-            session.add(
-                MedicionModel(
-                    sitio_id=sitio.id,
-                    caracteristica_id=car.id,
-                    dataset_id=dataset_id,
-                    valor=float(valor),
-                    valor_normalizado=normalizado,
+            ).first()
+            if existente:
+                existente.valor = float(valor)
+                existente.dataset_id = dataset_id
+                existente.valor_normalizado = normalizado
+                session.add(existente)
+            else:
+                session.add(
+                    MedicionModel(
+                        sitio_id=sitio.id,
+                        caracteristica_id=car.id,
+                        dataset_id=dataset_id,
+                        valor=float(valor),
+                        valor_normalizado=normalizado,
+                    )
                 )
-            )
     session.commit()
 
     # Analogías persistidas: cada sitio terrestre contra su mejor destino por cuerpo.
@@ -228,6 +272,12 @@ def _seed_sitios_y_mediciones(session: Session) -> None:
         valores_por_sitio.setdefault(m.sitio_id, {})[m.caracteristica_id] = m.valor
     sitios = session.exec(select(SitioModel)).all()
     tierra = [s for s in sitios if s.cuerpo_id == cuerpos["Tierra"]]
+    # Las analogías sembradas se recalculan siempre con los datos vigentes.
+    for vieja in session.exec(
+        select(AnalogiaModel).where(AnalogiaModel.metodo == METODO)
+    ).all():
+        session.delete(vieja)
+    session.flush()
     for destino in ("Marte", "Luna"):
         destinos = [s for s in sitios if s.cuerpo_id == cuerpos[destino]]
         for t in tierra:

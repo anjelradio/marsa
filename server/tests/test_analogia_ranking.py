@@ -105,6 +105,39 @@ def test_ranking_rechaza_destino_invalido(client: TestClient) -> None:
     assert client.get("/api/analogia/ranking", params={"destino": "venus"}).status_code == 422
 
 
+def test_seed_usa_mediciones_reales_con_su_dataset() -> None:
+    from sqlmodel import select
+
+    from app.modules.dataset.infrastructure.persistence.models.dataset_model import (
+        DatasetModel,
+    )
+    from app.modules.medicion.infrastructure.persistence.models.medicion_model import (
+        MedicionModel,
+    )
+    from app.modules.sitio.infrastructure.persistence.models.sitio_model import (
+        SitioModel,
+    )
+
+    engine = create_engine(
+        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
+    )
+    SQLModel.metadata.create_all(engine)
+    with Session(engine) as session:
+        seed_initial_data(session)
+        seed_initial_data(session)  # segunda pasada: no duplica ni rompe
+        atacama = session.exec(
+            select(SitioModel).where(SitioModel.nombre.like("Desierto de Atacama%"))
+        ).one()
+        filas = session.exec(
+            select(MedicionModel, DatasetModel)
+            .join(DatasetModel, MedicionModel.dataset_id == DatasetModel.id)
+            .where(MedicionModel.sitio_id == atacama.id)
+        ).all()
+        assert len(filas) == len(CARACTERISTICAS)  # una medición por característica
+        datasets = {d.nombre for _, d in filas}
+        assert {"NASA POWER (MERRA-2)", "OpenTopoData SRTM 30 m"} <= datasets
+
+
 def test_seed_es_idempotente_y_persiste_analogias(client: TestClient) -> None:
     primera = client.get("/api/analogia/").json()
     assert len(primera) == 10  # 5 sitios terrestres x (Marte, Luna)
