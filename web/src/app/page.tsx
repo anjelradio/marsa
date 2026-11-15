@@ -33,19 +33,6 @@ export default function LandingPage() {
         <div className={cn(stars.comets, styles.earthComets, "absolute inset-0")} />
       </div>
 
-      {/* Top right utility navigation */}
-      <div className="absolute top-4 right-4 z-40 flex items-center gap-2">
-        <Button
-          asChild
-          variant="ghost"
-          size="sm"
-          className="text-white/80 hover:text-white hover:bg-white/10 rounded-full text-xs"
-        >
-          <Link href="/auth/login">
-            Iniciar sesión
-          </Link>
-        </Button>
-      </div>
       <LandingScenes
         earthBackdropClass={styles.scene}
         earthFallback={<div className={styles.fallback} />}
