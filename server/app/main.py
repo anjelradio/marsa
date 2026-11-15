@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
 from app.core.config import settings
-from app.core.database import engine, init_db
+from app.core.database import engine, run_migrations
 from app.core.dependencies import get_event_bus
 from app.core.errors.handlers import setup_exception_handlers
 from app.core.events.subscriptions import configure_event_subscriptions
@@ -51,13 +51,13 @@ async def lifespan(app: FastAPI):
     """
     Ciclo de vida de la aplicación.
 
-    - DEV  + SQLite   → crea tablas automáticamente (rápido para prototipar).
+    - DEV  + SQLite   → aplica las migraciones (`alembic upgrade head`) al arrancar.
     - DEV  + Postgres → se asume que Alembic ya corrió (`alembic upgrade head`).
-    - PROD            → Alembic siempre. init_db() nunca se llama.
+    - PROD            → Alembic siempre. run_migrations() nunca se llama.
     """
     if settings.ENVIRONMENT == "DEV" and settings.is_sqlite:
-        logger.info("DEV + SQLite — inicializando tablas con SQLModel...")
-        init_db()
+        logger.info("DEV + SQLite — aplicando migraciones de Alembic...")
+        run_migrations()
         # Sembrar datos iniciales (Tierra, Marte, datasets y características)
         from sqlmodel import Session
         from app.shared.infrastructure.db.seed import seed_initial_data

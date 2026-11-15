@@ -75,3 +75,24 @@ Define la ventana de tiempo en formato ISO 8601 UTC (`YYYY-MM-DDTHH:MM:SSZ`):
 - **Marte (USGS STAC):**
   - Misiones históricas y en curso (año de adquisición terrestre o año marciano $L_s$ - longitud solar para estaciones marcianas).
   - Día vs Noche: Permite contrastar la inercia térmica diurna y nocturna (`themis_day` vs `themis_night`).
+
+---
+
+## 🗄️ Migraciones de la base de datos (Alembic)
+
+El esquema se gestiona con Alembic: las migraciones están en `alembic/versions/` y son la única fuente de verdad.
+La base de desarrollo (`dev.db`) no se versiona en Git: se crea sola al arrancar el backend.
+
+| Qué quieres hacer | Comando (desde `server/`) |
+| :--- | :--- |
+| Aplicar todas las migraciones | `alembic upgrade head` |
+| Crear una migración tras cambiar un modelo | `alembic revision --autogenerate -m "descripcion"` |
+| Ver en qué versión está la base | `alembic current` |
+| Deshacer la última migración | `alembic downgrade -1` |
+| Generar el SQL para PostgreSQL sin conectarse | `alembic upgrade head --sql` |
+
+- En DEV con SQLite, el backend ejecuta `alembic upgrade head` al arrancar. Una base creada antes con `create_all`
+  se marca automáticamente en la revisión base y luego se actualiza; sus datos se conservan.
+- Revisa siempre la migración generada: el autogenerado puede dejar imports sin resolver o no detectar cambios de nombre.
+- `tests/test_migrations.py` falla si un modelo cambia sin su migración.
+
