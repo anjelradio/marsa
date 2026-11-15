@@ -7,8 +7,25 @@ import { createMarsSurfaceOverlay } from "./mars-surface-overlay";
 const radius = 0.96;
 
 // Superficie y atmósfera adaptadas de Aditya-567/3D-Planets (Apache-2.0).
-export function MarsPlanet() {
+export function MarsPlanet({
+  className,
+  isHovered = false,
+  isExploring = false,
+  showSurfaceOverlay = true,
+  rotationSpeed = 0.012,
+}: {
+  className?: string;
+  isHovered?: boolean;
+  isExploring?: boolean;
+  showSurfaceOverlay?: boolean;
+  rotationSpeed?: number;
+}) {
   const mount = useRef<HTMLDivElement>(null);
+  const isExploringRef = useRef(isExploring);
+
+  useEffect(() => {
+    isExploringRef.current = isExploring;
+  }, [isExploring]);
 
   useEffect(() => {
     const container = mount.current;
@@ -17,18 +34,38 @@ export function MarsPlanet() {
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
     camera.position.z = 2.8;
+
     const canvas = document.createElement("canvas");
-    const context = canvas.getContext("webgl2", { alpha: true, antialias: true });
+    const context = canvas.getContext("webgl2", { alpha: true, antialias: true, powerPreference: "high-performance" });
     if (!context) return;
 
-    const renderer = new THREE.WebGLRenderer({ canvas, context, alpha: true, antialias: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      context,
+      alpha: true,
+      antialias: true,
+      powerPreference: "high-performance",
+    });
+    // A 1.75 DPR cap keeps the globe crisp without doubling the fragment cost
+    // on high-density displays.
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+    renderer.domElement.style.width = "100%";
+    renderer.domElement.style.height = "100%";
+    renderer.domElement.style.touchAction = "none";
     container.appendChild(renderer.domElement);
 
     const loader = new THREE.TextureLoader();
-    const texture = loader.load("/mars/marsmap.jpg");
+    let disposed = false;
+    let ready = false;
+    const texture = loader.load("/mars/marsmap.jpg", () => {
+      if (disposed) return;
+      ready = true;
+      syncMotion();
+    });
     texture.colorSpace = THREE.SRGBColorSpace;
-    const bump = loader.load("/mars/marsbump.jpg");
+    const bump = loader.load("/mars/marsbump.jpg", () => {
+      if (!disposed && ready && !document.hidden) renderer.render(scene, camera);
+    });
     const geometry = new THREE.SphereGeometry(radius, 80, 64);
     const material = new THREE.MeshPhongMaterial({
       map: texture,
@@ -38,7 +75,7 @@ export function MarsPlanet() {
       shininess: 12,
     });
 
-    // Añade luz cálida dispersa en el lado diurno y un borde fino en la silueta.
+    // Warm daylight scattering on sunlit side and limb glow
     material.onBeforeCompile = (shader) => {
       shader.fragmentShader = shader.fragmentShader.replace(
         "#include <opaque_fragment>",
@@ -64,53 +101,141 @@ export function MarsPlanet() {
     planet.rotation.set(-0.08, -2.12, 0.22, "ZYX");
     scene.add(planet);
 
-    const surfaceOverlay = createMarsSurfaceOverlay(radius);
-    scene.add(surfaceOverlay.group);
+    const surfaceOverlay = showSurfaceOverlay ? createMarsSurfaceOverlay(radius) : null;
+    if (surfaceOverlay) scene.add(surfaceOverlay.group);
 
-    scene.add(new THREE.AmbientLight(0xff411b, 0.08));
-    const light = new THREE.DirectionalLight(0xffefe7, 10);
+    scene.add(new THREE.AmbientLight(0xff411b, 0.09));
+    const light = new THREE.DirectionalLight(0xffefe7, 10.5);
     light.position.set(6, 2.2, 3.6);
     scene.add(light);
 
+    // Optimized Drag Interaction: Only listen to pointermove while dragging
+    let isDragging = false;
+    let prevX = 0;
+    let prevY = 0;
+
+    const renderOnce = () => renderer.render(scene, camera);
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!isDragging) return;
+      const dx = e.clientX - prevX;
+      const dy = e.clientY - prevY;
+      prevX = e.clientX;
+      prevY = e.clientY;
+
+      planet.rotation.y += dx * 0.006;
+      planet.rotation.x = Math.max(-0.65, Math.min(0.65, planet.rotation.x + dy * 0.004));
+
+      if (reducedMotion.matches) renderOnce();
+    };
+
+    const onPointerUp = () => {
+      if (!isDragging) return;
+      isDragging = false;
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerUp);
+    };
+
+    const onPointerDown = (e: PointerEvent) => {
+      if (!isExploringRef.current) return;
+      isDragging = true;
+      prevX = e.clientX;
+      prevY = e.clientY;
+      window.addEventListener("pointermove", onPointerMove, { passive: true });
+      window.addEventListener("pointerup", onPointerUp, { passive: true });
+      window.addEventListener("pointercancel", onPointerUp, { passive: true });
+    };
+
+    const domElement = renderer.domElement;
+    domElement.addEventListener("pointerdown", onPointerDown, { passive: true });
+
+    let lastWidth = 0;
+    let lastHeight = 0;
     const resize = () => {
       const width = container.clientWidth;
       const height = container.clientHeight;
-      if (!width || !height) return;
+      if (!width || !height || (width === lastWidth && height === lastHeight)) return;
+      lastWidth = width;
+      lastHeight = height;
       camera.left = -width / height;
       camera.right = width / height;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height);
+      if (ready && !document.hidden) renderer.render(scene, camera);
     };
+
     const observer = new ResizeObserver(resize);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    function syncMotion() {
+      renderer.setAnimationLoop(null);
+      if (!ready || document.hidden) return;
+
+      renderer.render(scene, camera);
+      canvas.dataset.rendered = "";
+      if (reducedMotion.matches) return;
+
+      let previousTime: number | undefined;
+      renderer.setAnimationLoop((time) => {
+        const delta = Math.min(0.05, (time - (previousTime ?? time)) / 1000);
+        previousTime = time;
+        planet.rotation.y += delta * rotationSpeed;
+        renderer.render(scene, camera);
+      });
+    }
+
     observer.observe(container);
     resize();
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let previousTime = performance.now();
-    renderer.setAnimationLoop((time) => {
-      const delta = Math.min(0.05, (time - previousTime) / 1000);
-      previousTime = time;
-      if (!reducedMotion.matches) planet.rotation.y += delta * 0.012;
-      renderer.render(scene, camera);
-    });
+    reducedMotion.addEventListener("change", syncMotion);
+    document.addEventListener("visibilitychange", syncMotion);
 
     return () => {
+      disposed = true;
+      onPointerUp();
+      domElement.removeEventListener("pointerdown", onPointerDown);
       renderer.setAnimationLoop(null);
       observer.disconnect();
+      reducedMotion.removeEventListener("change", syncMotion);
+      document.removeEventListener("visibilitychange", syncMotion);
       geometry.dispose();
       material.dispose();
       texture.dispose();
       bump.dispose();
-      surfaceOverlay.dispose();
+      surfaceOverlay?.dispose();
       renderer.dispose();
+      renderer.forceContextLoss();
       renderer.domElement.remove();
     };
-  }, []);
+  }, [showSurfaceOverlay, rotationSpeed]);
 
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-      <div className="absolute -inset-[22%] bg-[radial-gradient(ellipse_25%_16%_at_52%_18%,#ffaf7b85,transparent),radial-gradient(ellipse_18%_28%_at_81%_48%,#ffa77585,transparent),radial-gradient(ellipse_21%_19%_at_68%_76%,#ff854b64,transparent)]" />
-      <div className="absolute inset-[2.5%] rounded-full bg-[#251006] shadow-[4px_-3px_14px_#ffba78b0,13px_-7px_50px_#ff763a86] [background-image:radial-gradient(ellipse_at_73%_38%,#ff975f,#180603_75%)]" />
-      <div ref={mount} className="absolute inset-0" />
+    <div
+      aria-hidden="true"
+      className={className ?? "absolute inset-0"}
+    >
+      {/* Outer atmospheric coronal diffusion */}
+      <div
+        className={`absolute -inset-[22%] pointer-events-none transition-[transform,opacity] duration-700 ease-out motion-reduce:transition-none ${
+          isHovered
+            ? "scale-105 opacity-100 bg-[radial-gradient(ellipse_28%_18%_at_52%_18%,#ffaf7ba0,transparent),radial-gradient(ellipse_20%_30%_at_81%_48%,#ffa775a0,transparent),radial-gradient(ellipse_23%_21%_at_68%_76%,#ff854b80,transparent)]"
+            : "scale-100 opacity-80 bg-[radial-gradient(ellipse_25%_16%_at_52%_18%,#ffaf7b85,transparent),radial-gradient(ellipse_18%_28%_at_81%_48%,#ffa77585,transparent),radial-gradient(ellipse_21%_19%_at_68%_76%,#ff854b64,transparent)]"
+        }`}
+      />
+      {/* Soft limb rim glow */}
+      <div
+        className={`absolute inset-[2.5%] pointer-events-none rounded-full bg-[#251006] transition-[box-shadow] duration-700 ease-out motion-reduce:transition-none [background-image:radial-gradient(ellipse_at_73%_38%,#ff975f,#180603_75%)] ${
+          isHovered
+            ? "shadow-[4px_-3px_24px_#ffba78df,13px_-7px_65px_#ff763aab]"
+            : "shadow-[4px_-3px_14px_#ffba78b0,13px_-7px_50px_#ff763a86]"
+        }`}
+      />
+      <div
+        ref={mount}
+        className={`absolute inset-0 transition-transform duration-700 ease-out motion-reduce:transition-none ${
+          isHovered && !isExploring ? "scale-[1.018]" : "scale-100"
+        }`}
+      />
     </div>
   );
 }

@@ -80,13 +80,15 @@ export function AppDialog({
 export type AppDialogFormActionsProps = {
   submitText?: string;
   submitPendingText?: string;
+  cancelText?: string;
   onCancel: () => void;
   className?: string;
 };
 
 export function AppDialogFormActions({
-  submitText = "Confirmar",
-  submitPendingText = "Confirmando...",
+  submitText = "Confirm",
+  submitPendingText = "Confirming...",
+  cancelText = "Cancel",
   onCancel,
   className,
 }: AppDialogFormActionsProps) {
@@ -108,7 +110,7 @@ export function AppDialogFormActions({
         className="mt-0 w-full sm:mt-0 sm:w-auto"
         onClick={onCancel}
       >
-        Cancelar
+        {cancelText}
       </Button>
     </div>
   );

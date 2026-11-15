@@ -7,15 +7,20 @@ import { FieldGroup } from "@/components/ui/field";
 import TextFormField from "@/features/shared/presentation/components/forms/text-form-field";
 import { appToast } from "@/features/shared/presentation/components/notifications/toast";
 import SubmitButton from "@/features/shared/presentation/components/custom-buttons/submit-button";
+import { useTranslation } from "@/i18n/context";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const formRef = useRef<HTMLFormElement>(null);
+  const { dict } = useTranslation();
 
   const handleSubmit = async () => {
-    appToast.error("Autenticación no disponible", "Aún no hay un proveedor de autenticación configurado.");
+    appToast.error(
+      dict.auth.login.notAvailableTitle,
+      dict.auth.login.notAvailableMsg
+    );
   };
 
   return (
@@ -25,16 +30,16 @@ export function LoginForm({
           <TextFormField
             id="email"
             name="email"
-            label="Email"
-            placeholder="tu@correo.com"
+            label={dict.auth.login.emailLabel}
+            placeholder={dict.auth.login.emailPlaceholder}
             type="email"
             autoComplete="email"
           />
           <TextFormField
             id="password"
             name="password"
-            label="Contraseña"
-            placeholder="*******"
+            label={dict.auth.login.passwordLabel}
+            placeholder={dict.auth.login.passwordPlaceholder}
             type="password"
             autoComplete="current-password"
           />
@@ -44,13 +49,13 @@ export function LoginForm({
               href="/auth/forgot-password"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              ¿Olvidaste tu contraseña?
+              {dict.auth.login.forgotPasswordLink}
             </Link>
           </div>
 
           <SubmitButton
-            text="Iniciar sesión"
-            pendingText="Iniciando sesión..."
+            text={dict.auth.login.submitButton}
+            pendingText={dict.auth.login.submittingButton}
           />
         </FieldGroup>
       </form>

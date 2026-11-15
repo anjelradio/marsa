@@ -1,3 +1,12 @@
+.nebula {
+  background:
+    radial-gradient(circle at 18% 74%, #35143f42 0, transparent 28%),
+    radial-gradient(circle at 78% 22%, #1235613d 0, transparent 32%),
+    radial-gradient(circle at 54% 54%, #6c281a24 0, transparent 34%);
+  opacity: 0.72;
+  transform: translate3d(0, 0, 0) scale(1.04);
+}
+
 .distantStars {
   background-image:
     radial-gradient(1px 1px at 8% 13%, #759dd988, transparent),
@@ -21,6 +30,7 @@
     131px 171px, 117px 197px, 191px 145px, 129px 153px,
     151px 133px, 161px 159px, 163px 139px, 109px 173px,
     131px 109px, 183px 163px, 127px 107px, 137px 167px;
+  transform: translate3d(0, 0, 0);
 }
 
 .nearStars {
@@ -31,18 +41,29 @@
     radial-gradient(3px 3px at 77% 84%, #a3cfff 2%, #315b9a 28%, transparent 95%),
     radial-gradient(3px 3px at 13% 23%, #729ce5 12%, #123e73 26%, transparent 90%);
   background-size: 457px 357px, 389px 299px, 413px 389px, 327px 231px, 327px 257px;
+  transform: translate3d(0, 0, 0);
+}
+
+.dashboardCard {
+  animation: card-arrival 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .nebula {
+    animation: nebula-breathe 18s ease-in-out infinite alternate;
+  }
+
   .distantStars {
     animation: drift 36s ease-in-out infinite alternate;
-    --star-offset: 13px -8px;
+    --star-offset-x: 13px;
+    --star-offset-y: -8px;
   }
 
   .nearStars {
     animation: drift 14s ease-in-out infinite alternate;
     animation-delay: -4s;
-    --star-offset: 24px -14px;
+    --star-offset-x: 24px;
+    --star-offset-y: -14px;
   }
 
   .comets::before,
@@ -72,13 +93,37 @@
 
 @keyframes drift {
   to {
-    translate: var(--star-offset);
+    transform: translate3d(var(--star-offset-x), var(--star-offset-y), 0) scale(1.015);
+  }
+}
+
+@keyframes nebula-breathe {
+  from {
+    opacity: 0.52;
+    transform: translate3d(-1%, 0, 0) scale(1.04);
+  }
+
+  to {
+    opacity: 0.82;
+    transform: translate3d(1%, -1%, 0) scale(1.08);
+  }
+}
+
+@keyframes card-arrival {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0) scale(0.975);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
 @keyframes comet-flight {
   0% {
-    transform: translate(0, 0) rotate(-31deg);
+    transform: translate3d(0, 0, 0) rotate(-31deg);
     opacity: 0;
   }
 
@@ -88,7 +133,13 @@
 
   10%,
   100% {
-    transform: translate(-140px, 84px) rotate(-31deg);
+    transform: translate3d(-140px, 84px, 0) rotate(-31deg);
     opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboardCard {
+    animation: none;
   }
 }

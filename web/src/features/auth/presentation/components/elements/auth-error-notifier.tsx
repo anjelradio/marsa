@@ -3,32 +3,27 @@
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { appToast } from "@/features/shared/presentation/components/notifications/toast";
-
-const SOCIAL_ERROR_MESSAGES: Record<string, string> = {
-  social:
-    "Esta cuenta fue creada con email y contraseña. Inicia sesión de esa manera o usa el mismo proveedor con el que te registraste.",
-};
+import { useTranslation } from "@/i18n/context";
 
 /**
- * Componente que lee los query params de error en la URL al montarse
- * y muestra el toast correspondiente.
- * 
- * Uso: montar en páginas que reciben redirects de error de Better Auth.
- * Ejemplo: /auth/login?error=social
+ * Component that reads error query params from URL on mount
+ * and triggers the corresponding toast.
  */
 export default function AuthErrorNotifier() {
   const searchParams = useSearchParams();
+  const { dict } = useTranslation();
 
   useEffect(() => {
     const error = searchParams.get("error");
     if (!error) return;
 
     const message =
-      SOCIAL_ERROR_MESSAGES[error] ??
-      "Ocurrió un error durante la autenticación. Inténtalo de nuevo.";
+      error === "social"
+        ? dict.auth.notifier.socialError
+        : dict.auth.notifier.defaultError;
 
-    appToast.error("Error de autenticación", message);
-  }, [searchParams]);
+    appToast.error(dict.auth.notifier.title, message);
+  }, [searchParams, dict]);
 
   return null;
 }

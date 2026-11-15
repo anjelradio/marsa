@@ -27,8 +27,8 @@ export function AppAlertDialog({
   onOpenChange,
   title,
   description,
-  cancelText = "Cancelar",
-  actionText = "Confirmar",
+  cancelText = "Cancel",
+  actionText = "Confirm",
   onAction,
   actionDisabled = false,
 }: AppAlertDialogProps) {

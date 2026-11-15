@@ -6,15 +6,20 @@ import { FieldGroup } from "@/components/ui/field";
 import TextFormField from "@/features/shared/presentation/components/forms/text-form-field";
 import { appToast } from "@/features/shared/presentation/components/notifications/toast";
 import SubmitButton from "@/features/shared/presentation/components/custom-buttons/submit-button";
+import { useTranslation } from "@/i18n/context";
 
 export function ResetPasswordForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const formRef = useRef<HTMLFormElement>(null);
+  const { dict } = useTranslation();
 
   const handleSubmit = async () => {
-    appToast.error("Autenticación no disponible", "Aún no hay un proveedor de autenticación configurado.");
+    appToast.error(
+      dict.auth.login.notAvailableTitle,
+      dict.auth.login.notAvailableMsg
+    );
   };
 
   return (
@@ -24,22 +29,22 @@ export function ResetPasswordForm({
           <TextFormField
             id="newPassword"
             name="newPassword"
-            label="Nueva contraseña"
-            placeholder="Mínimo 8 caracteres"
+            label={dict.auth.resetPassword.newPasswordLabel}
+            placeholder={dict.auth.resetPassword.newPasswordPlaceholder}
             type="password"
             autoComplete="new-password"
           />
           <TextFormField
             id="confirmPassword"
             name="confirmPassword"
-            label="Confirmar contraseña"
-            placeholder="Repite tu contraseña"
+            label={dict.auth.resetPassword.confirmPasswordLabel}
+            placeholder={dict.auth.resetPassword.confirmPasswordPlaceholder}
             type="password"
             autoComplete="new-password"
           />
           <SubmitButton
-            text="Restablecer contraseña"
-            pendingText="Restableciendo..."
+            text={dict.auth.resetPassword.submitButton}
+            pendingText={dict.auth.resetPassword.submittingButton}
           />
         </FieldGroup>
       </form>
