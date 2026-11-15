@@ -2,9 +2,11 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import type { MarsCoordinates } from "@/features/mars/infrastructure/mars-climate";
 import { createMarsSurfaceOverlay } from "./mars-surface-overlay";
 
 const radius = 0.96;
+const dragThreshold = 5;
 
 // Superficie y atmósfera adaptadas de Aditya-567/3D-Planets (Apache-2.0).
 export function MarsPlanet({
@@ -13,19 +15,28 @@ export function MarsPlanet({
   isExploring = false,
   showSurfaceOverlay = true,
   rotationSpeed = 0.012,
+  selectionLabel,
+  onSelect,
 }: {
   className?: string;
   isHovered?: boolean;
   isExploring?: boolean;
   showSurfaceOverlay?: boolean;
   rotationSpeed?: number;
+  selectionLabel?: string;
+  onSelect?: (point: MarsCoordinates) => void;
 }) {
   const mount = useRef<HTMLDivElement>(null);
   const isExploringRef = useRef(isExploring);
+  const onSelectRef = useRef(onSelect);
 
   useEffect(() => {
     isExploringRef.current = isExploring;
   }, [isExploring]);
+
+  useEffect(() => {
+    onSelectRef.current = onSelect;
+  }, [onSelect]);
 
   useEffect(() => {
     const container = mount.current;
@@ -109,19 +120,43 @@ export function MarsPlanet({
     light.position.set(6, 2.2, 3.6);
     scene.add(light);
 
-    // Optimized Drag Interaction: Only listen to pointermove while dragging
-    let isDragging = false;
-    let prevX = 0;
-    let prevY = 0;
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    const domElement = renderer.domElement;
+    let gesture: { id: number; x: number; y: number; moved: boolean } | null = null;
 
     const renderOnce = () => renderer.render(scene, camera);
 
+    const selectPoint = (clientX: number, clientY: number) => {
+      if (!ready || !onSelectRef.current) return;
+      const bounds = domElement.getBoundingClientRect();
+      if (!bounds.width || !bounds.height) return;
+      pointer.set(
+        2 * (clientX - bounds.left) / bounds.width - 1,
+        1 - 2 * (clientY - bounds.top) / bounds.height,
+      );
+      raycaster.setFromCamera(pointer, camera);
+      const [hit] = raycaster.intersectObject(planet, false);
+      if (!hit) return;
+
+      // The texture begins at 0° east. Convert in mesh space so drag and tilt
+      // affect which surface point is visible without changing its coordinates.
+      const local = planet.worldToLocal(hit.point).normalize();
+      const east = THREE.MathUtils.radToDeg(Math.atan2(local.z, -local.x));
+      const latitude = THREE.MathUtils.radToDeg(Math.asin(local.y));
+      const longitude = THREE.MathUtils.euclideanModulo(east + 180, 360) - 180;
+      onSelectRef.current({ latitude, longitude });
+    };
+
     const onPointerMove = (e: PointerEvent) => {
-      if (!isDragging) return;
-      const dx = e.clientX - prevX;
-      const dy = e.clientY - prevY;
-      prevX = e.clientX;
-      prevY = e.clientY;
+      if (!gesture || e.pointerId !== gesture.id) return;
+      const dx = e.clientX - gesture.x;
+      const dy = e.clientY - gesture.y;
+      if (!gesture.moved && Math.hypot(dx, dy) < dragThreshold) return;
+      gesture.moved = true;
+      gesture.x = e.clientX;
+      gesture.y = e.clientY;
+      if (!isExploringRef.current) return;
 
       planet.rotation.y += dx * 0.006;
       planet.rotation.x = Math.max(-0.65, Math.min(0.65, planet.rotation.x + dy * 0.004));
@@ -129,26 +164,45 @@ export function MarsPlanet({
       if (reducedMotion.matches) renderOnce();
     };
 
-    const onPointerUp = () => {
-      if (!isDragging) return;
-      isDragging = false;
+    const clearGesture = () => {
+      gesture = null;
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
-      window.removeEventListener("pointercancel", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerCancel);
+      window.removeEventListener("blur", clearGesture);
+    };
+
+    const onPointerUp = (e: PointerEvent) => {
+      if (!gesture || e.pointerId !== gesture.id) return;
+      const isClick = !gesture.moved
+        && Math.hypot(e.clientX - gesture.x, e.clientY - gesture.y) < dragThreshold;
+      clearGesture();
+      if (isClick) selectPoint(e.clientX, e.clientY);
+    };
+
+    const onPointerCancel = (e: PointerEvent) => {
+      if (e.pointerId === gesture?.id) clearGesture();
     };
 
     const onPointerDown = (e: PointerEvent) => {
-      if (!isExploringRef.current) return;
-      isDragging = true;
-      prevX = e.clientX;
-      prevY = e.clientY;
+      if ((!isExploringRef.current && !onSelectRef.current) || e.button !== 0 || !e.isPrimary || gesture) return;
+      gesture = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false };
       window.addEventListener("pointermove", onPointerMove, { passive: true });
       window.addEventListener("pointerup", onPointerUp, { passive: true });
-      window.addEventListener("pointercancel", onPointerUp, { passive: true });
+      window.addEventListener("pointercancel", onPointerCancel, { passive: true });
+      window.addEventListener("blur", clearGesture);
     };
 
-    const domElement = renderer.domElement;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!onSelectRef.current || (e.key !== "Enter" && e.key !== " ")) return;
+      e.preventDefault();
+      if (e.repeat) return;
+      const bounds = domElement.getBoundingClientRect();
+      selectPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+    };
+
     domElement.addEventListener("pointerdown", onPointerDown, { passive: true });
+    container.addEventListener("keydown", onKeyDown);
 
     let lastWidth = 0;
     let lastHeight = 0;
@@ -192,8 +246,9 @@ export function MarsPlanet({
 
     return () => {
       disposed = true;
-      onPointerUp();
+      clearGesture();
       domElement.removeEventListener("pointerdown", onPointerDown);
+      container.removeEventListener("keydown", onKeyDown);
       renderer.setAnimationLoop(null);
       observer.disconnect();
       reducedMotion.removeEventListener("change", syncMotion);
@@ -211,7 +266,7 @@ export function MarsPlanet({
 
   return (
     <div
-      aria-hidden="true"
+      aria-hidden={onSelect ? undefined : true}
       className={className ?? "absolute inset-0"}
     >
       {/* Outer atmospheric coronal diffusion */}
@@ -232,7 +287,10 @@ export function MarsPlanet({
       />
       <div
         ref={mount}
-        className={`absolute inset-0 transition-transform duration-700 ease-out motion-reduce:transition-none ${
+        role={onSelect ? "button" : undefined}
+        tabIndex={onSelect ? 0 : undefined}
+        aria-label={selectionLabel}
+        className={`absolute inset-0 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[#ffab57]/80 focus-visible:ring-offset-4 focus-visible:ring-offset-black transition-transform duration-700 ease-out motion-reduce:transition-none ${
           isHovered && !isExploring ? "scale-[1.018]" : "scale-100"
         }`}
       />

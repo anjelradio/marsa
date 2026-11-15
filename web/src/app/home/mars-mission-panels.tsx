@@ -59,9 +59,10 @@ export function MarsMissionPanels({ isExploring = false }: MarsMissionPanelsProp
 
   return (
     <div
+      inert={isExploring}
       className={cn(
         "order-4 grid gap-3 lg:contents",
-        isExploring && "lg:pointer-events-none"
+        isExploring && "max-lg:hidden lg:pointer-events-none"
       )}
     >
       {/* 1. Heliocentric Distance & Keplerian Orbit Panel */}

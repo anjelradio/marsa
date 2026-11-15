@@ -1,4 +1,8 @@
 @media (min-width: 64rem) {
+  .dashboard {
+    --exploration-panel-width: clamp(14rem, 22vw, 20rem);
+  }
+
   .planetStage {
     position: absolute;
     inset: 0;
@@ -23,10 +27,33 @@
     transform: translate3d(0, 0, 0) scale(1);
   }
 
+  .planetStage[data-selected="true"] > .planet {
+    transform: translate3d(0, 0, 0) scale(0.78);
+  }
+
   @supports (scale: calc(1px / 1px)) {
     .planetStage > .planet {
       --overview-scale: calc(var(--overview-width) / var(--exploration-width));
     }
+
+    .planetStage[data-selected="true"] > .planet {
+      --center-width: calc(100cqw - 2 * var(--exploration-panel-width) - 4rem);
+      transform: translate3d(0, 0, 0) scale(min(1, var(--center-width) / var(--exploration-width)));
+    }
+  }
+
+  .explorationPanels {
+    position: absolute;
+    inset: 4.75rem 1rem;
+    grid-template-columns: var(--exploration-panel-width) minmax(0, 1fr) var(--exploration-panel-width);
+    align-items: center;
+    pointer-events: none;
+  }
+
+  .explorationPanels > aside {
+    max-height: 100%;
+    overflow-y: auto;
+    pointer-events: auto;
   }
 }
 

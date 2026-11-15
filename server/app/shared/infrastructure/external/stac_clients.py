@@ -116,6 +116,8 @@ class USGSStacClient:
         bbox: list[float] | None = None,
         datetime_range: str | None = None,
         limit: int = 5,
+        *,
+        timeout: float = 20.0,
     ) -> list[dict[str, Any]]:
         """
         Busca productos en el catálogo planetario STAC de USGS.
@@ -131,7 +133,7 @@ class USGSStacClient:
 
         url = f"{self.base_url}/search"
         try:
-            with httpx.Client(timeout=20.0) as client:
+            with httpx.Client(timeout=timeout) as client:
                 res = client.get(url, params=params, headers=self.headers)
                 if res.status_code == 200:
                     return res.json().get("features", [])
