@@ -108,6 +108,7 @@ class USGSStacClient:
 
     def __init__(self) -> None:
         self.base_url = settings.USGS_STAC_API_URL.rstrip("/")
+        self.headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
 
     def search(
         self,
@@ -116,19 +117,22 @@ class USGSStacClient:
         datetime_range: str | None = None,
         limit: int = 5,
     ) -> list[dict[str, Any]]:
-        """Busca productos en el catálogo planetario STAC de USGS."""
-        payload: dict[str, Any] = {"limit": limit}
+        """
+        Busca productos en el catálogo planetario STAC de USGS.
+        Nota: AWS CloudFront en USGS bloquea POST con 403, por lo que usamos GET con query params.
+        """
+        params: dict[str, Any] = {"limit": limit}
         if collections:
-            payload["collections"] = collections
+            params["collections"] = ",".join(collections)
         if bbox:
-            payload["bbox"] = bbox
+            params["bbox"] = ",".join(map(str, bbox))
         if datetime_range:
-            payload["datetime"] = datetime_range
+            params["datetime"] = datetime_range
 
         url = f"{self.base_url}/search"
         try:
             with httpx.Client(timeout=20.0) as client:
-                res = client.post(url, json=payload, headers={"Content-Type": "application/json"})
+                res = client.get(url, params=params, headers=self.headers)
                 if res.status_code == 200:
                     return res.json().get("features", [])
                 logger.error("Error consultando USGS STAC (%s): %s", res.status_code, res.text)
