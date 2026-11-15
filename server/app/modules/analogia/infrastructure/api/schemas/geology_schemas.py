@@ -72,6 +72,40 @@ class RespuestaComparacion(BaseModel):
     atribuciones: List[MetadatosFuente] = Field(default_factory=list)
 
 
+class LimitesCelda(BaseModel):
+    lat_min: float
+    lat_max: float
+    lon_min: float
+    lon_max: float
+
+
+class CoordenadasCelda(BaseModel):
+    lat: float
+    lng: float
+
+
+class ComparacionLitologica(BaseModel):
+    categoria: str
+    marte_pct: float
+    tierra_pct: float
+
+
+class CandidatoTerrestre(BaseModel):
+    celda_id: str
+    region_referencia: str
+    centro: CoordenadasCelda
+    limites: LimitesCelda
+    similitud_pct: float
+    cobertura_pct: Optional[float] = None
+    rocas_principales: List[str] = Field(default_factory=list)
+    comparacion_litologica: List[ComparacionLitologica] = Field(default_factory=list)
+
+
+class RankingTerrestrePunto(BaseModel):
+    regiones_evaluadas: int = 0
+    candidatos: List[CandidatoTerrestre] = Field(default_factory=list)
+
+
 class RespuestaGeologiaPunto(BaseModel):
     cuerpo: str
     coordenadas: Dict[str, float]
@@ -84,5 +118,7 @@ class RespuestaGeologiaPunto(BaseModel):
     distribucion_litologica: Dict[str, float] = Field(default_factory=dict)
     unidades_macrostrat: List[UnidadMacrostrat] = Field(default_factory=list)
     muestras_laboratorio_in_situ: List[MuestraLaboratorio] = Field(default_factory=list)
+    cobertura_geologica: Optional[bool] = None
+    ranking_terrestre: Optional[RankingTerrestrePunto] = None
     mejor_analogo: Optional[Dict[str, Any]] = None
     atribuciones: List[MetadatosFuente] = Field(default_factory=list)

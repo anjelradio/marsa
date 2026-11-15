@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { createSurfaceSelection } from "@/features/shared/presentation/create-surface-selection";
 import {
   latLonToVector3,
   type GeographicLandmark,
@@ -19,6 +20,9 @@ export interface MoonPlanetProps {
   rotationSpeed?: number;
   /** Sigue girando solo aunque esté en modo exploración (hasta que se arrastre). */
   autoRotate?: boolean;
+  selectionLabel?: string;
+  hasSelection?: boolean;
+  onFocusGlobe?: () => void;
   /** Se llama con la coordenada seleccionada al hacer clic sobre el globo. */
   onSelect?: (point: { latitude: number; longitude: number }) => void;
   landmarks?: GeographicLandmark[];
@@ -31,6 +35,9 @@ export function MoonPlanet({
   isExploring = false,
   rotationSpeed = 0.008,
   autoRotate = false,
+  selectionLabel,
+  hasSelection = false,
+  onFocusGlobe,
   onSelect,
   landmarks,
   onProjectedLandmarksChange,
@@ -39,6 +46,8 @@ export function MoonPlanet({
   const isExploringRef = useRef(isExploring);
   const autoRotateRef = useRef(autoRotate);
   const onSelectRef = useRef(onSelect);
+  const onFocusGlobeRef = useRef(onFocusGlobe);
+  const clearSelectionRef = useRef<() => void>(null);
   const landmarksRef = useRef(landmarks);
   const onProjectedLandmarksChangeRef = useRef(onProjectedLandmarksChange);
 
@@ -53,6 +62,14 @@ export function MoonPlanet({
   useEffect(() => {
     onSelectRef.current = onSelect;
   }, [onSelect]);
+
+  useEffect(() => {
+    onFocusGlobeRef.current = onFocusGlobe;
+  }, [onFocusGlobe]);
+
+  useEffect(() => {
+    if (!hasSelection) clearSelectionRef.current?.();
+  }, [hasSelection]);
 
   useEffect(() => {
     landmarksRef.current = landmarks;
@@ -134,6 +151,7 @@ export function MoonPlanet({
     const planet = new THREE.Mesh(geometry, material);
     planet.rotation.set(-0.02, -1.1, 0.03, "ZYX");
     scene.add(planet);
+    const selection = createSurfaceSelection(planet, planet, radius);
 
     scene.add(new THREE.AmbientLight(0x406085, 0.12));
     const light = new THREE.DirectionalLight(0xffffff, 8.5);
@@ -193,7 +211,7 @@ export function MoonPlanet({
 
     const selectPoint = (clientX: number, clientY: number) => {
       const select = onSelectRef.current;
-      if (!select) return;
+      if (!ready || !select) return;
       const bounds = renderer.domElement.getBoundingClientRect();
       if (!bounds.width || !bounds.height) return;
       pointer.set(
@@ -203,8 +221,14 @@ export function MoonPlanet({
       raycaster.setFromCamera(pointer, camera);
       const [hit] = raycaster.intersectObject(planet, false);
       if (!hit) return;
+      if (!isExploringRef.current && onFocusGlobeRef.current) {
+        onFocusGlobeRef.current();
+        return;
+      }
       const local = planet.worldToLocal(hit.point).normalize();
       const theta = THREE.MathUtils.radToDeg(Math.atan2(local.z, -local.x));
+      selection.select(local, reducedMotion.matches);
+      syncMotion();
       select({
         latitude: THREE.MathUtils.radToDeg(Math.asin(local.y)),
         longitude: THREE.MathUtils.euclideanModulo(theta, 360) - 180,
@@ -219,7 +243,7 @@ export function MoonPlanet({
       const dy = e.clientY - prevY;
       prevX = e.clientX;
       prevY = e.clientY;
-      if (!isExploringRef.current) return;
+      if (!isExploringRef.current || selection.active) return;
 
       planet.rotation.y += dx * 0.006;
       planet.rotation.x = Math.max(-0.65, Math.min(0.65, planet.rotation.x + dy * 0.004));
@@ -237,7 +261,7 @@ export function MoonPlanet({
     };
 
     const onPointerDown = (e: PointerEvent) => {
-      if (!isExploringRef.current && !onSelectRef.current) return;
+      if ((!isExploringRef.current && !onSelectRef.current) || e.button !== 0 || !e.isPrimary || isDragging) return;
       isDragging = true;
       moved = false;
       downX = e.clientX;
@@ -250,7 +274,16 @@ export function MoonPlanet({
     };
 
     const domElement = renderer.domElement;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!onSelectRef.current || (e.key !== "Enter" && e.key !== " ")) return;
+      e.preventDefault();
+      if (e.repeat) return;
+      const bounds = domElement.getBoundingClientRect();
+      selectPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+    };
+
     domElement.addEventListener("pointerdown", onPointerDown, { passive: true });
+    container.addEventListener("keydown", onKeyDown);
 
     let lastWidth = 0;
     let lastHeight = 0;
@@ -272,16 +305,20 @@ export function MoonPlanet({
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const animate = (time: number) => {
-      const delta = (time - lastTime) / 1000;
+      const delta = Math.min(0.05, Math.max(0, (time - lastTime) / 1000));
       lastTime = time;
 
-      if (!isDragging && (!isExploringRef.current || autoRotateRef.current)) {
+      if (selection.active) {
+        selection.advance(reducedMotion.matches ? 0.5 : delta);
+      } else if (!reducedMotion.matches && !isDragging && (!isExploringRef.current || autoRotateRef.current)) {
         planet.rotation.y += rotationSpeed * delta;
       }
 
       renderer.render(scene, camera);
       updateLandmarkProjections();
-      animationFrameId = requestAnimationFrame(animate);
+      if (!reducedMotion.matches && (!selection.active || selection.animating)) {
+        animationFrameId = requestAnimationFrame(animate);
+      }
     };
 
     const syncMotion = () => {
@@ -289,6 +326,12 @@ export function MoonPlanet({
       lastTime = performance.now();
       cancelAnimationFrame(animationFrameId);
       animationFrameId = requestAnimationFrame(animate);
+    };
+
+    clearSelectionRef.current = () => {
+      if (!selection.active) return;
+      selection.clear();
+      syncMotion();
     };
 
     reducedMotion.addEventListener("change", syncMotion);
@@ -300,6 +343,9 @@ export function MoonPlanet({
       resizeObserver.disconnect();
       cancelAnimationFrame(animationFrameId);
       domElement.removeEventListener("pointerdown", onPointerDown);
+      container.removeEventListener("keydown", onKeyDown);
+      selection.clear();
+      clearSelectionRef.current = null;
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointercancel", onPointerUp);
@@ -314,5 +360,23 @@ export function MoonPlanet({
     };
   }, [rotationSpeed]);
 
-  return <div ref={mount} className={className ?? "size-full"} />;
+  return (
+    <div className={`relative ${className ?? "size-full"}`}>
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute -inset-[22%] rounded-full bg-[radial-gradient(ellipse_at_50%_58%,#c4d9ff32,transparent_68%)] blur-2xl transition-[transform,opacity] duration-700 ease-out motion-reduce:transition-none ${isHovered ? "scale-[1.02] opacity-90" : "scale-100 opacity-70"}`}
+      />
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-[2.5%] rounded-full shadow-[3px_-2px_10px_#d7e5ff75,9px_-5px_34px_#9bbcff4d] transition-[box-shadow] duration-700 ease-out motion-reduce:transition-none ${isHovered ? "shadow-[4px_-3px_15px_#e5eeff9c,12px_-7px_46px_#9bbcff70]" : ""}`}
+      />
+      <div
+        ref={mount}
+        role={onSelect ? "button" : undefined}
+        tabIndex={onSelect ? 0 : undefined}
+        aria-label={selectionLabel}
+        className={`absolute inset-0 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-white/55 transition-transform duration-700 ease-out motion-reduce:transition-none ${isHovered && !isExploring ? "scale-[1.018]" : "scale-100"}`}
+      />
+    </div>
+  );
 }
