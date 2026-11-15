@@ -19,6 +19,7 @@ const rankingItemSchema = z.object({
   geom: z.unknown().nullable(),
   sitio_destino_id: z.number(),
   sitio_destino: z.string(),
+  geom_destino: z.unknown().nullable(),
   similitud: z.number(),
   cobertura: z.number(),
   metodo: z.string(),
