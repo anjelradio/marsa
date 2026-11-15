@@ -49,6 +49,18 @@ These resources support the exploration and comparison of planetary environments
 
 To bridge the gap between Earth and space exploration through interactive technology, transforming complex planetary information into an accessible experience that inspires curiosity, discovery, and scientific learning.
 
+## Originality, Scientific Sources, and AI Transparency
+
+MARSA is a project developed by Tiluchi's Space for the NASA Space Apps Challenge 2026.
+
+The project combines original application design and implementation with openly available scientific resources and third-party software technologies.
+
+NASA and other external scientific sources are acknowledged in the project documentation according to their actual use.
+
+Artificial intelligence tools, including ChatGPT, were used to support research, documentation, brainstorming, and visual design exploration. AI-assisted materials included in the final submission are identified in accordance with the challenge requirements.
+
+The team is responsible for reviewing the accuracy of scientific information, respecting applicable licenses, and ensuring that the submitted project reflects the work actually completed.
+
 ## 👨‍🚀 Our Team
 
 **Team Tiluchis**
