@@ -82,7 +82,7 @@ export function PlanetMissionPanels({ planet = "mars", isExploring = false }: Pl
       {/* 1. Heliocentric Distance & Keplerian Orbit Panel */}
       <figure
         className={cn(
-          "relative min-w-0 rounded-3xl bg-app-primary/40 p-4 ring-1 ring-inset ring-white/10 backdrop-blur-md lg:absolute lg:top-[26%] lg:right-[20.7%] lg:z-0 lg:w-[30%] lg:p-2.5 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+          "relative min-w-0 rounded-3xl bg-app-primary/40 p-4 ring-1 ring-inset ring-white/10 backdrop-blur-md lg:absolute lg:top-[26%] lg:right-[14%] lg:z-0 lg:w-[30%] lg:p-2.5 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
           isExploring
             ? "lg:translate-x-[160%] lg:opacity-0 pointer-events-none"
             : "lg:translate-x-0 lg:opacity-100"
@@ -145,7 +145,7 @@ export function PlanetMissionPanels({ planet = "mars", isExploring = false }: Pl
       {/* 2. Reference mission card */}
       <Card
         className={cn(
-          "relative z-10 flex-row items-center gap-3 rounded-3xl bg-app-primary/65 p-1.5 text-app-primary-foreground shadow-none ring-1 ring-inset ring-white/10 backdrop-blur-md lg:absolute lg:top-[65%] lg:right-[20.7%] lg:w-[31%] lg:gap-4 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+          "relative z-10 flex-row items-center gap-3 rounded-3xl bg-app-primary/65 p-1.5 text-app-primary-foreground shadow-none ring-1 ring-inset ring-white/10 backdrop-blur-md lg:absolute lg:top-[65%] lg:right-[14%] lg:w-[31%] lg:gap-4 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
           isExploring
             ? "lg:translate-x-[160%] lg:opacity-0 pointer-events-none"
             : "lg:translate-x-0 lg:opacity-100"
@@ -165,7 +165,7 @@ export function PlanetMissionPanels({ planet = "mars", isExploring = false }: Pl
       {/* 3. Physical Characteristics Circular Gauges */}
       <dl
         className={cn(
-          "relative z-10 grid grid-cols-3 gap-1 rounded-3xl bg-app-primary/65 p-2 ring-1 ring-inset ring-white/10 backdrop-blur-md lg:absolute lg:top-[79.5%] lg:right-[20.7%] lg:w-[37%] lg:p-3 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+          "relative z-10 grid grid-cols-3 gap-1 rounded-3xl bg-app-primary/65 p-2 ring-1 ring-inset ring-white/10 backdrop-blur-md lg:absolute lg:top-[79.5%] lg:right-[14%] lg:w-[37%] lg:p-3 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
           isExploring
             ? "lg:translate-x-[160%] lg:opacity-0 pointer-events-none"
             : "lg:translate-x-0 lg:opacity-100"

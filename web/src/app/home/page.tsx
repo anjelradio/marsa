@@ -304,7 +304,7 @@ export default function HomePage() {
         <dl
           inert={isExploring}
           className={cn(
-            "order-3 grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:absolute lg:top-14 lg:right-[20.7%] lg:left-[22.7%] lg:z-0 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+            "order-3 grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:absolute lg:top-14 lg:right-[14%] lg:left-[29.4%] lg:z-0 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
             isExploring ? "max-lg:hidden lg:-translate-y-48 lg:opacity-0 pointer-events-none" : "lg:translate-y-0 lg:opacity-100"
           )}
         >
