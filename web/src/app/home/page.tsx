@@ -304,7 +304,7 @@ export default function HomePage() {
         <dl
           inert={isExploring}
           className={cn(
-            "order-3 grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:absolute lg:inset-x-4 lg:top-11 lg:left-[22.7%] lg:z-0 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+            "order-3 grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:absolute lg:top-14 lg:right-[20.7%] lg:left-[22.7%] lg:z-0 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
             isExploring ? "max-lg:hidden lg:-translate-y-48 lg:opacity-0 pointer-events-none" : "lg:translate-y-0 lg:opacity-100"
           )}
         >
@@ -313,7 +313,7 @@ export default function HomePage() {
               key={label}
               className={cn(
                 stars.dashboardCard,
-                "min-w-0 gap-2 rounded-3xl px-3 py-3 text-app-primary-foreground shadow-none ring-1 ring-inset ring-white/10 backdrop-blur-md transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_14px_32px_#00000040] motion-reduce:transition-none sm:px-4 lg:min-h-30 lg:gap-1 lg:py-2.5",
+                "min-w-0 gap-2 rounded-3xl px-3 py-3 text-app-primary-foreground shadow-none ring-1 ring-inset ring-white/10 backdrop-blur-md transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_14px_32px_#00000040] motion-reduce:transition-none sm:px-4 lg:min-h-28 lg:gap-1 lg:py-2.5",
                 color
               )}
               style={{ animationDelay: `${index * 70}ms` }}
