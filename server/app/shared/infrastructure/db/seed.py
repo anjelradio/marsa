@@ -37,16 +37,10 @@ def seed_initial_data(session: Session) -> None:
     # 2. Datasets
     datasets = [
         {
-            "nombre": "Copernicus Sentinel-2 L2A",
-            "agencia": "ESA",
-            "url": "https://stac.dataspace.copernicus.eu/v1",
-            "resolucion": 10.0,
-        },
-        {
-            "nombre": "Copernicus Sentinel-3 SLSTR",
-            "agencia": "ESA",
-            "url": "https://stac.dataspace.copernicus.eu/v1",
-            "resolucion": 1000.0,
+            "nombre": "Valores de referencia (literatura)",
+            "agencia": "Varias",
+            "url": None,
+            "resolucion": None,
         },
         {
             "nombre": "USGS THEMIS Infrared Mosaic",
@@ -265,11 +259,13 @@ SITIOS = [
      [250, 0, 50, -1900, 0.0, 0, 15]),
 ]
 
-# Dataset de origen por cuerpo para las mediciones sembradas.
+# Dataset de las mediciones sembradas a mano: son cifras de referencia de la literatura,
+# no lecturas de un instrumento. Las descargadas (real_measurements.json) llevan el suyo.
+_DATASET_REFERENCIA = "Valores de referencia (literatura)"
 _DATASET_POR_CUERPO = {
-    "Tierra": "Copernicus Sentinel-3 SLSTR",
-    "Marte": "NASA MGS MOLA",
-    "Luna": "NASA LRO LOLA / Diviner",
+    "Tierra": _DATASET_REFERENCIA,
+    "Marte": _DATASET_REFERENCIA,
+    "Luna": _DATASET_REFERENCIA,
 }
 
 

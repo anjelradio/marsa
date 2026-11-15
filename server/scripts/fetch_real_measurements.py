@@ -1,10 +1,8 @@
 """Descarga mediciones reales para los sitios sembrados y las guarda en JSON.
 
 Fuentes (todas públicas y sin clave):
-  - Copernicus CDSE STAC (CopernicusClient del proyecto): nubosidad media de
-    100 escenas Sentinel-2 L2A del último año completo (eo:cloud_cover).
-  - NASA POWER (climatología MERRA-2): temperatura de la piel (TS, K),
-    profundidad óptica de aerosoles (AOD_55) y nubosidad de respaldo.
+  - NASA POWER (climatología MERRA-2, media de 25 años): temperatura de la piel
+    (TS, K), nubosidad (CLOUD_AMT, %) y profundidad óptica de aerosoles (AOD_55).
   - OpenTopoData SRTM 30 m: elevación (m) de los sitios terrestres.
   - Mars Climate Database v6.2 vía el backend local: temperatura superficial
     y profundidad óptica de polvo de los sitios marcianos.
@@ -36,9 +34,7 @@ from app.modules.cuerpo_celeste.infrastructure.moon_lro import (  # noqa: E402
     get_moon_elevation,
     get_moon_temperature,
 )
-from app.shared.application.satelital_service import extract_bbox_from_geom  # noqa: E402
 from app.shared.infrastructure.db.seed import SITIOS  # noqa: E402
-from app.shared.infrastructure.external.stac_clients import CopernicusClient  # noqa: E402
 
 SALIDA = ROOT / "app" / "shared" / "infrastructure" / "db" / "real_measurements.json"
 FILL = -999.0
@@ -46,23 +42,7 @@ FILL = -999.0
 DS_POWER = "NASA POWER (MERRA-2)"
 DS_SRTM = "OpenTopoData SRTM 30 m"
 DS_MCD = "LMD Mars Climate Database"
-DS_S2 = "Copernicus Sentinel-2 L2A"
 DS_LRO = "NASA LRO LOLA / Diviner"
-
-# Escenas Sentinel-2 promediadas por sitio (un año completo).
-S2_ESCENAS = 100
-
-
-def nubosidad_sentinel2(cliente: CopernicusClient, lon: float, lat: float) -> float | None:
-    """Media de eo:cloud_cover de Sentinel-2 L2A del último año completo (API CDSE)."""
-    anio = date.today().year - 1
-    bbox = extract_bbox_from_geom({"type": "Point", "coordinates": [lon, lat]})
-    info = cliente.get_cloud_cover_and_weather(
-        bbox,
-        f"{anio}-01-01T00:00:00Z/{anio}-12-31T23:59:59Z",
-        limit=S2_ESCENAS,
-    )
-    return info.get("cloud_cover")
 
 
 def get_json(url: str, timeout: int = 60):
@@ -109,7 +89,6 @@ def main() -> None:
     args = parser.parse_args()
     seleccion = {c.strip() for c in args.cuerpos.split(",")}
 
-    copernicus = CopernicusClient()
     resultado: dict = {"generado": date.today().isoformat(), "sitios": {}}
     if SALIDA.exists():
         resultado["sitios"] = json.loads(SALIDA.read_text(encoding="utf-8")).get("sitios", {})
@@ -126,9 +105,6 @@ def main() -> None:
                     medidas["Nubosidad"] = {"valor": round(p["CLOUD_AMT"], 2), "dataset": DS_POWER}
                 if "AOD_55" in p:
                     medidas["Profundidad Óptica de Polvo"] = {"valor": round(p["AOD_55"], 3), "dataset": DS_POWER}
-                s2 = nubosidad_sentinel2(copernicus, lon, lat)
-                if s2 is not None:  # la API Copernicus del proyecto manda sobre POWER
-                    medidas["Nubosidad"] = {"valor": round(s2, 2), "dataset": DS_S2}
                 time.sleep(1)  # cortesía con la API pública
                 z = elevacion(lon, lat)
                 if z is not None:
