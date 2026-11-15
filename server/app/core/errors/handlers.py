@@ -6,6 +6,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.shared.domain.exceptions import (
     ConflictException,
     DomainException,
+    FuenteExternaException,
     NotFoundException,
     ValidationException,
 )
@@ -30,6 +31,10 @@ def setup_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(ValidationException)
     async def validation_handler(request: Request, exc: ValidationException):
         return JSONResponse(status_code=400, content=format_error(exc.code, exc.message))
+
+    @app.exception_handler(FuenteExternaException)
+    async def fuente_externa_handler(request: Request, exc: FuenteExternaException):
+        return JSONResponse(status_code=502, content=format_error(exc.code, exc.message))
 
     @app.exception_handler(DomainException)
     async def domain_generic_handler(request: Request, exc: DomainException):

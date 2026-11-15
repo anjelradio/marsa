@@ -31,3 +31,17 @@ class ConflictException(DomainException):
     """Mapea a HTTP 409 (Conflict)."""
 
     code = "CONFLICT_ERROR"
+
+
+class SinDatosException(NotFoundException):
+    """La entrada es válida pero la fuente no devolvió datos utilizables. Mapea a HTTP 404."""
+
+    code = "SIN_DATOS"
+    message = "La fuente no devolvió datos para los parámetros indicados."
+
+
+class FuenteExternaException(DomainException):
+    """Fallo al consultar una API externa (red, 4xx/5xx). Mapea a HTTP 502."""
+
+    code = "FUENTE_EXTERNA_ERROR"
+    message = "La fuente de datos externa no está disponible."
