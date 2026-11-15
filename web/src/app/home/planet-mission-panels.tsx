@@ -4,57 +4,71 @@ import { Card } from "@/components/ui/card";
 import { useTranslation } from "@/i18n/context";
 import { cn } from "@/lib/utils";
 
-// True physical data for Mars from NASA NSSDC Planetary Fact Sheet
-const semimajorAxis = 227.956; // million km (1.524 AU)
-const eccentricity = 0.0935;
+export type MissionPlanet = "mars" | "earth" | "moon";
 
-// Keplerian orbital profile: distance r(θ) across a full 360° revolution
-const orbitDistances = Array.from({ length: 49 }, (_, index) => {
-  const angle = (index / 48) * 2 * Math.PI;
-  return (semimajorAxis * (1 - eccentricity ** 2)) / (1 + eccentricity * Math.cos(angle));
-});
+interface OrbitProfile {
+  /** Semieje mayor en millones de km (Sol) o miles de km (Luna alrededor de la Tierra). */
+  semimajorAxis: number;
+  eccentricity: number;
+  /** GM del astro central en km³/s² por unidad de distancia (vis-viva). */
+  gm: number;
+  distanceMin: number;
+  distanceSpan: number;
+  speedMin: number;
+  speedSpan: number;
+}
 
-const orbitProfile = [
-  "0 100%",
-  ...orbitDistances.map((distance, index) =>
-    `${(index / 48) * 100}% ${100 - ((distance - 200) / 60) * 100}%`,
-  ),
-  "100% 100%",
-].join(", ");
+// Datos físicos de las fichas planetarias de NASA NSSDC.
+const ORBITS: Record<MissionPlanet, OrbitProfile> = {
+  mars: { semimajorAxis: 227.956, eccentricity: 0.0935, gm: 132_712, distanceMin: 200, distanceSpan: 60, speedMin: 21, speedSpan: 6 },
+  earth: { semimajorAxis: 149.598, eccentricity: 0.0167, gm: 132_712, distanceMin: 146, distanceSpan: 8, speedMin: 29, speedSpan: 1.5 },
+  moon: { semimajorAxis: 384.4, eccentricity: 0.0549, gm: 398.6, distanceMin: 355, distanceSpan: 60, speedMin: 0.9, speedSpan: 0.25 },
+};
 
-// Orbital velocity calculated from distance using the vis-viva equation: v = sqrt(GM * (2/r - 1/a))
-const orbitSpeeds = orbitDistances
-  .filter((_, index) => index % 8 === 0)
-  .map((distance) =>
-    Math.sqrt(132_712 * (2 / distance - 1 / semimajorAxis)),
-  );
+function buildOrbit({ semimajorAxis, eccentricity, gm, distanceMin, distanceSpan, speedMin, speedSpan }: OrbitProfile) {
+  // Perfil kepleriano: distancia r(θ) a lo largo de una revolución completa.
+  const distances = Array.from({ length: 49 }, (_, index) => {
+    const angle = (index / 48) * 2 * Math.PI;
+    return (semimajorAxis * (1 - eccentricity ** 2)) / (1 + eccentricity * Math.cos(angle));
+  });
+  const profile = [
+    "0 100%",
+    ...distances.map(
+      (distance, index) => `${(index / 48) * 100}% ${100 - ((distance - distanceMin) / distanceSpan) * 100}%`,
+    ),
+    "100% 100%",
+  ].join(", ");
+  // Velocidad orbital con la ecuación vis-viva: v = sqrt(GM · (2/r − 1/a)).
+  const speeds = distances
+    .filter((_, index) => index % 8 === 0)
+    .map((distance) => Math.sqrt(gm * (2 / distance - 1 / semimajorAxis)));
+  return {
+    profile,
+    speedHeights: speeds.map((speed) => ((speed - speedMin) / speedSpan) * 100),
+    meanTop: (1 - (semimajorAxis - distanceMin) / distanceSpan) * 100,
+  };
+}
 
-interface MarsMissionPanelsProps {
+const ORBIT_SHAPES = {
+  mars: buildOrbit(ORBITS.mars),
+  earth: buildOrbit(ORBITS.earth),
+  moon: buildOrbit(ORBITS.moon),
+};
+
+interface PlanetMissionPanelsProps {
+  planet?: MissionPlanet;
   isExploring?: boolean;
 }
 
-export function MarsMissionPanels({ isExploring = false }: MarsMissionPanelsProps) {
+export function PlanetMissionPanels({ planet = "mars", isExploring = false }: PlanetMissionPanelsProps) {
   const { dict } = useTranslation();
+  const p = dict[planet].panels;
+  const { profile, speedHeights, meanTop } = ORBIT_SHAPES[planet];
 
   const measurements = [
-    {
-      label: dict.mars.panels.measurements.gravity,
-      value: dict.mars.panels.measurements.gravityVal,
-      unit: dict.mars.panels.measurements.gravityUnit,
-      color: "#ae4685",
-    },
-    {
-      label: dict.mars.panels.measurements.tilt,
-      value: dict.mars.panels.measurements.tiltVal,
-      unit: dict.mars.panels.measurements.tiltUnit,
-      color: "#5f8bdb",
-    },
-    {
-      label: dict.mars.panels.measurements.moons,
-      value: dict.mars.panels.measurements.moonsVal,
-      unit: dict.mars.panels.measurements.moonsUnit,
-      color: "#b7b6ba",
-    },
+    { label: p.measurements.gravity, value: p.measurements.gravityVal, unit: p.measurements.gravityUnit, color: "#ae4685" },
+    { label: p.measurements.tilt, value: p.measurements.tiltVal, unit: p.measurements.tiltUnit, color: "#5f8bdb" },
+    { label: p.measurements.moons, value: p.measurements.moonsVal, unit: p.measurements.moonsUnit, color: "#b7b6ba" },
   ];
 
   return (
@@ -75,32 +89,33 @@ export function MarsMissionPanels({ isExploring = false }: MarsMissionPanelsProp
         )}
       >
         <figcaption className="mb-2 text-sm font-medium text-app-primary-foreground lg:ml-[45%]">
-          {dict.mars.panels.distanceToSunTitle}
+          {p.distanceToSunTitle}
         </figcaption>
         <div className="relative h-28 overflow-hidden border-b border-white/20 bg-[repeating-linear-gradient(to_bottom,transparent_0,transparent_calc(25%_-_1px),#ffffff16_calc(25%_-_1px),#ffffff16_25%)] lg:h-[clamp(5.75rem,16svh,9rem)]">
           {/* Orbital distance profile polygon */}
           <div
             aria-hidden="true"
             className="absolute inset-0 bg-linear-to-b from-[#b75d99] via-[#733460] to-[#31152e]"
-            style={{ clipPath: `polygon(${orbitProfile})` }}
+            style={{ clipPath: `polygon(${profile})` }}
           />
 
-          {/* Scientific Mean Distance reference line (227.9M km) */}
+          {/* Mean distance reference line */}
           <div
             aria-hidden="true"
-            className="absolute inset-x-0 top-[53.5%] border-b border-white/30 border-dashed"
+            className="absolute inset-x-0 border-b border-white/30 border-dashed"
+            style={{ top: `${meanTop}%` }}
           />
 
-          {/* Key astronomical markers: Aphelion (Peak) & Perihelion (Base) */}
+          {/* Key astronomical markers: far point (peak) & near point (base) */}
           <span className="absolute top-1.5 left-1/2 -translate-x-1/2 rounded bg-black/60 px-1.5 py-0.5 text-[0.62rem] font-mono text-white/90">
-            {dict.mars.panels.aphelion}
+            {p.aphelion}
           </span>
           <span className="absolute bottom-1.5 left-2 rounded bg-black/60 px-1.5 py-0.5 text-[0.62rem] font-mono text-[#ffdb8a]">
-            {dict.mars.panels.perihelion}
+            {p.perihelion}
           </span>
 
           <p className="absolute right-2 bottom-1.5 rounded-md bg-black/60 px-2 py-0.5 text-[0.65rem] font-mono text-app-secondary">
-            {dict.mars.panels.distanceRange}
+            {p.distanceRange}
           </p>
         </div>
 
@@ -110,22 +125,22 @@ export function MarsMissionPanels({ isExploring = false }: MarsMissionPanelsProp
             aria-hidden="true"
             className="flex h-13 flex-1 items-end justify-evenly gap-2 border-b border-white/15 bg-[repeating-linear-gradient(to_bottom,transparent_0,transparent_calc(33.33%_-_1px),#ffffff12_calc(33.33%_-_1px),#ffffff12_33.33%)] px-2 lg:h-[clamp(2.5rem,8svh,4.5rem)]"
           >
-            {orbitSpeeds.map((speed, index) => (
+            {speedHeights.map((height, index) => (
               <span
                 key={index}
                 className="w-1 rounded-full bg-app-secondary/90"
-                style={{ height: `${((speed - 21) / 6) * 100}%` }}
+                style={{ height: `${height}%` }}
               />
             ))}
           </div>
           <p className="text-right text-[0.625rem] leading-tight text-app-secondary/80">
-            {dict.mars.panels.orbitalSpeed}
-            <span className="block font-mono font-medium">{dict.mars.panels.orbitalSpeedRange}</span>
+            {p.orbitalSpeed}
+            <span className="block font-mono font-medium">{p.orbitalSpeedRange}</span>
           </p>
         </div>
       </figure>
 
-      {/* 2. Curiosity Rover Landing Card */}
+      {/* 2. Reference mission card */}
       <Card
         className={cn(
           "relative z-10 flex-row items-center gap-3 rounded-3xl bg-app-primary/65 p-1.5 text-app-primary-foreground shadow-none ring-1 ring-inset ring-white/10 backdrop-blur-md lg:absolute lg:top-[65%] lg:right-[20.7%] lg:w-[31%] lg:gap-4 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
@@ -135,15 +150,13 @@ export function MarsMissionPanels({ isExploring = false }: MarsMissionPanelsProp
         )}
       >
         <span className="grid min-h-16 shrink-0 place-items-center rounded-[1.15rem] bg-linear-to-br from-[#ffdb8a] to-[#f3824a] px-4 text-sm font-semibold text-[#39190d] shadow-[0_0_26px_#ffab5760] lg:min-h-[clamp(4rem,10svh,6rem)] lg:basis-[34%]">
-          {dict.mars.panels.missionCuriosity}
+          {p.missionCuriosity}
         </span>
         <div className="min-w-0 py-2 pr-2">
           <p className="text-[clamp(1.4rem,3vw,2.6rem)] font-semibold leading-none tracking-tight font-mono">
-            {dict.mars.panels.missionCuriosityCoord}
+            {p.missionCuriosityCoord}
           </p>
-          <p className="mt-1 text-xs text-app-secondary/70">
-            {dict.mars.panels.missionCuriosityDesc}
-          </p>
+          <p className="mt-1 text-xs text-app-secondary/70">{p.missionCuriosityDesc}</p>
         </div>
       </Card>
 

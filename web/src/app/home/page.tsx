@@ -19,11 +19,15 @@ import { Card } from "@/components/ui/card";
 import { MarsPlanet } from "@/features/mars/presentation/components/mars-planet";
 import type { MarsCoordinates } from "@/features/mars/infrastructure/mars-climate";
 import { cn } from "@/lib/utils";
-import { MarsMissionPanels } from "./mars-mission-panels";
+import { PlanetMissionPanels } from "./planet-mission-panels";
 import { MarsClimatePanel } from "./mars-climate-panel";
 import { MarsImageGallery } from "./mars-image-gallery";
 import { AnalogsPanel } from "./analogs-panel";
-import { AnalogsStage } from "./analogs-stage";
+import { earthLandmarks, GlobeMarkers, targetLandmarks } from "./analogs-globe";
+import { PlanetExplorationPanels } from "./planet-exploration-panels";
+import { EarthPlanet } from "@/features/earth/presentation/components/earth-planet";
+import { MoonPlanet } from "@/features/moon/presentation/components/moon-planet";
+import type { ProjectedLandmark } from "@/features/shared/domain/geographic-coordinates";
 import { PlanetFilter, type HomePlanet } from "./planet-filter";
 import type { AnalogDestination } from "@/features/analogs/infrastructure/analogs-ranking";
 import { useAnalogRanking } from "@/features/analogs/presentation/use-analog-ranking";
@@ -53,6 +57,15 @@ export default function HomePage() {
   const [destination, setDestination] = useState<AnalogDestination>("marte");
   const [openSiteId, setOpenSiteId] = useState<number | null>(null);
   const { result: ranking, retry: retryRanking } = useAnalogRanking(destination, dict.analogs.error);
+  const profile = dict[planet];
+  const [markers, setMarkers] = useState<ProjectedLandmark[]>([]);
+  const rankingList = ranking && ranking !== "error" ? ranking : null;
+  const landmarks = useMemo(() => {
+    if (!rankingList) return [];
+    if (planet === "earth") return earthLandmarks(rankingList);
+    if (planet === "moon") return targetLandmarks(rankingList);
+    return [];
+  }, [rankingList, planet]);
 
   const selectPlanet = useCallback((next: HomePlanet) => {
     setPlanet(next);
@@ -83,56 +96,56 @@ export default function HomePage() {
   const facts = useMemo(
     () => [
       {
-        label: dict.mars.facts.distanceToSun,
-        value: dict.mars.facts.distanceToSunVal,
-        unit: dict.mars.facts.distanceToSunUnit,
+        label: profile.facts.distanceToSun,
+        value: profile.facts.distanceToSunVal,
+        unit: profile.facts.distanceToSunUnit,
         icon: Orbit,
         color: "bg-app-primary/60",
       },
       {
-        label: dict.mars.facts.martianYear,
-        value: dict.mars.facts.martianYearVal,
-        unit: dict.mars.facts.martianYearUnit,
+        label: profile.facts.martianYear,
+        value: profile.facts.martianYearVal,
+        unit: profile.facts.martianYearUnit,
         icon: CalendarDays,
         color: "bg-[#290d24]/65",
       },
       {
-        label: dict.mars.facts.dayLength,
-        value: dict.mars.facts.dayLengthVal,
-        unit: dict.mars.facts.dayLengthUnit,
+        label: profile.facts.dayLength,
+        value: profile.facts.dayLengthVal,
+        unit: profile.facts.dayLengthUnit,
         icon: Clock3,
         color: "bg-[#131a30]/65",
       },
       {
-        label: dict.mars.facts.avgTemp,
-        value: dict.mars.facts.avgTempVal,
-        unit: dict.mars.facts.avgTempUnit,
+        label: profile.facts.avgTemp,
+        value: profile.facts.avgTempVal,
+        unit: profile.facts.avgTempUnit,
         icon: Thermometer,
         color: "bg-[#2d1e14]/65",
       },
     ],
-    [dict],
+    [profile],
   );
 
   const surfaceCards = useMemo(
     () => [
       {
-        ...dict.mars.leftCards.atmosphere,
+        ...profile.leftCards.atmosphere,
         icon: Wind,
         color: "bg-[#131a30]/65",
       },
       {
-        ...dict.mars.leftCards.topography,
+        ...profile.leftCards.topography,
         icon: Mountain,
         color: "bg-[#2d1e14]/65",
       },
       {
-        ...dict.mars.leftCards.composition,
+        ...profile.leftCards.composition,
         icon: Atom,
         color: "bg-[#291323]/65",
       },
     ],
-    [dict],
+    [profile],
   );
 
   return (
@@ -171,18 +184,8 @@ export default function HomePage() {
         </div>
       )}
 
-      {planet !== "mars" && (
-        <AnalogsStage
-          planet={planet}
-          result={ranking}
-          openId={openSiteId}
-          onOpenChange={setOpenSiteId}
-        />
-      )}
-
-      {planet === "mars" && (
       <section
-        aria-labelledby="mars-title"
+        aria-labelledby="planet-title"
         className={cn(
           styles.dashboard,
           "relative mx-auto grid max-w-[1600px] gap-7 px-4 py-5 sm:px-7 lg:min-h-[max(680px,100svh)] lg:gap-0 lg:px-4",
@@ -201,7 +204,7 @@ export default function HomePage() {
 
         {/* Surface data cards stacked on the left side */}
         <aside
-          aria-label="Mars Surface Characteristics"
+          aria-label={`${profile.title} · ${profile.leftCards.topography.label}`}
           inert={isExploring}
           className={cn(
             "order-4 grid grid-cols-1 gap-2.5 sm:grid-cols-3 lg:absolute lg:top-20 lg:left-4 lg:z-20 lg:flex lg:w-52 lg:flex-col lg:gap-3 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
@@ -252,12 +255,41 @@ export default function HomePage() {
               isExploring ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"
             )}
           >
-            <MarsPlanet
-              isHovered={isHovered && !isExploring}
-              isExploring={isExploring}
-              selectionLabel={dict.mars.explore.selectCenter}
-              onSelect={selectPoint}
-            />
+            {planet === "mars" && (
+              <MarsPlanet
+                isHovered={isHovered && !isExploring}
+                isExploring={isExploring}
+                selectionLabel={profile.explore.selectCenter}
+                onSelect={selectPoint}
+              />
+            )}
+            {planet === "earth" && (
+              <EarthPlanet
+                isExploring={isExploring}
+                onSelect={selectPoint}
+                landmarks={landmarks}
+                onProjectedLandmarksChange={setMarkers}
+              />
+            )}
+            {planet === "moon" && (
+              <MoonPlanet
+                isExploring={isExploring}
+                onSelect={selectPoint}
+                landmarks={landmarks}
+                onProjectedLandmarksChange={setMarkers}
+              />
+            )}
+            {planet !== "mars" && (
+              <GlobeMarkers
+                points={markers}
+                activeId={planet === "earth" && openSiteId !== null ? String(openSiteId) : null}
+                onSelect={
+                  planet === "earth"
+                    ? (id) => setOpenSiteId(Number(id) === openSiteId ? null : Number(id))
+                    : undefined
+                }
+              />
+            )}
           </div>
         </div>
 
@@ -270,13 +302,13 @@ export default function HomePage() {
           )}
         >
           <h1
-            id="mars-title"
+            id="planet-title"
             className="text-[clamp(5.6rem,16vw,9rem)] font-black leading-[0.85] tracking-[-0.075em] text-white lg:origin-left lg:scale-x-[1.33] lg:text-[clamp(6.75rem,10.7vw,11rem)]"
           >
-            {dict.mars.title}
+            {profile.title}
           </h1>
           <p className="mt-3 text-sm text-app-secondary/75 sm:text-base">
-            {dict.mars.subtitle}
+            {profile.subtitle}
           </p>
         </div>
 
@@ -315,15 +347,25 @@ export default function HomePage() {
         </dl>
 
         {/* Right Side Panels: Distance to Sun graph, Curiosity, Measurements */}
-        <MarsMissionPanels isExploring={isExploring} />
+        <PlanetMissionPanels planet={planet} isExploring={isExploring} />
 
         {isExploring && selectedPoint && (
           <div
             key={`${selectedPoint.latitude}:${selectedPoint.longitude}`}
             className={cn(styles.explorationPanels, "relative z-30 order-3 grid items-start gap-3 sm:grid-cols-2")}
           >
-            <MarsClimatePanel point={selectedPoint} onClose={() => setSelectedPoint(null)} />
-            <MarsImageGallery point={selectedPoint} />
+            {planet === "mars" ? (
+              <>
+                <MarsClimatePanel point={selectedPoint} onClose={() => setSelectedPoint(null)} />
+                <MarsImageGallery point={selectedPoint} />
+              </>
+            ) : (
+              <PlanetExplorationPanels
+                planet={planet}
+                point={selectedPoint}
+                onClose={() => setSelectedPoint(null)}
+              />
+            )}
           </div>
         )}
 
@@ -338,11 +380,11 @@ export default function HomePage() {
                 className="rounded-full border-white/20 bg-black/60 px-4 text-white hover:bg-white/20 hover:text-white backdrop-blur-md shadow-xl gap-2 font-medium cursor-pointer"
               >
                 <ArrowLeft className="size-4" />
-                {dict.mars.explore.exit}
+                {profile.explore.exit}
               </Button>
               <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80 backdrop-blur-md">
                 <Compass className="size-3.5 text-[#ffab57]" />
-                {dict.mars.explore.modeBadge}
+                {profile.explore.modeBadge}
               </span>
             </div>
           </div>
@@ -350,11 +392,10 @@ export default function HomePage() {
         {isExploring && (
           <div className="pointer-events-none z-20 order-2 mx-auto -mt-4 flex w-fit items-center gap-2 rounded-full border border-white/15 bg-black/60 px-4 py-1.5 text-center text-xs text-white/85 shadow-2xl backdrop-blur-md lg:absolute lg:bottom-6 lg:left-1/2 lg:mt-0 lg:-translate-x-1/2">
             <RotateCcw className="size-3.5 shrink-0 text-[#ffab57] animate-spin [animation-duration:8s] motion-reduce:animate-none" />
-            {dict.mars.explore.dragHint}
+            {profile.explore.dragHint}
           </div>
         )}
       </section>
-      )}
 
       <div inert={isExploring} className={cn(isExploring && "hidden")}>
         <AnalogsPanel
