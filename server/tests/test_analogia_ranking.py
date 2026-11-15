@@ -69,14 +69,16 @@ def test_ranking_ordenado_y_con_explicacion(client: TestClient, destino: str) ->
     assert [f["posicion"] for f in filas] == [1, 2, 3, 4, 5]
     for f in filas:
         assert 0 <= f["similitud"] <= 1
-        assert f["cobertura"] == pytest.approx(1.0)
+        # los sitios de referencia no tienen "Relieve Regional" (solo las celdas): el grupo de
+        # terreno cubre el 70 % de su peso y la cobertura total baja a (0,5 + 0,2 x 0,7) / 0,7
+        assert f["cobertura"] == pytest.approx((0.5 + 0.2 * 0.7) / 0.7, abs=1e-3)
         assert set(f["por_grupo"]) == {"fisico", "terreno"}  # sin geología todavía
         assert all(0 <= s <= 1 for s in f["por_grupo"].values())
         assert {d["grupo"] for d in f["detalle"]} == {"fisico", "terreno"}
         assert f["metodo"] == "grupos-v1"
         assert f["geom"]["type"] == "Point"
         assert f["geom_destino"]["type"] == "Point"
-        assert len(f["detalle"]) == len(CARACTERISTICAS)
+        assert len(f["detalle"]) == len(CARACTERISTICAS) - 1  # todas menos "Relieve Regional"
 
 
 def test_ranking_destino_por_defecto_es_marte(client: TestClient) -> None:
@@ -118,7 +120,8 @@ def test_seed_usa_mediciones_reales_con_su_dataset() -> None:
             .join(DatasetModel, MedicionModel.dataset_id == DatasetModel.id)
             .where(MedicionModel.sitio_id == atacama.id)
         ).all()
-        assert len(filas) == len(CARACTERISTICAS)  # una medición por característica
+        # una medición por característica de los sitios de referencia (todas menos Relieve Regional)
+        assert len(filas) == len(CARACTERISTICAS) - 1
         datasets = {d.nombre for _, d in filas}
         assert {"NASA POWER (MERRA-2)", "OpenTopoData SRTM 30 m"} <= datasets
 

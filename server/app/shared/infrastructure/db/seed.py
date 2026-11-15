@@ -26,6 +26,7 @@ from app.modules.cuerpo_celeste.infrastructure.persistence.models.cuerpo_celeste
 )
 from app.modules.medicion.domain.entities.medicion import Medicion
 from app.modules.sitio.domain.entities.sitio import Sitio
+from app.shared.application.normalizacion import normalizar_valor
 from app.modules.dataset.infrastructure.persistence.models.dataset_model import (
     DatasetModel,
 )
@@ -91,6 +92,12 @@ def seed_initial_data(session: Session) -> None:
             "agencia": "NASA",
             "url": "https://pds-geosciences.wustl.edu/mgs/",
             "resolucion": 463.0,
+        },
+        {
+            "nombre": "GEBCO 2020 (OpenTopoData)",
+            "agencia": "GEBCO / BODC",
+            "url": "https://www.opentopodata.org/datasets/gebco2020/",
+            "resolucion": 450.0,
         },
         {
             "nombre": "NASA POWER (MERRA-2)",
@@ -203,8 +210,12 @@ CARACTERISTICAS = [
      "grupo": "fisico", "valor_min": 0.0, "valor_max": 10.0},
     {"nombre": "Hielo/Agua Superficial", "unidad": "%", "rango": 100.0, "peso": 1 / 5,
      "grupo": "fisico", "valor_min": 0.0, "valor_max": 100.0},
-    {"nombre": "Rugosidad del Terreno", "unidad": "m", "rango": 100.0, "peso": 3 / 5,
+    {"nombre": "Rugosidad del Terreno", "unidad": "m", "rango": 100.0, "peso": 3 / 10,
      "grupo": "terreno", "valor_min": 0.0, "valor_max": 1000.0},
+    # Solo las celdas de la malla la tienen (desviación de la elevación dentro de la celda).
+    # Va al final: los valores de SITIOS (siete por sitio) siguen el orden de las siete primeras.
+    {"nombre": "Relieve Regional", "unidad": "m", "rango": 3000.0, "peso": 3 / 10,
+     "grupo": "terreno", "valor_min": 0.0, "valor_max": 10000.0},
 ]
 
 # Composición mineral de cada sitio (% wt). No son variables físicas: se guardan en
@@ -302,14 +313,6 @@ def _slug(texto: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", base.lower()).strip("-")
 
 
-def _normalizar(valor: float, car: CaracteristicaModel) -> float:
-    """Valor en [0, 1] según el rango físico de la característica."""
-    minimo, maximo = car.valor_min, car.valor_max
-    if minimo is None or maximo is None:
-        minimo, maximo = 0.0, car.rango
-    return max(0.0, min(1.0, (valor - minimo) / (maximo - minimo)))
-
-
 def _seed_sitios_y_mediciones(session: Session) -> None:
     """Crea sitios, mediciones, composición mineral y la corrida de analogías.
 
@@ -383,7 +386,7 @@ def _seed_sitios_y_mediciones(session: Session) -> None:
                 caracteristica_id=car.id,
                 dataset_id=dataset_id,
                 valor=valor,
-                valor_normalizado=_normalizar(valor, car),
+                valor_normalizado=normalizar_valor(valor, car),
                 rango_fisico=(car.valor_min, car.valor_max),
             )
             existente = session.exec(

@@ -51,7 +51,7 @@ def session(engine):
 
 
 def test_minerals_are_composition_not_physical_features(session: Session) -> None:
-    assert _count(session, CaracteristicaModel) == 7
+    assert _count(session, CaracteristicaModel) == 8  # las 7 físicas y Relieve Regional
     assert {c.grupo for c in session.exec(select(CaracteristicaModel)).all()} == {
         "fisico",
         "terreno",
