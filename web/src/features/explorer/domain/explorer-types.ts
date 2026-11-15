@@ -1,7 +1,7 @@
-"""
-Domain types and embedded offline-first scientific catalog for Planetary Analog Explorer.
-Mirrors the FastAPI contracts (`/api/targets`, `/api/sites`, `/api/compare`, `/api/sources`).
-"""
+/**
+ * Domain types and embedded offline-first scientific catalog for Planetary Analog Explorer.
+ * Mirrors the FastAPI contracts (`/api/targets`, `/api/sites`, `/api/compare`, `/api/sources`).
+ */
 
 export type PlanetaryBody = "mars" | "moon" | "earth";
 export type MissionProfile = "rover_mobility" | "surface_geology" | "environmental_testing";
