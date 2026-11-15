@@ -46,7 +46,7 @@ export async function submitWithSchema<TSchemaData, TSuccessData>({
     response = await action(parsed.data);
   } catch {
     handleApiResultError(
-      { errors: ["No pudimos completar la operación. Intenta nuevamente."] },
+      { errors: ["Could not complete the operation. Please try again."] },
       { title: errorTitle },
     );
     return;

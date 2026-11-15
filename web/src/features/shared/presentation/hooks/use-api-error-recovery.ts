@@ -34,15 +34,15 @@ export function useApiErrorRecovery() {
 
       case "auth-provider-unavailable":
         appToast.error(
-          "No podemos verificar tu sesión",
-          "Intenta nuevamente en unos segundos.",
+          "Unable to verify your session",
+          "Please try again in a few seconds.",
         );
         return true;
 
       case "connection":
         appToast.error(
-          "Error de conexión",
-          "Revisa tu conexión e intenta nuevamente.",
+          "Connection error",
+          "Please check your internet connection and try again.",
         );
         return true;
 

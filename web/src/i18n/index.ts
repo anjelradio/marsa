@@ -1,6 +1,6 @@
 import { en, type TranslationDict } from "./locales/en";
 import { es } from "./locales/es";
-import { DEFAULT_LOCALE, SUPPORTED_LANGUAGES, type SupportedLocale } from "./types";
+import { DEFAULT_LOCALE, type SupportedLocale } from "./types";
 
 export * from "./types";
 export * from "./locales/en";

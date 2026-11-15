@@ -103,8 +103,8 @@ export async function sendPasswordResetEmail({
 
   await sendEmail({
     to: { email, name },
-    subject: "Recupera tu contraseña",
+    subject: "Reset your password",
     html: htmlString,
-    text: `Restablece tu contraseña: ${url}`,
+    text: `Reset your password: ${url}`,
   });
 }

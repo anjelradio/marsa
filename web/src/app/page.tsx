@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Globe2, Info, Moon, Orbit, Rocket, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,15 +10,15 @@ import stars from "./home/starfield.module.css";
 import styles from "./landing.module.css";
 
 export const metadata: Metadata = {
-  title: "AstroPlus | Explora el sistema solar",
-  description: "Observa la Tierra y la Luna en 3D y explora Marte con AstroPlus.",
+  title: "AstroPlus | Explore the Solar System",
+  description: "View Earth and the Moon in 3D and explore Mars with AstroPlus.",
 };
 
 const topics = [
-  { id: "tierra", title: "La Tierra", description: "Reconoce los océanos y continentes de nuestro planeta en la escena 3D.", icon: Globe2 },
-  { id: "luna", title: "La Luna", description: "Observa cómo nuestro satélite acompaña a la Tierra en su órbita.", icon: Moon },
-  { id: "orbita", title: "Órbitas", description: "Consulta en el atlas la distancia de Marte al Sol y cómo varía su velocidad orbital.", icon: Orbit },
-  { id: "planeta-marte", title: "Marte", description: "Explora su relieve y ubica el lugar donde aterrizó el rover Curiosity.", icon: Sun },
+  { id: "tierra", title: "Earth", description: "Explore the oceans and continents of our home planet in the interactive 3D scene.", icon: Globe2 },
+  { id: "luna", title: "The Moon", description: "Observe Earth's natural satellite accompanying our planet in its orbit.", icon: Moon },
+  { id: "orbita", title: "Orbits", description: "Check Mars' distance to the Sun and examine how its orbital velocity varies.", icon: Orbit },
+  { id: "planeta-marte", title: "Mars", description: "Explore Martian topography and locate the landing site of the Curiosity rover.", icon: Sun },
 ];
 
 const iconLink =
@@ -25,7 +26,7 @@ const iconLink =
 
 export default function LandingPage() {
   return (
-    <main lang="es" className={cn(styles.landing, "relative isolate overflow-hidden bg-[#050505] text-zinc-300")}>
+    <main lang="en" className={cn(styles.landing, "relative isolate overflow-hidden bg-[#050505] text-zinc-300")}>
       <div aria-hidden="true" className={styles.sky}>
         <div className={cn(stars.distantStars, "absolute -inset-8 opacity-30")} />
         <div className={cn(stars.nearStars, "absolute -inset-8 opacity-40")} />
@@ -45,32 +46,39 @@ export default function LandingPage() {
         }
       >
         <section aria-labelledby="landing-title" className={cn(styles.hero, "relative z-10 flex flex-col items-center px-5 text-center sm:px-8")}>
-          <h1 id="landing-title" className="relative font-headline text-[clamp(3rem,7.75vw,7rem)] font-bold leading-none tracking-[-0.055em] text-white">
-            <span aria-hidden="true" className={styles.titleOrbit} />
-            Astro<span className={styles.plus}>Plus</span>
+          <h1 id="landing-title" className="relative flex justify-center">
+            <span className="sr-only">MARSA - Earth Analog Explorer</span>
+            <Image
+              src="/landing/marsa-terra.png"
+              alt="MARSA - Earth Analog Explorer"
+              width={2103}
+              height={748}
+              priority
+              className="h-auto w-full max-w-[340px] sm:max-w-[460px] md:max-w-[560px] drop-shadow-[0_0_35px_rgba(59,149,255,0.35)] object-contain"
+            />
           </h1>
-          <p className="mt-2 max-w-[26rem] text-sm leading-snug text-slate-200/90">
-            Observa la Tierra y la Luna en 3D y explora la superficie y la órbita de Marte en el atlas interactivo.
+          <p className="mt-4 max-w-[26rem] text-sm leading-snug text-slate-200/90">
+            View Earth and the Moon in 3D and explore the surface and orbit of Mars in the interactive atlas.
           </p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-3 sm:gap-5">
             <Button asChild variant="ghost" className={cn(styles.glassButton, styles.exploreButton, "h-10 rounded-full px-5 sm:px-6")}>
-              <a href="#marte"><Rocket aria-hidden="true" /> Explorar Marte <ArrowRight aria-hidden="true" /></a>
+              <a href="#marte"><Rocket aria-hidden="true" /> Explore Mars <ArrowRight aria-hidden="true" /></a>
             </Button>
             <div className="flex gap-2 sm:gap-3">
               <Button asChild variant="ghost" className={iconLink}>
-                <a href="#tierra" aria-label="Sobre la Tierra"><Globe2 aria-hidden="true" /></a>
+                <a href="#tierra" aria-label="About Earth"><Globe2 aria-hidden="true" /></a>
               </Button>
               <Button asChild variant="ghost" className={iconLink}>
-                <a href="#luna" aria-label="Sobre la Luna"><Moon aria-hidden="true" /></a>
+                <a href="#luna" aria-label="About the Moon"><Moon aria-hidden="true" /></a>
               </Button>
               <Button asChild variant="ghost" className={iconLink}>
-                <a href="#explorar" aria-label="Ver guía de exploración"><Info aria-hidden="true" /></a>
+                <a href="#explorar" aria-label="View exploration guide"><Info aria-hidden="true" /></a>
               </Button>
             </div>
           </div>
         </section>
 
-        <section id="explorar" aria-label="Guía de exploración" className="relative z-10 scroll-mt-6 px-5 pt-12 pb-20 sm:px-8">
+        <section id="explorar" aria-label="Exploration guide" className="relative z-10 scroll-mt-6 px-5 pt-12 pb-20 sm:px-8">
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-linear-to-b from-transparent via-[#050505] via-65% to-[#050505]" />
           <div className="relative mx-auto grid max-w-6xl grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
             {topics.map(({ id, title, description, icon: Icon }) => (
@@ -92,13 +100,13 @@ function MarsLandingContent() {
   return (
     <div className="relative z-10 mx-auto w-full max-w-xl md:mx-0">
       <h2 id="mars-landing-title" className="font-headline text-[clamp(4.5rem,10vw,8rem)] font-semibold leading-[0.9] tracking-[-0.075em] text-white">
-        Marte
+        Mars
       </h2>
       <p className="mt-5 max-w-md text-sm leading-relaxed text-zinc-300 sm:text-base">
-        Acércate al planeta rojo. Recorre su relieve, descubre cómo cambia su distancia al Sol y ubica el cráter Gale, donde aterrizó Curiosity.
+        Get closer to the Red Planet. Explore its terrain, discover how its distance to the Sun changes, and locate Gale Crater, where Curiosity landed.
       </p>
       <Button asChild variant="ghost" className={cn(styles.glassButton, "mt-8 h-12 rounded-full px-6")}>
-        <Link href="/home">Abrir atlas de Marte <ArrowRight aria-hidden="true" /></Link>
+        <Link href="/home">Launch Mars Atlas <ArrowRight aria-hidden="true" /></Link>
       </Button>
     </div>
   );

@@ -38,20 +38,15 @@ export function LanguageProvider({
 }) {
   const [locale, setLocaleState] = useState<SupportedLocale>(defaultLocale);
 
-  // Sync with localStorage on client mount
+  // Sync with localStorage on client mount (ensure English is default and active)
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY) as SupportedLocale | null;
-      if (stored && (stored === "en" || stored === "es")) {
-        setLocaleState(stored);
-        document.documentElement.lang = stored;
-      } else {
-        document.documentElement.lang = defaultLocale;
-      }
+      localStorage.setItem(STORAGE_KEY, "en");
+      document.documentElement.lang = "en";
     } catch {
       // localStorage may not be accessible in some environments
     }
-  }, [defaultLocale]);
+  }, []);
 
   const setLocale = useCallback((newLocale: SupportedLocale) => {
     setLocaleState(newLocale);

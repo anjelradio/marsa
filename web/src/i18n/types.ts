@@ -8,7 +8,6 @@ export interface LanguageOption {
 
 export const SUPPORTED_LANGUAGES: LanguageOption[] = [
   { code: "en", name: "English", flag: "🇺🇸" },
-  { code: "es", name: "Español", flag: "🇪🇸" },
 ];
 
 export const DEFAULT_LOCALE: SupportedLocale = "en";

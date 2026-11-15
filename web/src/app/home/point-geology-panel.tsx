@@ -58,7 +58,7 @@ export function PointGeologyPanel({
       cuerpo,
       { latitude, longitude },
       controller.signal,
-      "Error al obtener los datos geológicos en tiempo real"
+      "Error retrieving real-time geological data"
     )
       .then((res) => {
         if (controller.signal.aborted) return;
@@ -148,7 +148,7 @@ export function PointGeologyPanel({
               }`}
             >
               <Mountain className={`size-3.5 ${viewMode === "geology" ? theme.accentIcon : "text-white/50"}`} />
-              <span>Rocas y Minerales</span>
+              <span>Rocks & Minerals</span>
             </button>
             <button
               type="button"
@@ -160,7 +160,7 @@ export function PointGeologyPanel({
               }`}
             >
               <Thermometer className={`size-3.5 ${viewMode === "climate" ? "text-amber-400" : "text-white/50"}`} />
-              <span>Clima y Atmósfera</span>
+              <span>Climate & Atmosphere</span>
             </button>
           </div>
         )}
@@ -176,7 +176,7 @@ export function PointGeologyPanel({
                 id="point-geology-title"
                 className="truncate font-headline text-base font-semibold text-white"
               >
-                {data ? data.region_nombre : `Geología y Minerales · ${cuerpo}`}
+                {data ? data.region_nombre : `Geology and Minerals · ${cuerpo === "Marte" ? "Mars" : cuerpo === "Luna" ? "Moon" : "Earth"}`}
               </h2>
             </div>
             <p className="mt-1 pl-10.5 font-mono text-xs text-white/60">
@@ -190,7 +190,7 @@ export function PointGeologyPanel({
             type="button"
             variant="ghost"
             size="icon-sm"
-            aria-label="Cerrar panel geológico"
+            aria-label="Close geology panel"
             onClick={onClose}
             className="shrink-0 rounded-full text-white/70 hover:bg-white/10 hover:text-white"
           >
@@ -210,7 +210,7 @@ export function PointGeologyPanel({
             }`}
           >
             <Layers className="size-3.5" />
-            <span>Rocas</span>
+            <span>Rocks</span>
           </button>
           <button
             type="button"
@@ -222,7 +222,7 @@ export function PointGeologyPanel({
             }`}
           >
             <Gem className="size-3.5" />
-            <span>Minerales</span>
+            <span>Minerals</span>
           </button>
           <button
             type="button"
@@ -234,7 +234,7 @@ export function PointGeologyPanel({
             }`}
           >
             <Sparkles className="size-3.5" />
-            <span>{cuerpo === "Marte" ? dict.marsAnalogComparison.tab : "Análogo"}</span>
+            <span>{cuerpo === "Marte" ? "Analogs" : "Analog"}</span>
           </button>
         </div>
 
@@ -244,7 +244,7 @@ export function PointGeologyPanel({
             <div className="flex flex-col items-center justify-center gap-3 py-10 text-white/70">
               <RefreshCw className={`size-6 animate-spin ${theme.accentIcon}`} />
               <p className="text-xs">
-                Consultando geología y minerales en tiempo real...
+                Querying geology and minerals in real time...
               </p>
             </div>
           )}
@@ -252,7 +252,7 @@ export function PointGeologyPanel({
           {result === "error" && !loading && (
             <div className="rounded-2xl border border-red-500/20 bg-red-950/20 p-4 text-center">
               <p className="text-xs text-red-300">
-                No fue posible conectar con los servicios de geología para este punto.
+                Unable to connect to geology services for this location.
               </p>
               <Button
                 type="button"
@@ -266,7 +266,7 @@ export function PointGeologyPanel({
                 className="mt-3 rounded-full border-white/20 bg-white/5 text-xs text-white hover:bg-white/10"
               >
                 <RefreshCw className="mr-1.5 size-3" />
-                Reintentar
+                Retry
               </Button>
             </div>
           )}
@@ -284,7 +284,7 @@ export function PointGeologyPanel({
                 <div className="space-y-2.5">
                   <div className="rounded-2xl bg-white/7 backdrop-blur-md p-3.5">
                     <span className={`text-[10px] font-semibold tracking-wider uppercase ${theme.accentText}`}>
-                      Unidad Geológica
+                      Geological Unit
                     </span>
                     <h3 className="mt-0.5 text-sm font-medium text-white leading-snug">
                       {data.unidad_geologica}
@@ -298,7 +298,7 @@ export function PointGeologyPanel({
                   <div>
                     <span className="flex items-center gap-1.5 text-[11px] font-medium text-white/70 uppercase tracking-wider">
                       <Layers className={`size-3.5 ${theme.accentIcon}`} />
-                      Rocas Predominantes
+                      Predominant Rocks
                     </span>
                     <div className="mt-1.5 flex flex-wrap gap-1.5">
                       {data.rocas_predominantes.map((roca, idx) => (
@@ -316,7 +316,7 @@ export function PointGeologyPanel({
                   {Object.keys(data.distribucion_litologica).length > 0 && (
                     <div className="space-y-1.5 pt-1">
                       <span className="text-[11px] font-semibold text-white/70 uppercase tracking-wider">
-                        Distribución de Área 10°×10°
+                        10°×10° Area Distribution
                       </span>
                       <div className="space-y-1">
                         {Object.entries(data.distribucion_litologica).map(
@@ -354,7 +354,7 @@ export function PointGeologyPanel({
                           Macrostrat Live Data
                         </span>
                         <span className="text-[10px] text-white/50">
-                          {data.unidades_macrostrat.length} unidades encontradas
+                          {data.unidades_macrostrat.length} units found
                         </span>
                       </div>
                       {data.unidades_macrostrat.slice(0, 2).map((u, i) => (
@@ -379,7 +379,7 @@ export function PointGeologyPanel({
                   <div>
                     <span className="flex items-center gap-1.5 text-[11px] font-medium text-white/70 uppercase tracking-wider">
                       <Gem className="size-3.5 text-teal-400" />
-                      Minerales Detectados (Espectrometría Orbital)
+                      Detected Minerals (Orbital Spectrometry)
                     </span>
                     <div className="mt-1.5 flex flex-wrap gap-1.5">
                       {data.minerales_principales.map((mineral, idx) => (
@@ -399,10 +399,10 @@ export function PointGeologyPanel({
                       <div className="flex items-center justify-between">
                         <span className="flex items-center gap-1.5 text-[11px] font-semibold text-white/90 uppercase tracking-wider">
                           <FlaskConical className={`size-3.5 ${theme.accentIcon}`} />
-                          Muestras In-Situ Cuantitativas (% wt)
+                          Quantitative In-Situ Samples (wt%)
                         </span>
                         <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-medium text-emerald-300">
-                          Laboratorio
+                          Laboratory
                         </span>
                       </div>
 
@@ -452,9 +452,7 @@ export function PointGeologyPanel({
                     </div>
                   ) : (
                     <div className="rounded-2xl bg-white/7 p-3.5 text-xs text-white/60">
-                      Este punto cuenta con análisis espectral multiespectral y
-                      litológico regional. Consulta la pestaña Análogo para
-                      ver los sitios gemelos en Marte o la Luna con muestras CheMin y Apolo.
+                      This location features multispectral orbital data and regional lithological analysis. See the Analogs tab for matching sites on Mars or the Moon with CheMin and Apollo samples.
                     </div>
                   )}
                 </div>
@@ -472,12 +470,12 @@ export function PointGeologyPanel({
                         <div className="flex items-center justify-between">
                           <span className={`flex items-center gap-1.5 text-xs font-semibold ${theme.accentText}`}>
                             <Orbit className="size-3.5" />
-                            Análogo en {legacyAnalog.cuerpo_destino}
+                            Analog on {legacyAnalog.cuerpo_destino === "Marte" ? "Mars" : legacyAnalog.cuerpo_destino === "Luna" ? "Moon" : "Earth"}
                           </span>
                           {legacyScore != null && (
                             <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-xs font-semibold text-emerald-300">
                               <Award className="size-3" />
-                              {fmt(legacyScore, 1)}% similitud
+                              {fmt(legacyScore, 1)}% similarity
                             </span>
                           )}
                         </div>
@@ -494,12 +492,12 @@ export function PointGeologyPanel({
                         )}
                       </div>
                       <p className="rounded-2xl bg-white/7 p-3 text-xs leading-relaxed text-white/70">
-                        Similitud coseno entre proporciones litológicas de las regiones catalogadas.
+                        Cosine similarity between lithological proportions of cataloged regions.
                       </p>
                     </div>
                   ) : (
                     <div className="text-xs text-white/60 p-4 text-center">
-                      No hay datos de analogía disponibles para esta coordenada.
+                      No analog data available for this coordinate.
                     </div>
                   )}
                 </div>

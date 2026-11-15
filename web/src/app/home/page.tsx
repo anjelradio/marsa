@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import {
   CalendarDays,
   Clock3,
   Orbit,
-  Sparkles,
   Thermometer,
   ArrowLeft,
   Wind,
@@ -185,9 +186,16 @@ export default function HomePage() {
           "text-app-primary-foreground lg:absolute lg:top-5 lg:left-4 z-30 motion-safe:transition-opacity motion-safe:duration-200",
           isExploring && "opacity-0 max-lg:hidden",
         )}>
-          <div className="flex items-start gap-1 font-headline text-3xl font-semibold leading-none tracking-tight">
-            {dict.common.appName} <Sparkles aria-hidden="true" className="size-3.5 fill-current text-[#ffab57]" />
-          </div>
+          <Link href="/" className="inline-block transition-opacity hover:opacity-90">
+            <Image
+              src="/landing/marsa.png"
+              alt="MARSA - Mars Analog Explorer"
+              width={866}
+              height={288}
+              priority
+              className="h-8 sm:h-9 lg:h-10 w-auto object-contain drop-shadow-[0_0_20px_rgba(255,171,87,0.25)]"
+            />
+          </Link>
         </header>
 
         {/* Surface data cards stacked on the left side */}
@@ -393,14 +401,14 @@ export default function HomePage() {
           <Button
             onClick={hasSelection ? clearSelection : exitExploration}
             variant="ghost"
-            aria-label={hasSelection ? "Volver" : profile.explore.exit}
+            aria-label={hasSelection ? "Back" : profile.explore.exit}
             className={cn(
               styles.explorationControls,
               "absolute top-4 left-4 z-40 inline-flex items-center gap-2 rounded-full border-0 bg-black/70 px-4 py-2 text-sm font-medium text-white/90 shadow-none ring-0 backdrop-blur-xl hover:bg-black/90 hover:text-white transition-all cursor-pointer",
             )}
           >
             <ArrowLeft aria-hidden="true" className="size-4" />
-            <span>Volver</span>
+            <span>Back</span>
           </Button>
         )}
       </section>

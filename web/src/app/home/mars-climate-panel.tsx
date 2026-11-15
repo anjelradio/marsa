@@ -59,7 +59,7 @@ export function MarsClimatePanel({
               className="flex items-center justify-center gap-1.5 rounded-xl py-1.5 font-medium text-white/60 hover:text-white transition-colors"
             >
               <Mountain className="size-3.5 text-[#ffab57]" />
-              <span>Rocas y Minerales</span>
+              <span>Rocks & Minerals</span>
             </button>
             <button
               type="button"
@@ -67,7 +67,7 @@ export function MarsClimatePanel({
               className="flex items-center justify-center gap-1.5 rounded-xl bg-white/15 py-1.5 font-medium text-white shadow-none transition-colors"
             >
               <Thermometer className="size-3.5 text-amber-400" />
-              <span>Clima y Atmósfera</span>
+              <span>Climate & Atmosphere</span>
             </button>
           </div>
         )}
