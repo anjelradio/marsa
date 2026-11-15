@@ -6,7 +6,7 @@
 
 The project connects planetary exploration with Earth-based analog environments, helping users discover and compare geographical, geological, and environmental characteristics across Earth, Mars, and the Moon.
 
-Deployment: [https://marsa-pearl.vercel.app/](https://marsa-pearl.vercel.app/)
+## Deployment: [https://marsa-pearl.vercel.app/](https://marsa-pearl.vercel.app/)
 
 ## 🌌 About the Project
 
