@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n/context";
 import type { AnalogDestination } from "@/features/analogs/infrastructure/analogs-ranking";
 import type { AnalogRankingState } from "@/features/analogs/presentation/use-analog-ranking";
+import { SimilarCellsPanel } from "./similar-cells-panel";
 
 const DESTINATIONS: AnalogDestination[] = ["marte", "luna"];
 
@@ -30,6 +31,7 @@ export function AnalogsPanel({
 
   const pct = (value: number) => `${Math.round(value * 100)}%`;
   const name = (key: string) => (copy.features as Record<string, string>)[key] ?? key;
+  const groupName = (key: string) => (copy.groups as Record<string, string>)[key] ?? key;
   const list = (value: string) =>
     value ? value.split(", ").map(name).join(", ") : copy.none;
   const number = (value: number) => value.toLocaleString(locale, { maximumFractionDigits: 2 });
@@ -145,6 +147,16 @@ export function AnalogsPanel({
                           <span className="text-[#ff9b8a]">{copy.differs}:</span>{" "}
                           <span className="text-white/80">{list(item.difiere)}</span>
                         </p>
+                        {Object.keys(item.por_grupo).length > 0 && (
+                          <p>
+                            <span className="text-[#ffbd80]">{copy.groupsTitle}:</span>{" "}
+                            <span className="text-white/80">
+                              {Object.entries(item.por_grupo)
+                                .map(([key, value]) => `${groupName(key)} ${pct(value)}`)
+                                .join(" · ")}
+                            </span>
+                          </p>
+                        )}
                         <dl className="space-y-1">
                           {item.detalle.map((d) => (
                             <div key={d.caracteristica} className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1 rounded-xl bg-white/5 px-2.5 py-2 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_5rem]">
@@ -159,6 +171,10 @@ export function AnalogsPanel({
                             </div>
                           ))}
                         </dl>
+                        <SimilarCellsPanel
+                          siteId={item.sitio_tierra_id}
+                          destination={destination}
+                        />
                         <p className="text-white/50">
                           {copy.method}: {item.metodo}
                         </p>

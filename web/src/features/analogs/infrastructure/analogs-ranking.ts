@@ -9,7 +9,13 @@ const detailSchema = z.object({
   valor_tierra: z.number(),
   valor_destino: z.number(),
   similitud: z.number(),
+  grupo: z.string().default("fisico"),
 });
+
+const limitsSchema = z
+  .object({ lat_min: z.number(), lat_max: z.number(), lon_min: z.number(), lon_max: z.number() })
+  .nullable()
+  .default(null);
 
 const rankingItemSchema = z.object({
   posicion: z.number(),
@@ -20,7 +26,10 @@ const rankingItemSchema = z.object({
   sitio_destino_id: z.number(),
   sitio_destino: z.string(),
   geom_destino: z.unknown().nullable(),
+  codigo_destino: z.string().nullable().default(null),
+  limites_destino: limitsSchema,
   similitud: z.number(),
+  por_grupo: z.record(z.string(), z.number()).default({}),
   cobertura: z.number(),
   metodo: z.string(),
   coincide: z.string(),
@@ -30,6 +39,7 @@ const rankingItemSchema = z.object({
 
 const rankingSchema = z.array(rankingItemSchema);
 
+export type CellLimits = z.infer<typeof limitsSchema>;
 export type AnalogDetail = z.infer<typeof detailSchema>;
 export type AnalogRankingItem = z.infer<typeof rankingItemSchema>;
 

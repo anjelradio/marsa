@@ -14,6 +14,15 @@ function pointOf(geom: unknown): { lat: number; lon: number } | null {
   return Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : null;
 }
 
+/** Las celdas de 10° llegan como polígono: se marcan por su centro. */
+function centerOf(limits: AnalogRankingItem["limites_destino"]): { lat: number; lon: number } | null {
+  if (!limits) return null;
+  return {
+    lat: (limits.lat_min + limits.lat_max) / 2,
+    lon: (limits.lon_min + limits.lon_max) / 2,
+  };
+}
+
 function formatCoord(lat: number, lon: number) {
   return `${Math.abs(lat).toFixed(2)}° ${lat < 0 ? "S" : "N"} · ${Math.abs(lon).toFixed(2)}° ${lon < 0 ? "W" : "E"}`;
 }
@@ -39,7 +48,7 @@ export function earthLandmarks(ranking: AnalogRankingItem[]): GeographicLandmark
 export function targetLandmarks(ranking: AnalogRankingItem[]): GeographicLandmark[] {
   const seen = new Map<number, GeographicLandmark>();
   for (const item of ranking) {
-    const p = pointOf(item.geom_destino);
+    const p = pointOf(item.geom_destino) ?? centerOf(item.limites_destino);
     if (p && !seen.has(item.sitio_destino_id)) {
       seen.set(item.sitio_destino_id, {
         id: String(item.sitio_destino_id),

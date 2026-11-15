@@ -81,7 +81,7 @@ export const en = {
     limitsBody:
       "Earth cannot reproduce reduced gravity (Mars 3.73 m/s², Moon 1.62 m/s²), the lunar vacuum, the thin Martian atmosphere, or their radiation environments. Similarity here only compares the listed surface properties.",
     dataNote:
-      "Earth cloudiness, temperature and dust come from NASA POWER (MERRA-2, 25-year mean) and elevation from SRTM 30 m; Mars temperature and dust from the Mars Climate Database (one seasonal snapshot). Moon elevation comes from LRO LOLA and mean temperature from LRO Diviner. Ice, roughness, thermal inertia, Mars elevation, the Moon's zero dust and cloud values and McMurdo elevation are approximate reference figures.",
+      "Earth cloudiness, temperature and dust come from NASA POWER (MERRA-2, 25-year mean) and elevation from SRTM 30 m for reference sites and GEBCO 2020 for grid cells; Mars temperature and dust from the Mars Climate Database (one seasonal snapshot). Moon elevation comes from LRO LOLA and mean temperature from LRO Diviner. Ice, roughness, thermal inertia, Mars elevation, the Moon's zero dust and cloud values and McMurdo elevation are approximate reference figures. The score combines groups (physical 50%, terrain 20%); geology is not part of it yet.",
     planetFilter: "Planet",
     planets: { mars: "Mars", moon: "Moon", earth: "Earth" },
     stage: {
@@ -104,6 +104,23 @@ export const en = {
       "Cueva de los Verdes (Lanzarote)":
         "Accessible lava tube to practice robotic underground exploration, GPS-free mapping and radiation-sheltered habitats, an analog of lunar and Martian lava tubes.",
     },
+    groupsTitle: "By group",
+    groups: { fisico: "Physical", terreno: "Terrain", geologia: "Geology" },
+    cells: {
+      title: "Most similar 10° cells",
+      loading: "Looking for similar cells…",
+      error: "Could not search for similar cells.",
+      retry: "Retry",
+      empty: "No 10° cells have been loaded for this destination yet.",
+      noValid: "No cell has enough data (minimum coverage {min}).",
+      summary: "{valid} of {total} cells with enough data",
+      cell: "Cell",
+      weights: "Group weights: {weights}. Geology is not part of the score yet.",
+      stability: "stability",
+      stabilityHint:
+        "Share of group-weight combinations (from half to double) in which the cell stays among the best.",
+      range: "range",
+    },
     features: {
       "Temperatura Superficial": "Surface temperature",
       Nubosidad: "Cloudiness",
@@ -112,6 +129,7 @@ export const en = {
       "Profundidad Óptica de Polvo": "Dust optical depth",
       "Hielo/Agua Superficial": "Surface ice/water",
       "Rugosidad del Terreno": "Terrain roughness",
+      "Relieve Regional": "Regional relief",
     },
   },
   earth: {

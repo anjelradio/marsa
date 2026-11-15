@@ -83,7 +83,7 @@ export const es: TranslationDict = {
     limitsBody:
       "La Tierra no reproduce la gravedad reducida (Marte 3,73 m/s², Luna 1,62 m/s²), el vacío lunar, la atmósfera delgada de Marte ni su radiación. La similitud solo compara las propiedades de superficie listadas.",
     dataNote:
-      "La nubosidad, la temperatura y el polvo de la Tierra vienen de NASA POWER (MERRA-2, media de 25 años) y la elevación, de SRTM 30 m; la temperatura y el polvo de Marte, de la Mars Climate Database (una foto estacional). La elevación de la Luna viene de LRO LOLA y su temperatura media de LRO Diviner. El hielo, la rugosidad, la inercia térmica, la elevación de Marte, el polvo y las nubes a cero de la Luna y la elevación de McMurdo son cifras de referencia aproximadas.",
+      "La nubosidad, la temperatura y el polvo de la Tierra vienen de NASA POWER (MERRA-2, media de 25 años) y la elevación, de SRTM 30 m en los sitios de referencia y de GEBCO 2020 en las celdas; la temperatura y el polvo de Marte, de la Mars Climate Database (una foto estacional). La elevación de la Luna viene de LRO LOLA y su temperatura media de LRO Diviner. El hielo, la rugosidad, la inercia térmica, la elevación de Marte, el polvo y las nubes a cero de la Luna y la elevación de McMurdo son cifras de referencia aproximadas. La puntuación combina grupos (físico 50 %, terreno 20 %); la geología aún no forma parte de ella.",
     planetFilter: "Planeta",
     planets: { mars: "Marte", moon: "Luna", earth: "Tierra" },
     stage: {
@@ -106,6 +106,23 @@ export const es: TranslationDict = {
       "Cueva de los Verdes (Lanzarote)":
         "Tubo de lava accesible para practicar exploración robótica subterránea, mapeo sin GPS y hábitats protegidos de la radiación; análogo de los tubos de lava de la Luna y Marte.",
     },
+    groupsTitle: "Por grupo",
+    groups: { fisico: "Físico", terreno: "Terreno", geologia: "Geología" },
+    cells: {
+      title: "Celdas de 10° más parecidas",
+      loading: "Buscando celdas parecidas…",
+      error: "No se pudo buscar celdas parecidas.",
+      retry: "Reintentar",
+      empty: "Todavía no hay celdas de 10° cargadas para este destino.",
+      noValid: "Ninguna celda tiene datos suficientes (cobertura mínima {min}).",
+      summary: "{valid} de {total} celdas con datos suficientes",
+      cell: "Celda",
+      weights: "Pesos de grupo: {weights}. La geología aún no entra en la puntuación.",
+      stability: "estabilidad",
+      stabilityHint:
+        "Porcentaje de combinaciones de pesos de grupo (de la mitad al doble) en que la celda sigue entre las mejores.",
+      range: "rango",
+    },
     features: {
       "Temperatura Superficial": "Temperatura superficial",
       Nubosidad: "Nubosidad",
@@ -114,6 +131,7 @@ export const es: TranslationDict = {
       "Profundidad Óptica de Polvo": "Profundidad óptica del polvo",
       "Hielo/Agua Superficial": "Hielo/agua superficial",
       "Rugosidad del Terreno": "Rugosidad del terreno",
+      "Relieve Regional": "Relieve regional",
     },
   },
   earth: {
