@@ -7,8 +7,8 @@
         "dataset": "NASA POWER (MERRA-2)"
       },
       "Nubosidad": {
-        "valor": 20.57,
-        "dataset": "NASA POWER (MERRA-2)"
+        "valor": 19.29,
+        "dataset": "Copernicus Sentinel-2 L2A"
       },
       "Profundidad Óptica de Polvo": {
         "valor": 0.04,
@@ -25,8 +25,8 @@
         "dataset": "NASA POWER (MERRA-2)"
       },
       "Nubosidad": {
-        "valor": 45.08,
-        "dataset": "NASA POWER (MERRA-2)"
+        "valor": 30.27,
+        "dataset": "Copernicus Sentinel-2 L2A"
       },
       "Profundidad Óptica de Polvo": {
         "valor": 0.1,
@@ -43,8 +43,8 @@
         "dataset": "NASA POWER (MERRA-2)"
       },
       "Nubosidad": {
-        "valor": 59.18,
-        "dataset": "NASA POWER (MERRA-2)"
+        "valor": 38.7,
+        "dataset": "Copernicus Sentinel-2 L2A"
       },
       "Profundidad Óptica de Polvo": {
         "valor": 0.0,
@@ -57,8 +57,8 @@
         "dataset": "NASA POWER (MERRA-2)"
       },
       "Nubosidad": {
-        "valor": 22.76,
-        "dataset": "NASA POWER (MERRA-2)"
+        "valor": 10.64,
+        "dataset": "Copernicus Sentinel-2 L2A"
       },
       "Profundidad Óptica de Polvo": {
         "valor": 0.27,
@@ -75,8 +75,8 @@
         "dataset": "NASA POWER (MERRA-2)"
       },
       "Nubosidad": {
-        "valor": 54.19,
-        "dataset": "NASA POWER (MERRA-2)"
+        "valor": 33.87,
+        "dataset": "Copernicus Sentinel-2 L2A"
       },
       "Profundidad Óptica de Polvo": {
         "valor": 0.22,

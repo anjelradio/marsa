@@ -80,15 +80,19 @@ class CopernicusClient:
         self,
         bbox: list[float],
         datetime_range: str | None = None,
+        limit: int = 5,
     ) -> dict[str, float | None]:
         """
         Extrae el porcentaje promedio de cobertura de nubes desde Sentinel-2 L2A.
+
+        ``limit`` controla cuántas escenas se promedian (5 por defecto; usar un
+        valor mayor con un rango de fechas anual para una media representativa).
         """
         items = self.search(
             collections=["sentinel-2-l2a"],
             bbox=bbox,
             datetime_range=datetime_range,
-            limit=5,
+            limit=limit,
         )
         if not items:
             return {"cloud_cover": None}
