@@ -12,8 +12,15 @@ from app.modules.analogia.application.queries.ranking_query import (
     DestinoNoEncontrado,
     ranking_analogos,
 )
+from app.modules.analogia.application.queries.celdas_similares import (
+    OrigenInvalido,
+    OrigenNoEncontrado,
+    OrigenSinDatos,
+    celdas_similares,
+)
 from app.modules.analogia.infrastructure.api.schemas.analogia_schemas import (
     AnalogiaResponse,
+    CeldasSimilaresResponse,
     RankingItemResponse,
 )
 from app.modules.analogia.infrastructure.api.schemas.geology_schemas import (
@@ -67,6 +74,36 @@ def ranking(
         return ranking_analogos(db, nombre)
     except DestinoNoEncontrado as exc:
         raise HTTPException(status_code=404, detail=f"Destino no encontrado: {exc}")
+
+
+@router.get(
+    "/celdas-similares",
+    response_model=CeldasSimilaresResponse,
+    summary="Celdas de Marte o la Luna más parecidas a un lugar de la Tierra",
+)
+def celdas_similares_endpoint(
+    db: DBSession,
+    destino: Annotated[Literal["marte", "luna"], Query()] = "marte",
+    sitio_id: Annotated[int | None, Query(gt=0, description="Sitio de la Tierra de partida.")] = None,
+    lat: Annotated[float | None, Query(ge=-90, le=90, description="Latitud del punto terrestre.")] = None,
+    lng: Annotated[float | None, Query(ge=-180, le=180, description="Longitud del punto terrestre.")] = None,
+    limite: Annotated[int, Query(ge=1, le=50)] = 10,
+) -> dict:
+    """Ordena las celdas de 10° del destino por similitud con el sitio o el punto terrestre.
+
+    Devuelve, por celda, la puntuación única y la de cada grupo, la cobertura de datos y la
+    estabilidad del resultado ante otros pesos de grupo. Las celdas con cobertura menor que
+    ``cobertura_minima`` no se ordenan y se cuentan en ``descartadas_por_cobertura``.
+    """
+    nombre = {"marte": "Marte", "luna": "Luna"}[destino]
+    try:
+        return celdas_similares(db, nombre, sitio_id=sitio_id, lat=lat, lng=lng, limite=limite)
+    except (OrigenNoEncontrado, DestinoNoEncontrado) as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    except OrigenInvalido as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except OrigenSinDatos as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
 
 
 # ==============================================================================

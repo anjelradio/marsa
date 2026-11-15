@@ -38,13 +38,27 @@ def _valores_por_sitio(session: Session) -> dict[int, dict[int, float]]:
     return valores
 
 
-def _sitios_de(session: Session, nombre_cuerpo: str) -> list[SitioModel]:
+def _sitios_de(
+    session: Session, nombre_cuerpo: str, clase: str | None = None
+) -> list[SitioModel]:
+    """Sitios del cuerpo; con ``clase`` solo los de esa clase (``referencia`` o ``celda``)."""
     cuerpo = session.exec(
         select(CuerpoCelesteModel).where(CuerpoCelesteModel.nombre == nombre_cuerpo)
     ).first()
     if cuerpo is None:
         raise DestinoNoEncontrado(nombre_cuerpo)
-    return list(session.exec(select(SitioModel).where(SitioModel.cuerpo_id == cuerpo.id)).all())
+    consulta = select(SitioModel).where(SitioModel.cuerpo_id == cuerpo.id)
+    if clase is not None:
+        consulta = consulta.where(SitioModel.clase == clase)
+    return list(session.exec(consulta).all())
+
+
+def limites_de(sitio: SitioModel) -> dict[str, float] | None:
+    """Los cuatro bordes del sitio si es una celda."""
+    bordes = (sitio.lat_min, sitio.lat_max, sitio.lon_min, sitio.lon_max)
+    if any(b is None for b in bordes):
+        return None
+    return dict(zip(("lat_min", "lat_max", "lon_min", "lon_max"), bordes))
 
 
 def mejor_coincidencia(
@@ -65,12 +79,14 @@ def mejor_coincidencia(
 
 
 def ranking_analogos(session: Session, destino: str) -> list[dict]:
-    """Ordena los sitios terrestres por similitud con el mejor sitio del destino.
+    """Ordena los sitios de referencia de la Tierra por similitud con el mejor sitio del destino.
 
-    ``destino`` es el nombre del cuerpo celeste (p. ej. ``Marte`` o ``Luna``).
+    ``destino`` es el nombre del cuerpo celeste (p. ej. ``Marte`` o ``Luna``). El destino puede ser
+    un sitio de referencia o una celda de la malla; en la Tierra solo cuentan los sitios de
+    referencia (las celdas terrestres se usan para buscar, no para este ranking).
     """
     sitios_destino = _sitios_de(session, destino)
-    sitios_tierra = _sitios_de(session, "Tierra")
+    sitios_tierra = _sitios_de(session, "Tierra", "referencia")
     specs = _especificaciones(session)
     valores = _valores_por_sitio(session)
 
@@ -89,6 +105,8 @@ def ranking_analogos(session: Session, destino: str) -> list[dict]:
                 "sitio_destino_id": sitio_destino.id,
                 "sitio_destino": sitio_destino.nombre,
                 "geom_destino": sitio_destino.geom,
+                "codigo_destino": sitio_destino.codigo,
+                "limites_destino": limites_de(sitio_destino),
                 "similitud": r.similitud,
                 "cobertura": r.cobertura,
                 "por_grupo": r.por_grupo,

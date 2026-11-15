@@ -61,6 +61,20 @@ def similitud_caracteristica(a: float, b: float, rango: float) -> float:
     return max(0.0, min(1.0, 1.0 - abs(a - b) / rango))
 
 
+def combinar_grupos(
+    por_grupo: dict[str, float], pesos: dict[str, float] | None = None
+) -> float:
+    """Puntuación única: media de los grupos con dato, ponderada con ``pesos``.
+
+    Si a un grupo le falta el dato su peso se reparte entre los demás. Sin ningún grupo, ``0``.
+    """
+    pesos = PESOS_GRUPO if pesos is None else pesos
+    peso_con_dato = sum(pesos.get(g, 0.0) for g in por_grupo)
+    if peso_con_dato <= 0:
+        return 0.0
+    return sum(pesos.get(g, 0.0) * s for g, s in por_grupo.items()) / peso_con_dato
+
+
 def calcular_similitud(
     caracteristicas: list[CaracteristicaSpec],
     valores_tierra: dict[int, float],
@@ -96,12 +110,7 @@ def calcular_similitud(
         g: acumulado[g] / peso_cubierto[g] for g in peso_cubierto if peso_cubierto[g] > 0
     }
 
-    peso_con_dato = sum(PESOS_GRUPO.get(g, 0.0) for g in por_grupo)
-    similitud = (
-        sum(PESOS_GRUPO.get(g, 0.0) * s for g, s in por_grupo.items()) / peso_con_dato
-        if peso_con_dato > 0
-        else 0.0
-    )
+    similitud = combinar_grupos(por_grupo)
 
     peso_esperado = sum(PESOS_GRUPO.get(g, 0.0) for g in peso_total if peso_total[g] > 0)
     cobertura = (

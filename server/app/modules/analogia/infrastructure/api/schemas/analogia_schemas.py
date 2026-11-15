@@ -36,6 +36,8 @@ class RankingItemResponse(BaseModel):
     sitio_destino_id: int
     sitio_destino: str
     geom_destino: dict | None
+    codigo_destino: str | None = None
+    limites_destino: dict[str, float] | None = None
     similitud: float
     por_grupo: dict[str, float] = {}
     cobertura: float
@@ -61,3 +63,40 @@ class AnalogiaResponse(BaseModel):
     metodo: str | None
     coincide: str | None
     difiere: str | None
+
+
+class CeldaSimilarResponse(BaseModel):
+    posicion: int
+    sitio_id: int
+    codigo: str | None
+    nombre: str
+    geom: dict | None
+    limites: dict[str, float] | None
+    similitud: float
+    por_grupo: dict[str, float]
+    cobertura: float
+    estabilidad: float = Field(description="Fracción de escenarios de pesos en que sigue en el top.")
+    similitud_min: float
+    similitud_max: float
+    coincide: str
+    difiere: str
+    detalle: list[DetalleCaracteristicaResponse]
+
+
+class OrigenResponse(BaseModel):
+    sitio_id: int
+    nombre: str
+    codigo: str | None
+    tipo: str | None
+
+
+class CeldasSimilaresResponse(BaseModel):
+    origen: OrigenResponse
+    destino: str
+    metodo: str
+    pesos_grupo: dict[str, float]
+    cobertura_minima: float
+    evaluadas: int
+    validas: int
+    descartadas_por_cobertura: int
+    resultados: list[CeldaSimilarResponse]
