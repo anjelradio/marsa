@@ -107,7 +107,31 @@
         "dataset": "LMD Mars Climate Database"
       }
     },
-    "Borde del cráter Shackleton": {},
-    "Mare Tranquillitatis": {}
+    "Borde del cráter Shackleton": {
+      "Elevación": {
+        "valor": 625.5,
+        "dataset": "NASA LRO LOLA / Diviner"
+      },
+      "Temperatura Superficial": {
+        "valor": 113.38,
+        "dataset": "NASA LRO LOLA / Diviner",
+        "max_k": 228.8,
+        "min_k": 57.2,
+        "bins_con_dato": 96
+      }
+    },
+    "Mare Tranquillitatis": {
+      "Elevación": {
+        "valor": -905.0,
+        "dataset": "NASA LRO LOLA / Diviner"
+      },
+      "Temperatura Superficial": {
+        "valor": 219.65,
+        "dataset": "NASA LRO LOLA / Diviner",
+        "max_k": 394.5,
+        "min_k": 92.9,
+        "bins_con_dato": 48
+      }
+    }
   }
 }

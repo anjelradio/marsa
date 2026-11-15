@@ -8,9 +8,13 @@ Fuentes (todas públicas y sin clave):
   - OpenTopoData SRTM 30 m: elevación (m) de los sitios terrestres.
   - Mars Climate Database v6.2 vía el backend local: temperatura superficial
     y profundidad óptica de polvo de los sitios marcianos.
+  - NASA PDS (LRO): elevación de LOLA (LDEM_16) y temperatura media diurna de
+    Diviner (GCP) de los sitios lunares, leídas por rango de bytes (sin bajar
+    los ficheros completos).
 
 Uso (desde server/):
     venv/Scripts/python.exe scripts/fetch_real_measurements.py [--backend http://localhost:8000]
+    venv/Scripts/python.exe scripts/fetch_real_measurements.py --cuerpos Luna   # solo la Luna
 
 Genera app/shared/infrastructure/db/real_measurements.json. Las características
 sin fuente quedan con el valor de referencia del seed.
@@ -28,6 +32,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from app.modules.cuerpo_celeste.infrastructure.moon_lro import (  # noqa: E402
+    get_moon_elevation,
+    get_moon_temperature,
+)
 from app.shared.application.satelital_service import extract_bbox_from_geom  # noqa: E402
 from app.shared.infrastructure.db.seed import SITIOS  # noqa: E402
 from app.shared.infrastructure.external.stac_clients import CopernicusClient  # noqa: E402
@@ -39,6 +47,7 @@ DS_POWER = "NASA POWER (MERRA-2)"
 DS_SRTM = "OpenTopoData SRTM 30 m"
 DS_MCD = "LMD Mars Climate Database"
 DS_S2 = "Copernicus Sentinel-2 L2A"
+DS_LRO = "NASA LRO LOLA / Diviner"
 
 # Escenas Sentinel-2 promediadas por sitio (un año completo).
 S2_ESCENAS = 100
@@ -92,11 +101,21 @@ def clima_marte(backend: str, lon: float, lat: float) -> dict[str, float]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--backend", default="http://localhost:8000")
+    parser.add_argument(
+        "--cuerpos",
+        default="Tierra,Marte,Luna",
+        help="Cuerpos a descargar, separados por comas; el resto se conserva del JSON actual.",
+    )
     args = parser.parse_args()
+    seleccion = {c.strip() for c in args.cuerpos.split(",")}
 
     copernicus = CopernicusClient()
     resultado: dict = {"generado": date.today().isoformat(), "sitios": {}}
+    if SALIDA.exists():
+        resultado["sitios"] = json.loads(SALIDA.read_text(encoding="utf-8")).get("sitios", {})
     for cuerpo, nombre, _tipo, lon, lat, _vals in SITIOS:
+        if cuerpo not in seleccion:
+            continue
         medidas: dict[str, dict] = {}
         try:
             if cuerpo == "Tierra":
@@ -119,6 +138,17 @@ def main() -> None:
                 v = clima_marte(args.backend, lon, lat)
                 medidas["Temperatura Superficial"] = {"valor": round(v["surface_temperature_k"], 2), "dataset": DS_MCD}
                 medidas["Profundidad Óptica de Polvo"] = {"valor": round(v["dust_optical_depth"], 3), "dataset": DS_MCD}
+            elif cuerpo == "Luna":
+                z = get_moon_elevation(lat, lon)
+                medidas["Elevación"] = {"valor": round(z, 1), "dataset": DS_LRO}
+                t = get_moon_temperature(lat, lon)
+                medidas["Temperatura Superficial"] = {
+                    "valor": round(t["mean_k"], 2),
+                    "dataset": DS_LRO,
+                    "max_k": round(t["max_k"], 1),
+                    "min_k": round(t["min_k"], 1),
+                    "bins_con_dato": int(t["valid_bins"]),
+                }
         except Exception as exc:  # una fuente caída no debe tumbar el resto
             print(f"[aviso] {nombre}: {exc}", file=sys.stderr)
         resultado["sitios"][nombre] = medidas
