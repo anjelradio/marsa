@@ -1,6 +1,13 @@
 from typing import Iterator
 
-from sqlmodel import Session, SQLModel, create_engine
+from sqlalchemy import create_engine
+from sqlalchemy.orm import DeclarativeBase, Session
+
+try:
+    from sqlmodel import SQLModel  # type: ignore[import-not-found]
+except ImportError:
+    class SQLModel(DeclarativeBase):  # type: ignore[no-redef]
+        pass
 
 from app.core.config import settings
 import app.shared.infrastructure.db.models  # noqa: F401

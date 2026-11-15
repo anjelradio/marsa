@@ -1,0 +1,38 @@
+{
+  "kind": "DEMO_FIXTURE_NOT_SCIENTIFIC_DATA",
+  "warning": "DEMOSTRACIÓN: Estos registros son sintéticos para pruebas automatizadas del motor y NO deben presentarse como hallazgos científicos.",
+  "records": [
+    {
+      "id": "demo-synthetic-perfect-clone",
+      "name": "[DEMO] Sitio Sintético de Control Positivo",
+      "body": "earth",
+      "features": {
+        "median_slope_deg": 4.2,
+        "slope_p90_deg": 11.8,
+        "ruggedness_tri": 2.8,
+        "local_relief_m": 185.0,
+        "lithology": "fluvio_lacustrine_volcaniclastic",
+        "ndvi": 0.0,
+        "precipitation_mm_year": 0.0,
+        "mean_temperature_c": -45.5
+      },
+      "kind": "DEMO"
+    },
+    {
+      "id": "demo-synthetic-tropical-forest-negative-control",
+      "name": "[DEMO] Control Negativo — Selva Tropical Húmeda",
+      "body": "earth",
+      "features": {
+        "median_slope_deg": 28.0,
+        "slope_p90_deg": 45.0,
+        "ruggedness_tri": 14.5,
+        "local_relief_m": 950.0,
+        "lithology": "evaporitic_alluvial_playa",
+        "ndvi": 0.88,
+        "precipitation_mm_year": 2950.0,
+        "mean_temperature_c": 27.0
+      },
+      "kind": "DEMO"
+    }
+  ]
+}

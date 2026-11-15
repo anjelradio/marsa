@@ -21,7 +21,11 @@ from collections.abc import Iterator
 from typing import Annotated
 
 from fastapi import Depends
-from sqlmodel import Session
+
+try:
+    from sqlmodel import Session  # type: ignore[import-not-found]
+except ImportError:
+    from sqlalchemy.orm import Session
 
 from app.core.database import get_session
 from app.shared.domain.event_bus import EventBus

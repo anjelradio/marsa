@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# Local databases & env files
+*.db
+*.sqlite3
+.env
+.env.*
+!.env.template
+!.env.example
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+
+# Raw large geospatial rasters & local zip archives
+datos-marte.zip
+datos-marte/
+data/raw/

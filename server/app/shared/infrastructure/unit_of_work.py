@@ -1,6 +1,9 @@
 import logging
 
-from sqlmodel import Session
+try:
+    from sqlmodel import Session  # type: ignore[import-not-found]
+except ImportError:
+    from sqlalchemy.orm import Session
 
 from app.shared.domain.aggregate_root import AggregateRoot
 from app.shared.domain.domain_event import DomainEvent

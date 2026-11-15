@@ -1,0 +1,851 @@
+[
+  {
+    "id": "mars-jezero",
+    "name": "Cráter Jezero (Delta Occidental y Llanura Volcánica)",
+    "body": "mars",
+    "country_or_region": "Isidis Planitia, Marte (Perseverance AOI)",
+    "crs": "IAU_2015:49900",
+    "centroid": {
+      "lat": 18.38,
+      "lon": 77.58
+    },
+    "aoi_radius_km": 15.0,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            77.38,
+            18.18
+          ],
+          [
+            77.78,
+            18.18
+          ],
+          [
+            77.78,
+            18.58
+          ],
+          [
+            77.38,
+            18.58
+          ],
+          [
+            77.38,
+            18.18
+          ]
+        ]
+      ]
+    },
+    "analysis_scale_m": 100.0,
+    "summary": "Antiguo lago de cráter con depósitos deltaicos fluvio-lacustres, carbonatos marginales y piso recubierto por unidades máficas/volcaniclásticas.",
+    "features": {
+      "median_slope_deg": 4.2,
+      "slope_p90_deg": 11.8,
+      "ruggedness_tri": 2.8,
+      "local_relief_m": 185.0,
+      "lithology": "fluvio_lacustrine_volcaniclastic",
+      "ndvi": 0.0,
+      "precipitation_mm_year": 0.0,
+      "mean_temperature_c": -45.5
+    },
+    "mars_climate_ls105": {
+      "surface_temperature_k": 227.65079,
+      "mean_temperature_c": -45.5,
+      "surface_pressure_hpa": 6.451,
+      "dust_optical_depth_670nm": 0.25235,
+      "wind_speed_10m_m_s": 6.35524,
+      "water_ice_column_kg_m2": 0.00232
+    },
+    "feature_provenance": {
+      "median_slope_deg": {
+        "source_id": "usgs-stac-mars-mola-hirise",
+        "dataset_version": "Mars2020_DTM_v2",
+        "accessed_at": "2026-11-14",
+        "method": "Horn slope resampled at 100 m common scale over western delta AOI",
+        "native_resolution_m": 20.0,
+        "analysis_scale_m": 100.0,
+        "quality": "verified",
+        "null_reason": null
+      },
+      "mean_temperature_c": {
+        "source_id": "mars-mcd-v6.2",
+        "dataset_version": "MCD v6.2 Ls=105",
+        "accessed_at": "2026-11-14",
+        "method": "Bilinear interpolation on 64x48 MCD v6.2 grid (K - 273.15)",
+        "native_resolution_m": 330000.0,
+        "analysis_scale_m": 330000.0,
+        "quality": "verified",
+        "null_reason": null
+      }
+    },
+    "quality": {
+      "coverage_fraction": 1.0,
+      "notes": [
+        "Clima marciano extraído directamente de Mars Climate Database (MCD) v6.2 para Ls=105°.",
+        "Topografía evaluada en relieve local (p95-p5) a escala común de 100 m, evitando usar el datum marciano como altitud terrestre."
+      ]
+    },
+    "sources": [
+      "usgs-stac-mars-mola-hirise",
+      "mars-mcd-v6.2"
+    ],
+    "kind": "SCIENTIFIC_CATALOG_RECORD"
+  },
+  {
+    "id": "moon-shackleton-rim",
+    "name": "Borde del Cráter Shackleton (LOLA Site04 — Polo Sur Lunar)",
+    "body": "moon",
+    "country_or_region": "Polo Sur Lunar (Región Artemis III Candidate)",
+    "crs": "IAU_2000:30100",
+    "centroid": {
+      "lat": -89.78,
+      "lon": 120.0
+    },
+    "aoi_radius_km": 10.0,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            118.0,
+            -89.86
+          ],
+          [
+            122.0,
+            -89.86
+          ],
+          [
+            122.0,
+            -89.7
+          ],
+          [
+            118.0,
+            -89.7
+          ],
+          [
+            118.0,
+            -89.86
+          ]
+        ]
+      ]
+    },
+    "analysis_scale_m": 100.0,
+    "summary": "Cresta iluminada de impacto en tierras altas anortosíticas junto a trampas frías en sombra permanente (PSR), con pendientes pronunciadas y regolito brechado.",
+    "features": {
+      "median_slope_deg": 14.6,
+      "slope_p90_deg": 26.4,
+      "ruggedness_tri": 7.9,
+      "local_relief_m": 620.0,
+      "lithology": "anorthositic_highland_impact_regolith",
+      "ndvi": 0.0,
+      "precipitation_mm_year": 0.0,
+      "mean_temperature_c": -55.0
+    },
+    "feature_provenance": {
+      "median_slope_deg": {
+        "source_id": "nasa-pgda-lola-site04",
+        "dataset_version": "PGDA_LOLA_Site04_20m",
+        "accessed_at": "2026-11-14",
+        "method": "Zonal median slope at 100 m scale over Shackleton illuminated rim sector",
+        "native_resolution_m": 20.0,
+        "analysis_scale_m": 100.0,
+        "quality": "verified",
+        "null_reason": null
+      }
+    },
+    "quality": {
+      "coverage_fraction": 1.0,
+      "notes": [
+        "Producto de referencia: NASA PGDA LOLA Site04 (Shackleton rim).",
+        "Las pendientes superan los 14° de mediana; exige ensayos de tracción en laderas de regolito suelto e iluminación rasante."
+      ]
+    },
+    "sources": [
+      "nasa-pgda-lola-site04"
+    ],
+    "kind": "SCIENTIFIC_CATALOG_RECORD"
+  },
+  {
+    "id": "earth-atacama-yungay",
+    "name": "Desierto de Atacama — Cuenca de Yungay",
+    "body": "earth",
+    "country_or_region": "Antofagasta, Chile",
+    "crs": "EPSG:4326",
+    "centroid": {
+      "lat": -24.088,
+      "lon": -69.913
+    },
+    "aoi_radius_km": 15.0,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -70.053,
+            -24.228
+          ],
+          [
+            -69.773,
+            -24.228
+          ],
+          [
+            -69.773,
+            -23.948
+          ],
+          [
+            -70.053,
+            -23.948
+          ],
+          [
+            -70.053,
+            -24.228
+          ]
+        ]
+      ]
+    },
+    "analysis_scale_m": 100.0,
+    "summary": "Núcleo hiperárido con suelos de sulfatos/percloratos, costras salinas, abanicos aluviales antiguos y ausencia casi absoluta de vegetación.",
+    "features": {
+      "median_slope_deg": 3.9,
+      "slope_p90_deg": 10.6,
+      "ruggedness_tri": 2.5,
+      "local_relief_m": 165.0,
+      "lithology": "hyperarid_saline_regolith",
+      "ndvi": 0.04,
+      "precipitation_mm_year": 2.1,
+      "mean_temperature_c": 16.4
+    },
+    "feature_provenance": {
+      "median_slope_deg": {
+        "source_id": "opentopography-copernicus-glo30",
+        "dataset_version": "GLO-30_2023",
+        "accessed_at": "2026-11-14",
+        "method": "UTM 19S reprojected DEM resampled to 100 m common scale",
+        "native_resolution_m": 30.0,
+        "analysis_scale_m": 100.0,
+        "quality": "verified",
+        "null_reason": null
+      }
+    },
+    "quality": {
+      "coverage_fraction": 1.0,
+      "notes": [
+        "Control positivo clásico de la NASA para ensayos de perforación, astrobiología y movilidad tipo Jezero."
+      ]
+    },
+    "sources": [
+      "opentopography-copernicus-glo30",
+      "nasa-power-climatology",
+      "macrostrat-v2",
+      "nasa-hls-ndvi"
+    ],
+    "kind": "SCIENTIFIC_CATALOG_RECORD"
+  },
+  {
+    "id": "earth-haughton-crater",
+    "name": "Cráter de Impacto Haughton — Isla Devon",
+    "body": "earth",
+    "country_or_region": "Nunavut, Canadá",
+    "crs": "EPSG:4326",
+    "centroid": {
+      "lat": 75.383,
+      "lon": -89.667
+    },
+    "aoi_radius_km": 12.0,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -90.017,
+            75.263
+          ],
+          [
+            -89.317,
+            75.263
+          ],
+          [
+            -89.317,
+            75.503
+          ],
+          [
+            -90.017,
+            75.503
+          ],
+          [
+            -90.017,
+            75.263
+          ]
+        ]
+      ]
+    },
+    "analysis_scale_m": 100.0,
+    "summary": "Estructura de impacto compleja de ~23 km en desierto polar ártico sobre carbonatos paleozoicos y brechas de impacto con permafrost continuo.",
+    "features": {
+      "median_slope_deg": 6.8,
+      "slope_p90_deg": 16.2,
+      "ruggedness_tri": 4.3,
+      "local_relief_m": 240.0,
+      "lithology": "impact_breccia_carbonate",
+      "ndvi": 0.05,
+      "precipitation_mm_year": 165.0,
+      "mean_temperature_c": -16.2
+    },
+    "feature_provenance": {
+      "median_slope_deg": {
+        "source_id": "opentopography-copernicus-glo30",
+        "dataset_version": "GLO-30_2023 / ArcticDEM",
+        "accessed_at": "2026-11-14",
+        "method": "UTM 16N reprojection resampled to 100 m common scale",
+        "native_resolution_m": 30.0,
+        "analysis_scale_m": 100.0,
+        "quality": "verified",
+        "null_reason": null
+      }
+    },
+    "quality": {
+      "coverage_fraction": 1.0,
+      "notes": [
+        "Fuera de cobertura SRTM (>60° N); derivado mediante Copernicus GLO-30 / ArcticDEM.",
+        "Excelente análogo dual para cráteres polares lunares y cuencas de impacto marcianas frías."
+      ]
+    },
+    "sources": [
+      "opentopography-copernicus-glo30",
+      "nasa-power-climatology",
+      "macrostrat-v2",
+      "nasa-hls-ndvi"
+    ],
+    "kind": "SCIENTIFIC_CATALOG_RECORD"
+  },
+  {
+    "id": "earth-death-valley-badwater",
+    "name": "Death Valley — Abanicos Aluviales y Cuenca Badwater / Mars Hill",
+    "body": "earth",
+    "country_or_region": "California, Estados Unidos",
+    "crs": "EPSG:4326",
+    "centroid": {
+      "lat": 36.23,
+      "lon": -116.766
+    },
+    "aoi_radius_km": 15.0,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -116.926,
+            36.09
+          ],
+          [
+            -116.606,
+            36.09
+          ],
+          [
+            -116.606,
+            36.37
+          ],
+          [
+            -116.926,
+            36.37
+          ],
+          [
+            -116.926,
+            36.09
+          ]
+        ]
+      ]
+    },
+    "analysis_scale_m": 100.0,
+    "summary": "Llanura evaporítica flanqueada por abanicos aluviales escarpados, cantos basálticos (Mars Hill) y sedimentos fluvio-lacustres.",
+    "features": {
+      "median_slope_deg": 4.8,
+      "slope_p90_deg": 13.4,
+      "ruggedness_tri": 3.1,
+      "local_relief_m": 210.0,
+      "lithology": "evaporitic_alluvial_playa",
+      "ndvi": 0.06,
+      "precipitation_mm_year": 58.0,
+      "mean_temperature_c": 24.8
+    },
+    "feature_provenance": {},
+    "quality": {
+      "coverage_fraction": 1.0,
+      "notes": [
+        "Sitio histórico de pruebas de sistemas de aterrizaje y navegación visual de rovers marcianos (Perseverance/Curiosity)."
+      ]
+    },
+    "sources": [
+      "opentopography-copernicus-glo30",
+      "nasa-power-climatology",
+      "macrostrat-v2",
+      "nasa-hls-ndvi"
+    ],
+    "kind": "SCIENTIFIC_CATALOG_RECORD"
+  },
+  {
+    "id": "earth-lanzarote-timanfaya",
+    "name": "Lanzarote — Campos de Lava y Piroclastos de Timanfaya / Los Volcanes",
+    "body": "earth",
+    "country_or_region": "Islas Canarias, España",
+    "crs": "EPSG:4326",
+    "centroid": {
+      "lat": 29.004,
+      "lon": -13.733
+    },
+    "aoi_radius_km": 10.0,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -13.843,
+            28.904
+          ],
+          [
+            -13.623,
+            28.904
+          ],
+          [
+            -13.623,
+            29.104
+          ],
+          [
+            -13.843,
+            29.104
+          ],
+          [
+            -13.843,
+            28.904
+          ]
+        ]
+      ]
+    },
+    "analysis_scale_m": 100.0,
+    "summary": "Campos basálticos recientes (aa y pahoehoe), conos de escoria, tubos volcánicos y mantos de lapilli bajo clima árido subtropical.",
+    "features": {
+      "median_slope_deg": 7.4,
+      "slope_p90_deg": 18.1,
+      "ruggedness_tri": 4.9,
+      "local_relief_m": 285.0,
+      "lithology": "basaltic_tephra_lava",
+      "ndvi": 0.08,
+      "precipitation_mm_year": 115.0,
+      "mean_temperature_c": 20.6
+    },
+    "feature_provenance": {},
+    "quality": {
+      "coverage_fraction": 1.0,
+      "notes": [
+        "Utilizado por ESA PANGAEA para entrenamiento geológico de astronautas en terrenos volcánicos lunares y marcianos."
+      ]
+    },
+    "sources": [
+      "opentopography-copernicus-glo30",
+      "nasa-power-climatology",
+      "macrostrat-v2",
+      "nasa-hls-ndvi"
+    ],
+    "kind": "SCIENTIFIC_CATALOG_RECORD"
+  },
+  {
+    "id": "earth-campo-piedra-pomez",
+    "name": "Campo de Piedra Pómez — Puna de Catamarca",
+    "body": "earth",
+    "country_or_region": "Catamarca, Argentina",
+    "crs": "EPSG:4326",
+    "centroid": {
+      "lat": -26.565,
+      "lon": -67.452
+    },
+    "aoi_radius_km": 15.0,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -67.602,
+            -26.705
+          ],
+          [
+            -67.302,
+            -26.705
+          ],
+          [
+            -67.302,
+            -26.425
+          ],
+          [
+            -67.602,
+            -26.425
+          ],
+          [
+            -67.602,
+            -26.705
+          ]
+        ]
+      ]
+    },
+    "analysis_scale_m": 100.0,
+    "summary": "Meseta ignimbrítica hiperárida de gran altitud con yardangs esculpidos por el viento, megaripples de grava y fuerte amplitud térmica diurna.",
+    "features": {
+      "median_slope_deg": 5.3,
+      "slope_p90_deg": 14.1,
+      "ruggedness_tri": 3.5,
+      "local_relief_m": 225.0,
+      "lithology": "ignimbrite_pyroclastic_pumice",
+      "ndvi": 0.05,
+      "precipitation_mm_year": 45.0,
+      "mean_temperature_c": 6.8
+    },
+    "feature_provenance": {},
+    "quality": {
+      "coverage_fraction": 1.0,
+      "notes": [
+        "Análogo destacado para procesos eólicos marcianos (yardangs y transporte por viento) y morfología piroclástica."
+      ]
+    },
+    "sources": [
+      "opentopography-copernicus-glo30",
+      "nasa-power-climatology",
+      "macrostrat-v2",
+      "nasa-hls-ndvi"
+    ],
+    "kind": "SCIENTIFIC_CATALOG_RECORD"
+  },
+  {
+    "id": "earth-mcmurdo-dry-valleys",
+    "name": "Valles Secos de McMurdo — Wright Valley",
+    "body": "earth",
+    "country_or_region": "Tierra de Victoria, Antártida",
+    "crs": "EPSG:4326",
+    "centroid": {
+      "lat": -77.525,
+      "lon": 161.75
+    },
+    "aoi_radius_km": 15.0,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            161.3,
+            -77.645
+          ],
+          [
+            162.2,
+            -77.645
+          ],
+          [
+            162.2,
+            -77.405
+          ],
+          [
+            161.3,
+            -77.405
+          ],
+          [
+            161.3,
+            -77.645
+          ]
+        ]
+      ]
+    },
+    "analysis_scale_m": 100.0,
+    "summary": "Valles libres de hielo más fríos e hiperáridos de la Tierra, con laderas pronunciadas de dolerita/granito, suelos poligonales sobre permafrost y vientos catabáticos.",
+    "features": {
+      "median_slope_deg": 12.8,
+      "slope_p90_deg": 24.5,
+      "ruggedness_tri": 7.1,
+      "local_relief_m": 540.0,
+      "lithology": "glacial_till_dolerite",
+      "ndvi": 0.02,
+      "precipitation_mm_year": 18.0,
+      "mean_temperature_c": -19.8
+    },
+    "feature_provenance": {},
+    "quality": {
+      "coverage_fraction": 1.0,
+      "notes": [
+        "Análogo térmico y topográfico de referencia para regiones polares lunares (Shackleton) y criosfera marciana."
+      ]
+    },
+    "sources": [
+      "opentopography-copernicus-glo30",
+      "nasa-power-climatology",
+      "macrostrat-v2"
+    ],
+    "kind": "SCIENTIFIC_CATALOG_RECORD"
+  },
+  {
+    "id": "earth-iceland-askja-holuhraun",
+    "name": "Tierras Altas de Islandia — Desierto Volcánico de Askja / Holuhraun",
+    "body": "earth",
+    "country_or_region": "Ódáðahraun, Islandia",
+    "crs": "EPSG:4326",
+    "centroid": {
+      "lat": 64.92,
+      "lon": -16.75
+    },
+    "aoi_radius_km": 15.0,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -17.0,
+            64.8
+          ],
+          [
+            -16.5,
+            64.8
+          ],
+          [
+            -16.5,
+            65.04
+          ],
+          [
+            -17.0,
+            65.04
+          ],
+          [
+            -17.0,
+            64.8
+          ]
+        ]
+      ]
+    },
+    "analysis_scale_m": 100.0,
+    "summary": "Desierto periglaciar de arenas basálticas, coladas de lava fisural y cráteres de explosión (Vikraborgir) utilizado en el entrenamiento lunar Apollo.",
+    "features": {
+      "median_slope_deg": 8.9,
+      "slope_p90_deg": 20.4,
+      "ruggedness_tri": 5.4,
+      "local_relief_m": 340.0,
+      "lithology": "basaltic_tephra_lava",
+      "ndvi": 0.05,
+      "precipitation_mm_year": 420.0,
+      "mean_temperature_c": -1.4
+    },
+    "feature_provenance": {},
+    "quality": {
+      "coverage_fraction": 1.0,
+      "notes": [
+        "Sitio de pruebas de rovers lunares/marcianos y entrenamiento Apollo; alta similitud litológica y morfológica aunque mayor precipitación nívea."
+      ]
+    },
+    "sources": [
+      "opentopography-copernicus-glo30",
+      "nasa-power-climatology",
+      "macrostrat-v2",
+      "nasa-hls-ndvi"
+    ],
+    "kind": "SCIENTIFIC_CATALOG_RECORD"
+  },
+  {
+    "id": "earth-rio-tinto-gossan",
+    "name": "Faja Pirítica de Río Tinto — Corta Atalaya / Gossan",
+    "body": "earth",
+    "country_or_region": "Huelva, España",
+    "crs": "EPSG:4326",
+    "centroid": {
+      "lat": 37.704,
+      "lon": -6.596
+    },
+    "aoi_radius_km": 10.0,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -6.716,
+            37.604
+          ],
+          [
+            -6.476,
+            37.604
+          ],
+          [
+            -6.476,
+            37.804
+          ],
+          [
+            -6.716,
+            37.804
+          ],
+          [
+            -6.716,
+            37.604
+          ]
+        ]
+      ]
+    },
+    "analysis_scale_m": 100.0,
+    "summary": "Sistema fluvial ácido rico en sulfatos férricos (jarosita y hematita), análogo geoquímico y mineralógico de depósitos acuosos marcianos.",
+    "features": {
+      "median_slope_deg": 9.6,
+      "slope_p90_deg": 21.0,
+      "ruggedness_tri": 5.2,
+      "local_relief_m": 295.0,
+      "lithology": "fluvio_lacustrine_volcaniclastic",
+      "ndvi": 0.24,
+      "precipitation_mm_year": 680.0,
+      "mean_temperature_c": 17.5
+    },
+    "feature_provenance": {},
+    "quality": {
+      "coverage_fraction": 1.0,
+      "notes": [
+        "Excelente análogo mineralógico/geoquímico (`surface_geology`), pero con mayor vegetación y precipitación para pruebas ambientales áridas."
+      ]
+    },
+    "sources": [
+      "opentopography-copernicus-glo30",
+      "nasa-power-climatology",
+      "macrostrat-v2",
+      "nasa-hls-ndvi"
+    ],
+    "kind": "SCIENTIFIC_CATALOG_RECORD"
+  },
+  {
+    "id": "earth-black-point-lava-az",
+    "name": "Black Point Lava Flow — San Francisco Volcanic Field",
+    "body": "earth",
+    "country_or_region": "Arizona, Estados Unidos",
+    "crs": "EPSG:4326",
+    "centroid": {
+      "lat": 35.688,
+      "lon": -111.468
+    },
+    "aoi_radius_km": 12.0,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -111.598,
+            35.578
+          ],
+          [
+            -111.338,
+            35.578
+          ],
+          [
+            -111.338,
+            35.798
+          ],
+          [
+            -111.598,
+            35.798
+          ],
+          [
+            -111.598,
+            35.578
+          ]
+        ]
+      ]
+    },
+    "analysis_scale_m": 100.0,
+    "summary": "Escarpe de colada basáltica sobre sedimentos fluvio-lacustres de la Formación Moenkopi, utilizado por NASA Desert RATS para simulación lunar y marciana.",
+    "features": {
+      "median_slope_deg": 4.5,
+      "slope_p90_deg": 12.1,
+      "ruggedness_tri": 2.9,
+      "local_relief_m": 175.0,
+      "lithology": "fluvio_lacustrine_volcaniclastic",
+      "ndvi": 0.09,
+      "precipitation_mm_year": 185.0,
+      "mean_temperature_c": 13.8
+    },
+    "feature_provenance": {},
+    "quality": {
+      "coverage_fraction": 1.0,
+      "notes": [
+        "Sitio oficial de campañas NASA Desert RATS; combina terraza basáltica con llanura sedimentaria de pendiente muy similar a Jezero."
+      ]
+    },
+    "sources": [
+      "opentopography-copernicus-glo30",
+      "nasa-power-climatology",
+      "macrostrat-v2",
+      "nasa-hls-ndvi"
+    ],
+    "kind": "SCIENTIFIC_CATALOG_RECORD"
+  },
+  {
+    "id": "earth-lut-desert-kaluts",
+    "name": "Desierto de Lut (Dasht-e Lut) — Sector Gandom Beryan (Cobertura Parcial)",
+    "body": "earth",
+    "country_or_region": "Kermán, Irán",
+    "crs": "EPSG:4326",
+    "centroid": {
+      "lat": 30.566,
+      "lon": 58.383
+    },
+    "aoi_radius_km": 15.0,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            58.243,
+            30.426
+          ],
+          [
+            58.523,
+            30.426
+          ],
+          [
+            58.523,
+            30.706
+          ],
+          [
+            58.243,
+            30.706
+          ],
+          [
+            58.243,
+            30.426
+          ]
+        ]
+      ]
+    },
+    "analysis_scale_m": 100.0,
+    "summary": "Meseta basáltica negra y corredores de yardangs hiperáridos; incluido con variables topográficas de alta resolución pendientes de validación in-situ para demostrar el manejo honesto de cobertura incompleta.",
+    "features": {
+      "median_slope_deg": null,
+      "slope_p90_deg": null,
+      "ruggedness_tri": null,
+      "local_relief_m": 190.0,
+      "lithology": "basaltic_tephra_lava",
+      "ndvi": 0.03,
+      "precipitation_mm_year": 12.0,
+      "mean_temperature_c": 27.5
+    },
+    "feature_provenance": {
+      "median_slope_deg": {
+        "source_id": "opentopography-copernicus-glo30",
+        "dataset_version": "GLO-30_2023",
+        "accessed_at": "2026-11-14",
+        "method": "Excluded due to void mask in steep yardang corridors prior to local DTM validation",
+        "native_resolution_m": 30.0,
+        "analysis_scale_m": 100.0,
+        "quality": "missing",
+        "null_reason": "DEM void-fill artifacts in narrow kalut corridors exceed quality threshold."
+      }
+    },
+    "quality": {
+      "coverage_fraction": 0.625,
+      "notes": [
+        "Sitio con cobertura parcial (faltan pendiente mediana, p90 y TRI) para verificar que el motor penaliza o clasifica como `insufficient_coverage` cuando faltan variables críticas de movilidad."
+      ]
+    },
+    "sources": [
+      "nasa-power-climatology",
+      "macrostrat-v2",
+      "nasa-hls-ndvi"
+    ],
+    "kind": "SCIENTIFIC_CATALOG_RECORD"
+  }
+]

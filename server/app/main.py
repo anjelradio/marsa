@@ -23,8 +23,9 @@ logger = logging.getLogger(__name__)
 # ==============================================================================
 # IMPORTACIONES DE ROUTERS (descomenta cuando crees los módulos)
 # ==============================================================================
-# from app.modules.module_a.infrastructure.api.routers.module_a_router import router as module_a_router
-# from app.modules.module_b.infrastructure.api.routers.module_b_router import router as module_b_router
+from app.modules.analog_explorer.infrastructure.api.routers.explorer_router import (
+    router as explorer_router,
+)
 
 
 # ==============================================================================
@@ -81,6 +82,7 @@ app.add_middleware(
 # RUTAS GENÉRICAS / HEALTHCHECK
 # ==============================================================================
 @app.get("/health", tags=["System"], summary="Verificar estado del sistema y BD")
+@app.get("/api/health", tags=["System"], summary="Verificar estado del sistema y BD (API alias)")
 def health_check():
     """
     Comprueba el estado de la API y la conectividad real con la base de datos.
@@ -115,5 +117,4 @@ def health_check():
 # ==============================================================================
 # REGISTRO DE ROUTERS (descomenta según vayas agregando módulos)
 # ==============================================================================
-# app.include_router(module_a_router, prefix="/api/module-a", tags=["Module A"])
-# app.include_router(module_b_router, prefix="/api/module-b", tags=["Module B"])
+app.include_router(explorer_router, prefix="/api", tags=["Planetary Analog Explorer"])

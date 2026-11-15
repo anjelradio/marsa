@@ -1,0 +1,263 @@
+{
+  "dataset_id": "mars-mcd-v6.2-ls105",
+  "title": "Mars Climate Database (MCD) v6.2 Global Diurnal Mean at Ls=105 deg",
+  "citation": "Mars Climate Database v6.2, LMD/OU/IAA/ESA/CNES",
+  "url": "https://www-mars.lmd.jussieu.fr/mars/access",
+  "scenario": "climatology average solar, diurnal mean over all local times, Ls = 105.0 deg",
+  "grid_shape": {
+    "longitudes": 64,
+    "latitudes": 48
+  },
+  "latitudes": [
+    -90.0,
+    -86.1702,
+    -82.3404,
+    -78.5106,
+    -74.6809,
+    -70.8511,
+    -67.0213,
+    -63.1915,
+    -59.3617,
+    -55.5319,
+    -51.7021,
+    -47.8723,
+    -44.0426,
+    -40.2128,
+    -36.383,
+    -32.5532,
+    -28.7234,
+    -24.8936,
+    -21.0638,
+    -17.234,
+    -13.4043,
+    -9.57447,
+    -5.74468,
+    -1.91489,
+    1.91489,
+    5.74468,
+    9.57447,
+    13.4043,
+    17.234,
+    21.0638,
+    24.8936,
+    28.7234,
+    32.5532,
+    36.383,
+    40.2128,
+    44.0426,
+    47.8723,
+    51.7021,
+    55.5319,
+    59.3617,
+    63.1915,
+    67.0213,
+    70.8511,
+    74.6809,
+    78.5106,
+    82.3404,
+    86.1702,
+    90.0
+  ],
+  "longitudes": [
+    -180.0,
+    -174.0,
+    -168.0,
+    -162.0,
+    -157.0,
+    -151.0,
+    -145.0,
+    -140.0,
+    -134.0,
+    -128.0,
+    -122.0,
+    -117.0,
+    -111.0,
+    -105.0,
+    -100.0,
+    -94.0,
+    -88.0,
+    -82.0,
+    -77.0,
+    -71.0,
+    -65.0,
+    -60.0,
+    -54.0,
+    -48.0,
+    -42.0,
+    -37.0,
+    -31.0,
+    -25.0,
+    -20.0,
+    -14.0,
+    -8.0,
+    -2.0,
+    2.0,
+    8.0,
+    14.0,
+    20.0,
+    25.0,
+    31.0,
+    37.0,
+    42.0,
+    48.0,
+    54.0,
+    60.0,
+    65.0,
+    71.0,
+    77.0,
+    82.0,
+    88.0,
+    94.0,
+    100.0,
+    105.0,
+    111.0,
+    117.0,
+    122.0,
+    128.0,
+    134.0,
+    140.0,
+    145.0,
+    151.0,
+    157.0,
+    162.0,
+    168.0,
+    174.0,
+    180.0
+  ],
+  "layers_summary": {
+    "surface_temperature_k": {
+      "description": "Surface temperature (K)",
+      "unit": "K",
+      "stats": {
+        "min": 142.157,
+        "max": 235.653,
+        "mean": 194.662878,
+        "count_unique_meridians": 3024
+      }
+    },
+    "surface_pressure_pa": {
+      "description": "Surface pressure (Pa)",
+      "unit": "Pa",
+      "stats": {
+        "min": 199.892,
+        "max": 1295.68,
+        "mean": 597.61488,
+        "count_unique_meridians": 3024
+      }
+    },
+    "water_ice_column_kg_m2": {
+      "description": "Water ice column (kg/m2)",
+      "unit": "kg/m^2",
+      "stats": {
+        "min": 2e-06,
+        "max": 0.011126,
+        "mean": 0.00142,
+        "count_unique_meridians": 3024
+      }
+    },
+    "dust_optical_depth_670nm": {
+      "description": "Monthly mean dust column visible optical depth above surface",
+      "unit": "dimensionless",
+      "stats": {
+        "min": 0.009862,
+        "max": 0.334565,
+        "mean": 0.160979,
+        "count_unique_meridians": 3024
+      }
+    },
+    "wind_speed_10m_m_s": {
+      "description": "Horizontal wind speed (m/s)",
+      "unit": "m/s",
+      "stats": {
+        "min": 0.51974,
+        "max": 17.4535,
+        "mean": 5.26589,
+        "count_unique_meridians": 3024
+      }
+    }
+  },
+  "reference_locations": {
+    "mars-jezero": {
+      "name": "Jezero Crater (Perseverance landing region)",
+      "lat": 18.38,
+      "lon": 77.58,
+      "variables": {
+        "surface_temperature_k": {
+          "bilinear": 227.65079,
+          "nearest": 227.909,
+          "nearest_grid_lat": 17.234,
+          "nearest_grid_lon": 77.0
+        },
+        "surface_pressure_pa": {
+          "bilinear": 645.10025,
+          "nearest": 649.426,
+          "nearest_grid_lat": 17.234,
+          "nearest_grid_lon": 77.0
+        },
+        "water_ice_column_kg_m2": {
+          "bilinear": 0.00232,
+          "nearest": 0.0024,
+          "nearest_grid_lat": 17.234,
+          "nearest_grid_lon": 77.0
+        },
+        "dust_optical_depth_670nm": {
+          "bilinear": 0.25235,
+          "nearest": 0.25447,
+          "nearest_grid_lat": 17.234,
+          "nearest_grid_lon": 77.0
+        },
+        "wind_speed_10m_m_s": {
+          "bilinear": 6.35524,
+          "nearest": 6.33203,
+          "nearest_grid_lat": 17.234,
+          "nearest_grid_lon": 77.0
+        }
+      },
+      "derived": {
+        "mean_temperature_c": -45.5,
+        "surface_pressure_hpa": 6.451
+      }
+    },
+    "mars-gale": {
+      "name": "Gale Crater (Curiosity landing region)",
+      "lat": -4.59,
+      "lon": 137.44,
+      "variables": {
+        "surface_temperature_k": {
+          "bilinear": 211.89448,
+          "nearest": 210.496,
+          "nearest_grid_lat": -5.7447,
+          "nearest_grid_lon": 140.0
+        },
+        "surface_pressure_pa": {
+          "bilinear": 609.54546,
+          "nearest": 599.784,
+          "nearest_grid_lat": -5.7447,
+          "nearest_grid_lon": 140.0
+        },
+        "water_ice_column_kg_m2": {
+          "bilinear": 0.00148,
+          "nearest": 0.00138,
+          "nearest_grid_lat": -5.7447,
+          "nearest_grid_lon": 140.0
+        },
+        "dust_optical_depth_670nm": {
+          "bilinear": 0.21518,
+          "nearest": 0.21436,
+          "nearest_grid_lat": -5.7447,
+          "nearest_grid_lon": 140.0
+        },
+        "wind_speed_10m_m_s": {
+          "bilinear": 7.45176,
+          "nearest": 7.62776,
+          "nearest_grid_lat": -5.7447,
+          "nearest_grid_lon": 140.0
+        }
+      },
+      "derived": {
+        "mean_temperature_c": -61.26,
+        "surface_pressure_hpa": 6.095
+      }
+    }
+  }
+}
