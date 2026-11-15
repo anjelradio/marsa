@@ -1,0 +1,113 @@
+{
+  "generado": "2026-11-15",
+  "sitios": {
+    "Desierto de Atacama (Yungay)": {
+      "Temperatura Superficial": {
+        "valor": 292.1,
+        "dataset": "NASA POWER (MERRA-2)"
+      },
+      "Nubosidad": {
+        "valor": 20.57,
+        "dataset": "NASA POWER (MERRA-2)"
+      },
+      "Profundidad Óptica de Polvo": {
+        "valor": 0.04,
+        "dataset": "NASA POWER (MERRA-2)"
+      },
+      "Elevación": {
+        "valor": 1005.0,
+        "dataset": "OpenTopoData SRTM 30 m"
+      }
+    },
+    "Salar de Uyuni": {
+      "Temperatura Superficial": {
+        "valor": 281.43,
+        "dataset": "NASA POWER (MERRA-2)"
+      },
+      "Nubosidad": {
+        "valor": 45.08,
+        "dataset": "NASA POWER (MERRA-2)"
+      },
+      "Profundidad Óptica de Polvo": {
+        "valor": 0.1,
+        "dataset": "NASA POWER (MERRA-2)"
+      },
+      "Elevación": {
+        "valor": 3661.0,
+        "dataset": "OpenTopoData SRTM 30 m"
+      }
+    },
+    "Valles Secos de McMurdo": {
+      "Temperatura Superficial": {
+        "valor": 243.41,
+        "dataset": "NASA POWER (MERRA-2)"
+      },
+      "Nubosidad": {
+        "valor": 59.18,
+        "dataset": "NASA POWER (MERRA-2)"
+      },
+      "Profundidad Óptica de Polvo": {
+        "valor": 0.0,
+        "dataset": "NASA POWER (MERRA-2)"
+      }
+    },
+    "Tarso Toussidé": {
+      "Temperatura Superficial": {
+        "valor": 299.69,
+        "dataset": "NASA POWER (MERRA-2)"
+      },
+      "Nubosidad": {
+        "valor": 22.76,
+        "dataset": "NASA POWER (MERRA-2)"
+      },
+      "Profundidad Óptica de Polvo": {
+        "valor": 0.27,
+        "dataset": "NASA POWER (MERRA-2)"
+      },
+      "Elevación": {
+        "valor": 1751.0,
+        "dataset": "OpenTopoData SRTM 30 m"
+      }
+    },
+    "Cueva de los Verdes (Lanzarote)": {
+      "Temperatura Superficial": {
+        "valor": 293.58,
+        "dataset": "NASA POWER (MERRA-2)"
+      },
+      "Nubosidad": {
+        "valor": 54.19,
+        "dataset": "NASA POWER (MERRA-2)"
+      },
+      "Profundidad Óptica de Polvo": {
+        "valor": 0.22,
+        "dataset": "NASA POWER (MERRA-2)"
+      },
+      "Elevación": {
+        "valor": 10.0,
+        "dataset": "OpenTopoData SRTM 30 m"
+      }
+    },
+    "Cráter Gale": {
+      "Temperatura Superficial": {
+        "valor": 210.5,
+        "dataset": "LMD Mars Climate Database"
+      },
+      "Profundidad Óptica de Polvo": {
+        "valor": 0.214,
+        "dataset": "LMD Mars Climate Database"
+      }
+    },
+    "Meridiani Planum": {
+      "Temperatura Superficial": {
+        "valor": 219.33,
+        "dataset": "LMD Mars Climate Database"
+      },
+      "Profundidad Óptica de Polvo": {
+        "valor": 0.227,
+        "dataset": "LMD Mars Climate Database"
+      }
+    },
+    "Borde del cráter Shackleton": {},
+    "Mare Tranquillitatis": {}
+  }
+}
