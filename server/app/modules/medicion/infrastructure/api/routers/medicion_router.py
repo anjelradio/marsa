@@ -2,7 +2,7 @@
 
 from collections.abc import Sequence
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from sqlmodel import select
 
 from app.core.dependencies import DBSession
@@ -37,16 +37,10 @@ def extraer_satelital(
     db: DBSession,
 ) -> Sequence[MedicionModel]:
     """Consulta la API satelital correspondiente (Copernicus o USGS) según el cuerpo celeste del sitio."""
+    # Las excepciones de dominio (400/404/502) las formatea el handler global;
+    # cualquier otro error cae al 500 genérico sin filtrar detalles internos.
     service = SatelitalService(db)
-    try:
-        mediciones = service.procesar_extraccion_sitio(
-            sitio_id=request.sitio_id,
-            datetime_range=request.datetime_range,
-        )
-        return mediciones
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Error durante la extracción satelital: {e}"
-        )
+    return service.procesar_extraccion_sitio(
+        sitio_id=request.sitio_id,
+        datetime_range=request.datetime_range,
+    )

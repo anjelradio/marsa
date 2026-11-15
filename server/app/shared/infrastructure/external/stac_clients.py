@@ -5,6 +5,7 @@ from typing import Any
 import httpx
 
 from app.core.config import settings
+from app.shared.domain.exceptions import FuenteExternaException
 
 logger = logging.getLogger(__name__)
 
@@ -72,9 +73,11 @@ class CopernicusClient:
                     data = res.json()
                     return data.get("features", [])
                 logger.error("Error consultando Copernicus STAC (%s): %s", res.status_code, res.text)
-        except Exception as e:
+                status = res.status_code
+        except httpx.HTTPError as e:
             logger.error("Fallo de red en Copernicus STAC: %s", e)
-        return []
+            raise FuenteExternaException("Copernicus STAC no responde (fallo de red)") from e
+        raise FuenteExternaException(f"Copernicus STAC respondió HTTP {status}")
 
     def get_cloud_cover_and_weather(
         self,
@@ -93,11 +96,11 @@ class CopernicusClient:
         if not items:
             return {"cloud_cover": None}
 
-        # Extraer propiedad estándar 'eo:cloud_cover' de los items
+        # Extraer propiedad estándar 'eo:cloud_cover' de los items (ignora nulos)
         cloud_values = [
             f["properties"]["eo:cloud_cover"]
             for f in items
-            if "properties" in f and "eo:cloud_cover" in f["properties"]
+            if "properties" in f and f["properties"].get("eo:cloud_cover") is not None
         ]
         avg_cloud = sum(cloud_values) / len(cloud_values) if cloud_values else None
         return {"cloud_cover": avg_cloud}
@@ -136,7 +139,9 @@ class USGSStacClient:
                 if res.status_code == 200:
                     return res.json().get("features", [])
                 logger.error("Error consultando USGS STAC (%s): %s", res.status_code, res.text)
-        except Exception as e:
+                status = res.status_code
+        except httpx.HTTPError as e:
             logger.error("Fallo de red en USGS STAC: %s", e)
-        return []
+            raise FuenteExternaException("USGS STAC no responde (fallo de red)") from e
+        raise FuenteExternaException(f"USGS STAC respondió HTTP {status}")
 
