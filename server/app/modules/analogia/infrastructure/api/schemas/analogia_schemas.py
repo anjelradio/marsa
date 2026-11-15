@@ -13,6 +13,30 @@ class CreateAnalogiaRequest(BaseModel):
     difiere: str | None = None
 
 
+class DetalleCaracteristicaResponse(BaseModel):
+    caracteristica: str
+    unidad: str | None
+    valor_tierra: float
+    valor_destino: float
+    similitud: float
+
+
+class RankingItemResponse(BaseModel):
+    posicion: int
+    sitio_tierra_id: int
+    sitio_tierra: str
+    tipo: str | None
+    geom: dict | None
+    sitio_destino_id: int
+    sitio_destino: str
+    similitud: float
+    cobertura: float
+    metodo: str
+    coincide: str
+    difiere: str
+    detalle: list[DetalleCaracteristicaResponse]
+
+
 class AnalogiaResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
