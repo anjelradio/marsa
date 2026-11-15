@@ -20,7 +20,7 @@
     width: var(--exploration-width);
     max-width: none;
     /* Keep the canvas at a stable layout size while the visible globe moves. */
-    transform: translate3d(-4.9cqw, 0.3cqh, 0) scale(var(--overview-scale));
+    transform: translate3d(-4.9cqw, 4cqh, 0) scale(var(--overview-scale));
   }
 
   .planetStage[data-exploring="true"] > .planet {
