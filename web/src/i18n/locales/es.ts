@@ -38,6 +38,38 @@ export const es: TranslationDict = {
     footer: "next-scaffoldcito — hecho con Next.js y shadcn/ui",
     viewDashboard: "Ir al Dashboard de Marte",
   },
+  analogs: {
+    title: "Sitios análogos en la Tierra",
+    subtitle:
+      "Lugares terrestres ordenados por qué tanto se parecen sus condiciones medidas a un sitio de Marte o la Luna. Selecciona una fila para ver qué coincide y qué no.",
+    selectDestination: "Destino de la analogía",
+    destinations: { marte: "Marte", luna: "Luna" },
+    bestMatch: "más parecido a",
+    coverage: "cobertura",
+    matches: "Coincide",
+    differs: "Difiere",
+    none: "ninguna",
+    earth: "Tierra",
+    target: "Destino",
+    method: "Método",
+    loading: "Calculando análogos terrestres…",
+    error: "No se pudo cargar el ranking de análogos.",
+    retry: "Reintentar",
+    limitsTitle: "Dónde falla la analogía",
+    limitsBody:
+      "La Tierra no reproduce la gravedad reducida (Marte 3,73 m/s², Luna 1,62 m/s²), el vacío lunar, la atmósfera delgada de Marte ni su radiación. La similitud solo compara las propiedades de superficie listadas.",
+    dataNote:
+      "Los valores de los sitios son cifras de referencia aproximadas, aún no calculadas con los datasets satelitales.",
+    features: {
+      "Temperatura Superficial": "Temperatura superficial",
+      Nubosidad: "Nubosidad",
+      "Inercia Térmica": "Inercia térmica",
+      Elevación: "Elevación",
+      "Profundidad Óptica de Polvo": "Profundidad óptica del polvo",
+      "Hielo/Agua Superficial": "Hielo/agua superficial",
+      "Rugosidad del Terreno": "Rugosidad del terreno",
+    },
+  },
   mars: {
     title: "Mars",
     subtitle: "El cuarto planeta del sistema solar",

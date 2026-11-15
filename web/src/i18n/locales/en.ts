@@ -36,6 +36,38 @@ export const en = {
     footer: "next-scaffoldcito — built with Next.js and shadcn/ui",
     viewDashboard: "Launch Mars Dashboard",
   },
+  analogs: {
+    title: "Earth analog sites",
+    subtitle:
+      "Terrestrial places ranked by how closely their measured conditions match a Mars or Moon site. Select a row to see what matches and what does not.",
+    selectDestination: "Analog destination",
+    destinations: { marte: "Mars", luna: "Moon" },
+    bestMatch: "closest to",
+    coverage: "coverage",
+    matches: "Matches",
+    differs: "Differs",
+    none: "none",
+    earth: "Earth",
+    target: "Target",
+    method: "Method",
+    loading: "Ranking Earth analogs…",
+    error: "The analog ranking could not be loaded.",
+    retry: "Try again",
+    limitsTitle: "Where the analogy breaks down",
+    limitsBody:
+      "Earth cannot reproduce reduced gravity (Mars 3.73 m/s², Moon 1.62 m/s²), the lunar vacuum, the thin Martian atmosphere, or their radiation environments. Similarity here only compares the listed surface properties.",
+    dataNote:
+      "Site values are approximate reference figures, not yet computed from the satellite datasets.",
+    features: {
+      "Temperatura Superficial": "Surface temperature",
+      Nubosidad: "Cloudiness",
+      "Inercia Térmica": "Thermal inertia",
+      Elevación: "Elevation",
+      "Profundidad Óptica de Polvo": "Dust optical depth",
+      "Hielo/Agua Superficial": "Surface ice/water",
+      "Rugosidad del Terreno": "Terrain roughness",
+    },
+  },
   mars: {
     title: "Mars",
     subtitle: "The fourth planet from the Sun",

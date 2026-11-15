@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { MarsMissionPanels } from "./mars-mission-panels";
 import { MarsClimatePanel } from "./mars-climate-panel";
 import { MarsImageGallery } from "./mars-image-gallery";
+import { AnalogsPanel } from "./analogs-panel";
 import styles from "./mars-dashboard.module.css";
 import stars from "./starfield.module.css";
 import { useTranslation } from "@/i18n/context";
@@ -313,6 +314,10 @@ export default function HomePage() {
           </div>
         )}
       </section>
+
+      <div inert={isExploring} className={cn(isExploring && "hidden")}>
+        <AnalogsPanel />
+      </div>
     </main>
   );
 }
