@@ -96,3 +96,36 @@ La base de desarrollo (`dev.db`) no se versiona en Git: se crea sola al arrancar
 - Revisa siempre la migración generada: el autogenerado puede dejar imports sin resolver o no detectar cambios de nombre.
 - `tests/test_migrations.py` falla si un modelo cambia sin su migración.
 
+
+---
+
+## 🌐 Ingesta de la malla global (celdas de 10°)
+
+`scripts/ingest_grid.py` recorre la malla de 648 celdas de cada cuerpo (Tierra, Marte, Luna) y guarda cada celda como
+un sitio de clase `celda` (código `T_S30_W070`: borde sur y borde oeste) con temperatura, nubosidad, polvo, elevación
+y relieve regional, más la incertidumbre y el número de muestras de cada medición.
+
+| Cuerpo | Fuente | Red |
+| :--- | :--- | :--- |
+| Tierra | NASA POWER regional (3 peticiones por celda de tierra firme) y GEBCO 2020 vía OpenTopoData (4 celdas por petición, 1 por segundo, límite público de 1.000 al día) | Sí, unas 2.100 peticiones |
+| Marte | Mars Climate Database (rejilla local) y raster MOLA `megt90n000eb.img` | Solo la descarga del raster |
+| Luna | Raster LOLA `ldem_16.img` y Diviner por rango de bytes (unos 11 KB por celda) | Descarga del raster y 648 lecturas |
+
+```bash
+# ver el plan (celdas, peticiones, archivos que faltan) sin red ni escritura
+venv/Scripts/python.exe scripts/ingest_grid.py --dry-run
+
+# ensayo con pocas celdas
+venv/Scripts/python.exe scripts/ingest_grid.py --cuerpos Tierra --limite 8
+
+# ingesta completa; --descargar autoriza bajar los dos rasters del PDS (33 MB cada uno) a data_cache/
+venv/Scripts/python.exe scripts/ingest_grid.py --descargar --informe ingesta_informe.json
+```
+
+- **No descarga nada sin `--descargar`**: si falta un raster, el script se detiene con código 2 y lista nombre, tamaño y URL.
+  Los archivos se comprueban por tamaño y se escriben de forma atómica, así que nunca queda uno a medias.
+- **Se valida primero**: antes de la primera petición se comprueba que existen los cuerpos, datasets y características.
+  Un valor fuera de su rango físico no se guarda ni se sustituye: queda en el informe y la ingesta sigue con las demás celdas.
+- Las celdas de océano de la Tierra se descartan (GEBCO: menos de la mitad de los puntos sobre el nivel del mar).
+- Es idempotente: repetirla actualiza las mediciones por (celda, característica) sin duplicar nada.
+- Los tests (`tests/test_malla_fuentes.py`, `tests/test_ingesta_malla.py`, `tests/test_ingest_grid_cli.py`) no usan la red.

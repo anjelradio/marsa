@@ -8,3 +8,6 @@ venv
 *.db
 *.db.bak
 *.sqlite3
+
+# Rasters de topografía descargados por scripts/ingest_grid.py
+data_cache/
