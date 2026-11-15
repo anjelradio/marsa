@@ -15,7 +15,7 @@ Resumen técnico de los aspectos más importantes para el desarrollo del backend
 ## 2. Variables de Clima Extraídas
 * **Nubosidad (Tierra):** Se extrae directo de `properties.eo:cloud_cover` (% de cobertura) y se clasifica píxel por píxel con la banda `SCL`.
 * **Temperatura (Tierra):** Se obtiene de Sentinel-3 SLSTR en Kelvin (LST - Land Surface Temperature).
-* **Temperatura e Inercia Térmica (Marte):** Se obtiene de mosaicos `THEMIS IR` diurnos y nocturnos.
+* **Mosaicos infrarrojos (Marte):** colección `mo_themis_controlled_mosaics` (THEMIS IR, ítems `_dir` diurnos y `_nir` nocturnos, ±65° de latitud, sin polos). Son imágenes de 8 bits **cualitativas**: sirven para comparar el contraste día/noche, pero **no entregan temperatura calibrada en kelvin**. Para temperatura real hay que usar un producto calibrado (pendiente); mientras tanto el servicio guarda un valor representativo fijo.
 * **Topografía:** DEMs de OpenTopography y CTX DTMs para correlacionar altitud y clima.
 
 ---

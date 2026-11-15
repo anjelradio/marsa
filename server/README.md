@@ -21,7 +21,7 @@ Catálogo SpatioTemporal Asset Catalog (STAC) público de la USGS para datos pla
 | :--- | :---: | :---: | :--- |
 | `/` | `GET` | `application/json` | Landing page / Catálogo raíz de STAC. |
 | `/conformance` | `GET` | `application/json` | Clases de conformidad STAC y OGC soportadas. |
-| `/collections` | `GET` | `application/json` | Lista de todas las colecciones disponibles (ej. `mars_ctx`). |
+| `/collections` | `GET` | `application/json` | Lista de todas las colecciones disponibles (ej. `mo_themis_controlled_mosaics`). |
 | `/collections/{collection_id}` | `GET` | `application/json` | Metadatos y detalles de una colección específica. |
 | `/collections/{collection_id}/items` | `GET` | `application/geo+json` | Items y escenas pertenecientes a una colección. |
 | `/collections/{collection_id}/items/{item_id}` | `GET` | `application/geo+json` | Metadatos y assets de un ítem individual. |
@@ -84,8 +84,8 @@ Catálogo oficial de la Agencia Espacial Europea (ESA) para datos de observació
 
 | Variable | Colección / Instrumento | Atributos y Bandas clave |
 | :--- | :--- | :--- |
-| **Temperatura (Infrarrojo)** | `THEMIS` (Mars Odyssey) / `TES` | Mosaicos infrarrojos diurnos y nocturnos (`themis_day_ir`, `themis_night_ir`). Miden temperatura superficial directa e **inercia térmica** del regolito marciano. |
-| **Nubosidad / Nubes de Hielo y Polvo** | `mars_ctx` (CTX) / `mars_mroc` (MARCI/MOC) | Detección visible de nubes de hielo de agua ($H_2O$), nieblas matutinas en cañones y tormentas locales/globales de polvo (*dust storms*). |
+| **Temperatura (Infrarrojo)** | `THEMIS` (Mars Odyssey) / `TES` | Colección `mo_themis_controlled_mosaics`: 28 cuadrángulos con versión diurna (`_dir`) y nocturna (`_nir`), cobertura de ±65° de latitud (sin polos). Son imágenes de 8 bits **cualitativas**, no temperatura calibrada en kelvin. |
+| **Nubosidad / Nubes de Hielo y Polvo** | CTX (`mro_ctx_controlled_usgs_dtms`) / MARCI-MOC (colección sin verificar) | Detección visible de nubes de hielo de agua ($H_2O$), nieblas matutinas en cañones y tormentas locales/globales de polvo (*dust storms*). |
 | **Topografía y Clima** | CTX DTMs / HRSC | Modelos Digitales de Elevación que explican variaciones térmicas y presión atmosférica por altitud (ej. Olympus Mons vs Valles Marineris). |
 
 
@@ -109,4 +109,4 @@ Define la ventana de tiempo en formato ISO 8601 UTC (`YYYY-MM-DDTHH:MM:SSZ`):
   - Permite evaluar variaciones estacionales (verano/invierno) y evolución climática día a día.
 - **Marte (USGS STAC):**
   - Misiones históricas y en curso (año de adquisición terrestre o año marciano $L_s$ - longitud solar para estaciones marcianas).
-  - Día vs Noche: Permite contrastar la inercia térmica diurna y nocturna (`themis_day` vs `themis_night`).
+  - Día vs Noche: Permite contrastar la inercia térmica diurna y nocturna (ítems `_dir` vs `_nir` de `mo_themis_controlled_mosaics`).
