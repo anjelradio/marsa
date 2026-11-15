@@ -23,6 +23,10 @@ import { MarsMissionPanels } from "./mars-mission-panels";
 import { MarsClimatePanel } from "./mars-climate-panel";
 import { MarsImageGallery } from "./mars-image-gallery";
 import { AnalogsPanel } from "./analogs-panel";
+import { AnalogsStage } from "./analogs-stage";
+import { PlanetFilter, type HomePlanet } from "./planet-filter";
+import type { AnalogDestination } from "@/features/analogs/infrastructure/analogs-ranking";
+import { useAnalogRanking } from "@/features/analogs/presentation/use-analog-ranking";
 import styles from "./mars-dashboard.module.css";
 import stars from "./starfield.module.css";
 import { useTranslation } from "@/i18n/context";
@@ -43,6 +47,26 @@ export default function HomePage() {
   const exitExploration = useCallback(() => {
     setIsExploring(false);
     setSelectedPoint(null);
+  }, []);
+
+  const [planet, setPlanet] = useState<HomePlanet>("mars");
+  const [destination, setDestination] = useState<AnalogDestination>("marte");
+  const [openSiteId, setOpenSiteId] = useState<number | null>(null);
+  const { result: ranking, retry: retryRanking } = useAnalogRanking(destination, dict.analogs.error);
+
+  const selectPlanet = useCallback((next: HomePlanet) => {
+    setPlanet(next);
+    setOpenSiteId(null);
+    setIsExploring(false);
+    setSelectedPoint(null);
+    if (next === "mars") setDestination("marte");
+    if (next === "moon") setDestination("luna");
+  }, []);
+
+  const changeDestination = useCallback((next: AnalogDestination) => {
+    setDestination(next);
+    setOpenSiteId(null);
+    setPlanet((current) => (current === "earth" ? current : next === "marte" ? "mars" : "moon"));
   }, []);
 
   // Allow ESC key to seamlessly exit exploration mode
@@ -141,6 +165,22 @@ export default function HomePage() {
         />
       </div>
 
+      {!isExploring && (
+        <div className="absolute top-16 left-1/2 z-50 -translate-x-1/2 sm:top-4">
+          <PlanetFilter value={planet} onChange={selectPlanet} />
+        </div>
+      )}
+
+      {planet !== "mars" && (
+        <AnalogsStage
+          planet={planet}
+          result={ranking}
+          openId={openSiteId}
+          onOpenChange={setOpenSiteId}
+        />
+      )}
+
+      {planet === "mars" && (
       <section
         aria-labelledby="mars-title"
         className={cn(
@@ -314,9 +354,17 @@ export default function HomePage() {
           </div>
         )}
       </section>
+      )}
 
       <div inert={isExploring} className={cn(isExploring && "hidden")}>
-        <AnalogsPanel />
+        <AnalogsPanel
+          destination={destination}
+          onDestinationChange={changeDestination}
+          result={ranking}
+          onRetry={retryRanking}
+          openId={openSiteId}
+          onOpenChange={setOpenSiteId}
+        />
       </div>
     </main>
   );

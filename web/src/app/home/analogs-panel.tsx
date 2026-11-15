@@ -1,134 +1,32 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, ChevronDown, Globe2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n/context";
-import { EarthPlanet } from "@/features/earth/presentation/components/earth-planet";
-import { MoonPlanet } from "@/features/moon/presentation/components/moon-planet";
-import type {
-  GeographicLandmark,
-  ProjectedLandmark,
-} from "@/features/shared/domain/geographic-coordinates";
-import {
-  requestAnalogRanking,
-  type AnalogDestination,
-  type AnalogRankingItem,
-} from "@/features/analogs/infrastructure/analogs-ranking";
+import type { AnalogDestination } from "@/features/analogs/infrastructure/analogs-ranking";
+import type { AnalogRankingState } from "@/features/analogs/presentation/use-analog-ranking";
 
 const DESTINATIONS: AnalogDestination[] = ["marte", "luna"];
 
-function pointOf(geom: unknown): { lat: number; lon: number } | null {
-  const g = geom as { type?: string; coordinates?: unknown } | null;
-  if (!g || g.type !== "Point" || !Array.isArray(g.coordinates)) return null;
-  const [lon, lat] = g.coordinates as number[];
-  return Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : null;
-}
-
-function formatCoord(lat: number, lon: number) {
-  return `${Math.abs(lat).toFixed(2)}° ${lat < 0 ? "S" : "N"} · ${Math.abs(lon).toFixed(2)}° ${lon < 0 ? "W" : "E"}`;
-}
-
-/** Globo con marcadores clicables proyectados sobre el canvas. */
-function GlobeMarkers({
-  points,
-  activeId,
-  onSelect,
+export function AnalogsPanel({
+  destination,
+  onDestinationChange,
+  result,
+  onRetry,
+  openId,
+  onOpenChange,
 }: {
-  points: ProjectedLandmark[];
-  activeId: string | null;
-  onSelect?: (id: string) => void;
+  destination: AnalogDestination;
+  onDestinationChange: (destination: AnalogDestination) => void;
+  result: AnalogRankingState;
+  onRetry: () => void;
+  openId: number | null;
+  onOpenChange: (id: number | null) => void;
 }) {
-  return (
-    <div className="pointer-events-none absolute inset-0 z-10">
-      {points.map((poi) => {
-        if (!poi.visible || poi.opacity <= 0.05) return null;
-        const active = activeId === poi.id;
-        return (
-          <button
-            key={poi.id}
-            type="button"
-            disabled={!onSelect}
-            onClick={() => onSelect?.(poi.id)}
-            aria-label={poi.name}
-            className={cn(
-              "absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 rounded-full border px-2 py-0.5 text-[0.62rem] font-semibold backdrop-blur-md transition-colors",
-              onSelect ? "pointer-events-auto cursor-pointer" : "pointer-events-none",
-              active
-                ? "border-[#ffab57] bg-[#39190d]/95 text-white shadow-[0_0_14px_#ffab57a0]"
-                : "border-white/20 bg-black/70 text-white/90",
-            )}
-            style={{ left: poi.screenX, top: poi.screenY, opacity: poi.opacity }}
-          >
-            <span className="size-1.5 rounded-full bg-[#ffab57]" />
-            <span className="max-w-24 truncate">{poi.name}</span>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-export function AnalogsPanel() {
   const { dict, locale } = useTranslation();
   const copy = dict.analogs;
-  const [destination, setDestination] = useState<AnalogDestination>("marte");
-  const [result, setResult] = useState<AnalogRankingItem[] | "error" | null>(null);
-  const [attempt, setAttempt] = useState(0);
-  const [openId, setOpenId] = useState<number | null>(null);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    void requestAnalogRanking(destination, controller.signal, copy.error).then((response) => {
-      if (controller.signal.aborted) return;
-      setResult(response.ok ? response.data : "error");
-    });
-    return () => controller.abort();
-  }, [destination, attempt, copy.error]);
-
-  const [earthPoints, setEarthPoints] = useState<ProjectedLandmark[]>([]);
-  const [moonPoints, setMoonPoints] = useState<ProjectedLandmark[]>([]);
-
-  const ranking = result && result !== "error" ? result : null;
-
-  const earthLandmarks = useMemo<GeographicLandmark[]>(
-    () =>
-      (ranking ?? []).flatMap((item) => {
-        const p = pointOf(item.geom);
-        return p
-          ? [{
-              id: String(item.sitio_tierra_id),
-              name: item.sitio_tierra,
-              type: item.tipo ?? "",
-              coord: formatCoord(p.lat, p.lon),
-              desc: "",
-              ...p,
-            }]
-          : [];
-      }),
-    [ranking],
-  );
-
-  const moonLandmarks = useMemo<GeographicLandmark[]>(() => {
-    if (destination !== "luna") return [];
-    const seen = new Map<number, GeographicLandmark>();
-    for (const item of ranking ?? []) {
-      const p = pointOf(item.geom_destino);
-      if (p && !seen.has(item.sitio_destino_id)) {
-        seen.set(item.sitio_destino_id, {
-          id: String(item.sitio_destino_id),
-          name: item.sitio_destino,
-          type: "",
-          coord: formatCoord(p.lat, p.lon),
-          desc: "",
-          ...p,
-        });
-      }
-    }
-    return [...seen.values()];
-  }, [ranking, destination]);
 
   const pct = (value: number) => `${Math.round(value * 100)}%`;
   const name = (key: string) => (copy.features as Record<string, string>)[key] ?? key;
@@ -158,9 +56,8 @@ export function AnalogsPanel() {
               variant="ghost"
               aria-pressed={destination === value}
               onClick={() => {
-                setResult(null);
-                setOpenId(null);
-                setDestination(value);
+                onOpenChange(null);
+                onDestinationChange(value);
               }}
               className={cn(
                 "rounded-full px-4 text-white/80 hover:bg-white/10 hover:text-white",
@@ -173,42 +70,6 @@ export function AnalogsPanel() {
         </div>
       </div>
 
-      <div
-        className={cn(
-          "mt-5 grid gap-4",
-          destination === "luna" ? "sm:grid-cols-2" : "sm:grid-cols-1",
-        )}
-      >
-        <figure className="relative mx-auto aspect-square w-full max-w-[380px]">
-          <EarthPlanet
-            isExploring
-            landmarks={earthLandmarks}
-            onProjectedLandmarksChange={setEarthPoints}
-          />
-          <GlobeMarkers
-            points={earthPoints}
-            activeId={openId === null ? null : String(openId)}
-            onSelect={(id) => setOpenId(Number(id) === openId ? null : Number(id))}
-          />
-          <figcaption className="absolute inset-x-0 bottom-0 text-center text-[0.68rem] text-white/60">
-            {copy.globeEarth}
-          </figcaption>
-        </figure>
-        {destination === "luna" && (
-          <figure className="relative mx-auto aspect-square w-full max-w-[380px]">
-            <MoonPlanet
-              isExploring
-              landmarks={moonLandmarks}
-              onProjectedLandmarksChange={setMoonPoints}
-            />
-            <GlobeMarkers points={moonPoints} activeId={null} />
-            <figcaption className="absolute inset-x-0 bottom-0 text-center text-[0.68rem] text-white/60">
-              {copy.globeMoon}
-            </figcaption>
-          </figure>
-        )}
-      </div>
-
       <div aria-live="polite" className="mt-5">
         {result === null && <p className="text-sm text-white/75">{copy.loading}</p>}
         {result === "error" && (
@@ -219,10 +80,7 @@ export function AnalogsPanel() {
               variant="outline"
               size="sm"
               className="rounded-full border-white/20 bg-white/5 text-white hover:bg-white/15 hover:text-white"
-              onClick={() => {
-                setResult(null);
-                setAttempt((previous) => previous + 1);
-              }}
+              onClick={onRetry}
             >
               {copy.retry}
             </Button>
@@ -238,7 +96,7 @@ export function AnalogsPanel() {
                     <button
                       type="button"
                       aria-expanded={isOpen}
-                      onClick={() => setOpenId(isOpen ? null : item.sitio_tierra_id)}
+                      onClick={() => onOpenChange(isOpen ? null : item.sitio_tierra_id)}
                       className="flex w-full items-center gap-3 rounded-3xl px-4 py-3 text-left"
                     >
                       <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#ffab57]/20 font-mono text-sm text-[#ffbd80]">

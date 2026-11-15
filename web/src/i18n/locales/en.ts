@@ -58,8 +58,15 @@ export const en = {
       "Earth cannot reproduce reduced gravity (Mars 3.73 m/s², Moon 1.62 m/s²), the lunar vacuum, the thin Martian atmosphere, or their radiation environments. Similarity here only compares the listed surface properties.",
     dataNote:
       "Earth cloudiness comes from the Copernicus Sentinel-2 STAC API (one-year mean); temperature and dust from NASA POWER (MERRA-2) and elevation from SRTM 30 m; Mars temperature and dust from the Mars Climate Database (one seasonal snapshot). Ice, roughness, thermal inertia, all Moon values and McMurdo elevation are approximate reference figures.",
-    globeEarth: "Earth · drag to rotate, select a site",
-    globeMoon: "Moon · target sites",
+    planetFilter: "Planet",
+    planets: { mars: "Mars", moon: "Moon", earth: "Earth" },
+    stage: {
+      moon: { title: "Moon", subtitle: "Candidate base sites · drag to rotate" },
+      earth: {
+        title: "Earth",
+        subtitle: "Analog sites on our home planet · select one to see its details below",
+      },
+    },
     usesTitle: "Use in exploration",
     uses: {
       "Desierto de Atacama (Yungay)":

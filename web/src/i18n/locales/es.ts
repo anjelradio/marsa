@@ -60,8 +60,15 @@ export const es: TranslationDict = {
       "La Tierra no reproduce la gravedad reducida (Marte 3,73 m/s², Luna 1,62 m/s²), el vacío lunar, la atmósfera delgada de Marte ni su radiación. La similitud solo compara las propiedades de superficie listadas.",
     dataNote:
       "La nubosidad de la Tierra viene de la API STAC de Copernicus Sentinel-2 (media de un año); la temperatura y el polvo, de NASA POWER (MERRA-2) y la elevación, de SRTM 30 m; la temperatura y el polvo de Marte, de la Mars Climate Database (una foto estacional). El hielo, la rugosidad, la inercia térmica, todos los valores de la Luna y la elevación de McMurdo son cifras de referencia aproximadas.",
-    globeEarth: "Tierra · arrastra para girar, elige un sitio",
-    globeMoon: "Luna · sitios de destino",
+    planetFilter: "Planeta",
+    planets: { mars: "Marte", moon: "Luna", earth: "Tierra" },
+    stage: {
+      moon: { title: "Luna", subtitle: "Sitios candidatos para una base · arrastra para girar" },
+      earth: {
+        title: "Tierra",
+        subtitle: "Sitios análogos en nuestro planeta · elige uno para ver su detalle abajo",
+      },
+    },
     usesTitle: "Uso en la exploración",
     uses: {
       "Desierto de Atacama (Yungay)":
