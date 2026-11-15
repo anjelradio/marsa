@@ -36,7 +36,7 @@ export function MarsAnalogComparison({ ranking, point }: { ranking: RankingTerre
                   type="button"
                   aria-haspopup="dialog"
                   aria-label={`${copy.compare} · ${item.region_referencia}`}
-                  className="h-auto w-full justify-between gap-3 rounded-2xl border-0 bg-white/7 p-3.5 text-left whitespace-normal text-white hover:bg-white/12 transition-all shadow-none ring-0 dark:ring-0"
+                  className="h-auto w-full justify-between gap-3 rounded-2xl border-0 bg-white/7 backdrop-blur-md p-3.5 text-left whitespace-normal text-white hover:bg-white/12 transition-all shadow-none ring-0 dark:ring-0"
                   onClick={(event) => {
                     trigger.current = event.currentTarget;
                     setSelectedId(item.celda_id);

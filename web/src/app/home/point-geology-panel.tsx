@@ -94,7 +94,7 @@ export function PointGeologyPanel({
   const theme =
     cuerpo === "Marte"
       ? {
-          card: "bg-[#2d1e14]/65",
+          card: "bg-[#2d1e14]/55",
           accentText: "text-[#ffab57]",
           accentIcon: "text-[#ffab57]",
           accentBg: "bg-white/7 text-[#ffab57]",
@@ -106,7 +106,7 @@ export function PointGeologyPanel({
         }
       : cuerpo === "Luna"
       ? {
-          card: "bg-[#161a24]/65",
+          card: "bg-[#161a24]/55",
           accentText: "text-slate-300",
           accentIcon: "text-slate-300",
           accentBg: "bg-white/7 text-slate-300",
@@ -118,7 +118,7 @@ export function PointGeologyPanel({
         }
       : {
           // Tierra
-          card: "bg-[#131a30]/65",
+          card: "bg-[#131a30]/55",
           accentText: "text-sky-400",
           accentIcon: "text-sky-400",
           accentBg: "bg-white/7 text-sky-400",
@@ -137,7 +137,7 @@ export function PointGeologyPanel({
       <Card className={`gap-3.5 rounded-4xl border-0 p-5 text-app-primary-foreground shadow-none ring-0 dark:ring-0 backdrop-blur-xl ${theme.card}`}>
         {/* Toggle Mode Switcher (Geología vs Clima) */}
         {onToggleViewMode && (
-          <div className="grid grid-cols-2 gap-1 rounded-2xl bg-white/7 p-1 text-xs">
+          <div className="grid grid-cols-2 gap-1 rounded-2xl bg-white/7 backdrop-blur-md p-1 text-xs">
             <button
               type="button"
               onClick={() => onToggleViewMode("geology")}
@@ -199,7 +199,7 @@ export function PointGeologyPanel({
         </div>
 
         {/* Tab Navigation */}
-        <div className="grid grid-cols-3 gap-1 rounded-2xl bg-white/7 p-1 text-xs">
+        <div className="grid grid-cols-3 gap-1 rounded-2xl bg-white/7 backdrop-blur-md p-1 text-xs">
           <button
             type="button"
             onClick={() => setActiveTab("rocks")}
@@ -282,7 +282,7 @@ export function PointGeologyPanel({
               {/* TAB 1: ROCAS & LITOLOGÍA */}
               {activeTab === "rocks" && (
                 <div className="space-y-2.5">
-                  <div className="rounded-2xl bg-white/7 p-3.5">
+                  <div className="rounded-2xl bg-white/7 backdrop-blur-md p-3.5">
                     <span className={`text-[10px] font-semibold tracking-wider uppercase ${theme.accentText}`}>
                       Unidad Geológica
                     </span>
@@ -348,7 +348,7 @@ export function PointGeologyPanel({
 
                   {/* Unidades Macrostrat en vivo (si existen) */}
                   {data.unidades_macrostrat.length > 0 && (
-                    <div className="rounded-2xl bg-white/7 p-3.5 space-y-1.5">
+                    <div className="rounded-2xl bg-white/7 backdrop-blur-md p-3.5 space-y-1.5">
                       <div className="flex items-center justify-between">
                         <span className={`text-[10px] font-semibold ${theme.accentText}`}>
                           Macrostrat Live Data
@@ -409,7 +409,7 @@ export function PointGeologyPanel({
                       {data.muestras_laboratorio_in_situ.slice(0, 2).map((m) => (
                         <div
                           key={m.muestra_id}
-                          className="rounded-2xl bg-white/7 p-3.5 space-y-1.5"
+                          className="rounded-2xl bg-white/7 backdrop-blur-md p-3.5 space-y-1.5"
                         >
                           <div className="flex items-baseline justify-between">
                             <span className={`font-semibold text-xs ${theme.accentText}`}>
@@ -468,7 +468,7 @@ export function PointGeologyPanel({
                 <div className="space-y-2.5">
                   {legacyAnalog && legacyMatch ? (
                     <div className="space-y-2.5">
-                      <div className="space-y-2 rounded-2xl bg-white/7 p-3.5">
+                      <div className="space-y-2 rounded-2xl bg-white/7 backdrop-blur-md p-3.5">
                         <div className="flex items-center justify-between">
                           <span className={`flex items-center gap-1.5 text-xs font-semibold ${theme.accentText}`}>
                             <Orbit className="size-3.5" />

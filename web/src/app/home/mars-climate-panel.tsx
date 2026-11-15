@@ -50,9 +50,9 @@ export function MarsClimatePanel({
       aria-labelledby="mars-climate-title"
       className="min-w-0 rounded-4xl max-sm:order-first sm:col-start-2 sm:row-start-1 lg:col-start-3"
     >
-      <Card className="gap-4 rounded-4xl border-0 bg-[#2d1e14]/65 p-5 text-app-primary-foreground shadow-none ring-0 dark:ring-0 backdrop-blur-xl">
+      <Card className="gap-4 rounded-4xl border-0 bg-[#2d1e14]/55 p-5 text-app-primary-foreground shadow-none ring-0 dark:ring-0 backdrop-blur-xl">
         {onToggleViewMode && (
-          <div className="grid grid-cols-2 gap-1 rounded-2xl bg-white/7 p-1 text-xs">
+          <div className="grid grid-cols-2 gap-1 rounded-2xl bg-white/7 backdrop-blur-md p-1 text-xs">
             <button
               type="button"
               onClick={() => onToggleViewMode("geology")}
@@ -122,7 +122,7 @@ export function MarsClimatePanel({
             <>
               <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {metrics.map(({ label, value, unit, digits, icon: Icon }) => (
-                  <div key={label} className="flex flex-col justify-between gap-2 rounded-2xl bg-white/7 p-3.5 min-h-[5.5rem]">
+                  <div key={label} className="flex flex-col justify-between gap-2 rounded-2xl bg-white/7 backdrop-blur-md p-3.5 min-h-[5.5rem]">
                     <dt className="flex items-center gap-1.5 text-xs text-app-secondary/75">
                       <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-white/7">
                         <Icon aria-hidden="true" className="size-3.5 text-[#ffab57]" />

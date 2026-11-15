@@ -77,7 +77,7 @@ export function MarsImageGallery({ point, className }: { point: MarsCoordinates;
 
   return (
     <aside aria-labelledby={titleId} className={cn("min-w-0 rounded-4xl", className ?? "max-sm:order-last sm:col-start-1 sm:row-start-1 lg:col-start-1")}>
-      <Card className="gap-3.5 rounded-4xl border-0 bg-[#2d1e14]/65 p-5 text-app-primary-foreground shadow-none ring-0 dark:ring-0 backdrop-blur-xl">
+      <Card className="gap-3.5 rounded-4xl border-0 bg-[#2d1e14]/55 p-5 text-app-primary-foreground shadow-none ring-0 dark:ring-0 backdrop-blur-xl">
         <div className="flex items-center gap-2.5 pb-2">
           <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-white/7 text-[#ffab57]">
             <Images aria-hidden="true" className="size-4" />
@@ -90,7 +90,7 @@ export function MarsImageGallery({ point, className }: { point: MarsCoordinates;
         <div
           role="group"
           aria-label={copy.selectView}
-          className="grid grid-cols-2 gap-1 rounded-2xl bg-white/7 p-1"
+          className="grid grid-cols-2 gap-1 rounded-2xl bg-white/7 backdrop-blur-md p-1"
         >
           {views.map((option) => (
             <Button
@@ -149,7 +149,7 @@ function MarsImageCarousel({ photos }: { photos: MarsImage[] }) {
   const arrowStyle = "rounded-full border-0 bg-white/10 text-white hover:bg-white/20 hover:text-white";
 
   return (
-    <figure className="overflow-hidden rounded-2xl bg-white/7">
+    <figure className="overflow-hidden rounded-2xl bg-white/7 backdrop-blur-md">
       <div className="relative aspect-square bg-black/40">
         {failedPhoto === photo.id ? (
           <p className="grid h-full place-items-center px-3 text-center text-xs text-white/75">

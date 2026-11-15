@@ -44,13 +44,13 @@ export function PointConditionsPanel({
   const theme =
     planet === "earth"
       ? {
-          card: "bg-[#131a30]/65",
+          card: "bg-[#131a30]/55",
           accent: "text-sky-400",
           iconColor: "text-sky-400",
           buttonActive: "bg-white/15 text-white shadow-none",
         }
       : {
-          card: "bg-[#161a24]/65",
+          card: "bg-[#161a24]/55",
           accent: "text-slate-300",
           iconColor: "text-slate-300",
           buttonActive: "bg-white/15 text-white shadow-none",
@@ -63,7 +63,7 @@ export function PointConditionsPanel({
     >
       <Card className={`gap-4 rounded-4xl border-0 p-5 text-app-primary-foreground shadow-none ring-0 dark:ring-0 backdrop-blur-xl ${theme.card}`}>
         {onToggleViewMode && (
-          <div className="grid grid-cols-2 gap-1 rounded-2xl bg-white/7 p-1 text-xs">
+          <div className="grid grid-cols-2 gap-1 rounded-2xl bg-white/7 backdrop-blur-md p-1 text-xs">
             <button
               type="button"
               onClick={() => onToggleViewMode("geology")}
@@ -132,7 +132,7 @@ export function PointConditionsPanel({
             <>
               <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {metrics.map(({ label, display, icon: Icon }) => (
-                  <div key={label} className="flex flex-col justify-between gap-2 rounded-2xl bg-white/7 p-3.5 min-h-[5.5rem]">
+                  <div key={label} className="flex flex-col justify-between gap-2 rounded-2xl bg-white/7 backdrop-blur-md p-3.5 min-h-[5.5rem]">
                     <dt className="flex items-center gap-1.5 text-xs text-app-secondary/75">
                       <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-white/7">
                         <Icon aria-hidden="true" className={`size-3.5 ${theme.iconColor}`} />

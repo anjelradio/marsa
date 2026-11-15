@@ -27,12 +27,12 @@ export function PointImagesPanel({ planet, point, className }: { planet: PointIm
   const theme =
     planet === "earth"
       ? {
-          card: "bg-[#131a30]/65",
+          card: "bg-[#131a30]/55",
           icon: "text-sky-400",
           pressed: "aria-pressed:bg-white/15 aria-pressed:text-white shadow-none",
         }
       : {
-          card: "bg-[#161a24]/65",
+          card: "bg-[#161a24]/55",
           icon: "text-slate-300",
           pressed: "aria-pressed:bg-white/15 aria-pressed:text-white shadow-none",
         };
@@ -52,7 +52,7 @@ export function PointImagesPanel({ planet, point, className }: { planet: PointIm
         <div
           role="group"
           aria-label={copy.selectView}
-          className="grid grid-cols-2 gap-1 rounded-2xl bg-white/7 p-1"
+          className="grid grid-cols-2 gap-1 rounded-2xl bg-white/7 backdrop-blur-md p-1"
         >
           {views.map((option) => (
             <Button

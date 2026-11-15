@@ -391,13 +391,16 @@ export default function HomePage() {
 
         {isExploring && (
           <Button
-            onClick={exitExploration}
+            onClick={hasSelection ? clearSelection : exitExploration}
             variant="ghost"
-            size="icon"
-            aria-label={profile.explore.exit}
-            className={cn(styles.explorationControls, "absolute top-4 left-4 z-40 rounded-full text-white/70 hover:bg-white/10 hover:text-white")}
+            aria-label={hasSelection ? "Volver" : profile.explore.exit}
+            className={cn(
+              styles.explorationControls,
+              "absolute top-4 left-4 z-40 inline-flex items-center gap-2 rounded-full border-0 bg-black/70 px-4 py-2 text-sm font-medium text-white/90 shadow-none ring-0 backdrop-blur-xl hover:bg-black/90 hover:text-white transition-all cursor-pointer",
+            )}
           >
             <ArrowLeft aria-hidden="true" className="size-4" />
+            <span>Volver</span>
           </Button>
         )}
       </section>
