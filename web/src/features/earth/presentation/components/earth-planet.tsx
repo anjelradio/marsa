@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { latLonToVector3, ProjectedLandmark } from "@/features/shared/domain/geographic-coordinates";
+import { GeographicLandmark } from "@/features/mars/presentation/components/mars-planet";
 
 const radius = 0.96;
 
@@ -10,6 +12,8 @@ export interface EarthPlanetProps {
   isHovered?: boolean;
   isExploring?: boolean;
   rotationSpeed?: number;
+  landmarks?: GeographicLandmark[];
+  onProjectedLandmarksChange?: (landmarks: ProjectedLandmark[]) => void;
 }
 
 export function EarthPlanet({
@@ -17,13 +21,25 @@ export function EarthPlanet({
   isHovered = false,
   isExploring = false,
   rotationSpeed = 0.010,
+  landmarks,
+  onProjectedLandmarksChange,
 }: EarthPlanetProps) {
   const mount = useRef<HTMLDivElement>(null);
   const isExploringRef = useRef(isExploring);
+  const landmarksRef = useRef(landmarks);
+  const onProjectedLandmarksChangeRef = useRef(onProjectedLandmarksChange);
 
   useEffect(() => {
     isExploringRef.current = isExploring;
   }, [isExploring]);
+
+  useEffect(() => {
+    landmarksRef.current = landmarks;
+  }, [landmarks]);
+
+  useEffect(() => {
+    onProjectedLandmarksChangeRef.current = onProjectedLandmarksChange;
+  }, [onProjectedLandmarksChange]);
 
   useEffect(() => {
     const container = mount.current;
@@ -128,12 +144,49 @@ export function EarthPlanet({
     sun.position.set(5.5, 2.5, 3.5);
     scene.add(sun);
 
-    // Drag interaction
+    // Update projected landmark 2D coordinates on current viewport
+    const tempV = new THREE.Vector3();
+    const updateLandmarkProjections = () => {
+      const currentLandmarks = landmarksRef.current;
+      const callback = onProjectedLandmarksChangeRef.current;
+      if (!currentLandmarks || currentLandmarks.length === 0 || !callback) return;
+
+      earth.updateMatrixWorld(true);
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      if (!width || !height) return;
+
+      const projected: ProjectedLandmark[] = currentLandmarks.map((lm) => {
+        const localPos = latLonToVector3(lm.lat, lm.lon, radius);
+        tempV.copy(localPos).applyMatrix4(earth.matrixWorld);
+        const zWorld = tempV.z;
+        const isFrontFacing = zWorld > 0.02;
+
+        tempV.project(camera);
+        const screenX = (tempV.x * 0.5 + 0.5) * width;
+        const screenY = (-tempV.y * 0.5 + 0.5) * height;
+
+        return {
+          ...lm,
+          screenX,
+          screenY,
+          visible: isFrontFacing,
+          opacity: Math.max(0, Math.min(1, (zWorld - 0.02) / 0.18)),
+        };
+      });
+
+      callback(projected);
+    };
+
+    // Drag Interaction
     let isDragging = false;
     let prevX = 0;
     let prevY = 0;
 
-    const renderOnce = () => renderer.render(scene, camera);
+    const renderOnce = () => {
+      renderer.render(scene, camera);
+      updateLandmarkProjections();
+    };
 
     const onPointerMove = (e: PointerEvent) => {
       if (!isDragging) return;
@@ -145,7 +198,7 @@ export function EarthPlanet({
       planetGroup.rotation.y += dx * 0.006;
       planetGroup.rotation.x = Math.max(-0.65, Math.min(0.65, planetGroup.rotation.x + dy * 0.004));
 
-      if (reducedMotion.matches) renderOnce();
+      renderOnce();
     };
 
     const onPointerUp = () => {
@@ -198,18 +251,17 @@ export function EarthPlanet({
       }
 
       renderer.render(scene, camera);
+      if (isExploringRef.current) {
+        updateLandmarkProjections();
+      }
       animationFrameId = requestAnimationFrame(animate);
     };
 
     const syncMotion = () => {
       if (!ready || disposed) return;
-      if (reducedMotion.matches) {
-        cancelAnimationFrame(animationFrameId);
-        renderOnce();
-      } else {
-        lastTime = performance.now();
-        animationFrameId = requestAnimationFrame(animate);
-      }
+      lastTime = performance.now();
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = requestAnimationFrame(animate);
     };
 
     reducedMotion.addEventListener("change", syncMotion);

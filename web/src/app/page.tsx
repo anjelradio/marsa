@@ -32,6 +32,20 @@ export default function LandingPage() {
         <div className={styles.skyOrbit} />
         <div className={cn(stars.comets, styles.earthComets, "absolute inset-0")} />
       </div>
+
+      {/* Top right utility navigation */}
+      <div className="absolute top-4 right-4 z-40 flex items-center gap-2">
+        <Button
+          asChild
+          variant="ghost"
+          size="sm"
+          className="text-white/80 hover:text-white hover:bg-white/10 rounded-full text-xs"
+        >
+          <Link href="/auth/login">
+            Iniciar sesión
+          </Link>
+        </Button>
+      </div>
       <LandingScenes
         earthBackdropClass={styles.scene}
         earthFallback={<div className={styles.fallback} />}
@@ -52,11 +66,8 @@ export default function LandingPage() {
           <p className="mt-2 max-w-[26rem] text-sm leading-snug text-slate-200/90">
             Observa la Tierra y la Luna en 3D y explora la superficie y la órbita de Marte en el atlas interactivo.
           </p>
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-3 sm:gap-5">
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             <Button asChild variant="ghost" className={cn(styles.glassButton, styles.exploreButton, "h-10 rounded-full px-5 sm:px-6")}>
-              <a href="#marte"><Rocket aria-hidden="true" /> Explorar Marte <ArrowRight aria-hidden="true" /></a>
-            </Button>
-            <Button asChild variant="ghost" className={cn(styles.glassButton, "h-10 rounded-full px-5 sm:px-6 border-[#ffab57]/40 bg-[#ffab57]/10 text-white hover:bg-[#ffab57]/20")}>
               <Link href="/home"><Orbit aria-hidden="true" /> Atlas 3D (Marte · Luna · Tierra) <ArrowRight aria-hidden="true" /></Link>
             </Button>
             <Button asChild variant="ghost" className={cn(styles.glassButton, "h-10 rounded-full px-5 sm:px-6 border-[#8de3ff]/40 bg-[#8de3ff]/10 text-white hover:bg-[#8de3ff]/20")}>

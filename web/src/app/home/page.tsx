@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MarsPlanet } from "@/features/mars/presentation/components/mars-planet";
+import { MarsPlanet, GeographicLandmark } from "@/features/mars/presentation/components/mars-planet";
 import { MoonPlanet } from "@/features/moon/presentation/components/moon-planet";
 import { EarthPlanet } from "@/features/earth/presentation/components/earth-planet";
 import { MarsMissionPanels } from "./mars-mission-panels";
@@ -35,8 +35,7 @@ import { SideBySideComparison } from "@/features/explorer/presentation/component
 import { InteractiveAnalogMap } from "@/features/explorer/presentation/components/interactive-analog-map";
 import { FALLBACK_CATALOG_REGIONS, FALLBACK_DEFAULT_RANKINGS } from "@/features/explorer/domain/explorer-catalog";
 import type { RegionProfile } from "@/features/explorer/domain/explorer-types";
-import { MOON_LANDMARKS } from "@/features/moon/domain/moon-data";
-import { EARTH_LANDMARKS } from "@/features/earth/domain/earth-data";
+import { ProjectedLandmark } from "@/features/shared/domain/geographic-coordinates";
 import styles from "./mars-dashboard.module.css";
 import stars from "./starfield.module.css";
 import { useTranslation } from "@/i18n/context";
@@ -46,6 +45,146 @@ import { cn } from "@/lib/utils";
 type CelestialBody = "mars" | "moon" | "earth";
 type ViewMode = "3d" | "2d";
 
+// Real planetary landmarks with true latitude and longitude coordinates
+const MARS_GEOGRAPHIC_LANDMARKS: GeographicLandmark[] = [
+  {
+    id: "olympus",
+    name: "Monte Olimpo",
+    lat: 18.65,
+    lon: -133.8,
+    type: "Volcán Escudo",
+    coord: "18,7° N · 133,8° W",
+    desc: "El mayor volcán y montaña del sistema solar, 2,5 veces más alto que el monte Everest.",
+    comparisonKey: null,
+  },
+  {
+    id: "valles",
+    name: "Valles Marineris",
+    lat: -13.9,
+    lon: -59.2,
+    type: "Cañón Tectónico",
+    coord: "13,9° S · 59,2° W",
+    desc: "Colosal sistema de cañones de más de 4.000 km que abarca una quinta parte de la circunferencia ecuatorial de Marte.",
+    comparisonKey: null,
+  },
+  {
+    id: "curiosity",
+    name: "Cráter Gale · Curiosity",
+    lat: -4.6,
+    lon: 137.4,
+    type: "Rover NASA (2012–Activo)",
+    coord: "4,6° S · 137,4° E",
+    desc: "Lugar de aterrizaje del rover Curiosity explorando las laderas de Mount Sharp para evaluar la habitabilidad antigua.",
+    comparisonKey: "jezero-atacama",
+  },
+  {
+    id: "perseverance",
+    name: "Cráter Jezero · Perseverance",
+    lat: 18.38,
+    lon: 77.58,
+    type: "Rover NASA (2021–Activo)",
+    coord: "18,4° N · 77,6° E",
+    desc: "Antiguo lecho de lago y delta fluvial sedimentario donde Perseverance recolecta núcleos para detectar biofirmas fósiles.",
+    comparisonKey: "jezero-atacama",
+  },
+];
+
+const MOON_GEOGRAPHIC_LANDMARKS: GeographicLandmark[] = [
+  {
+    id: "shackleton",
+    name: "Cráter Shackleton (LOLA Site04)",
+    lat: -89.9,
+    lon: 120.0,
+    type: "Sitio Candidato Artemis III",
+    coord: "89,9° S · 120,0° E",
+    desc: "Pico de luz casi continua en el borde e interior en sombra permanente (PSR) con depósitos de hielo de agua a 40 K.",
+    comparisonKey: "shackleton-mcmurdo",
+  },
+  {
+    id: "tranquillitatis",
+    name: "Mare Tranquillitatis · Apollo 11",
+    lat: 0.67,
+    lon: 23.47,
+    type: "Alunizaje Humano (1969)",
+    coord: "0,67° N · 23,5° E",
+    desc: "Llanura basáltica rica en titanio e ilmenita donde Armstrong y Aldrin recolectaron las primeras muestras lunares.",
+    comparisonKey: "shackleton-mcmurdo",
+  },
+  {
+    id: "tycho",
+    name: "Cráter Tycho",
+    lat: -43.3,
+    lon: -11.4,
+    type: "Cráter de Impacto Joven",
+    coord: "43,3° S · 11,4° W",
+    desc: "Cráter de 85 km con pico central y un sistema de rayos eyectados que se extiende por más de 1.500 km.",
+    comparisonKey: "shackleton-mcmurdo",
+  },
+  {
+    id: "aitken",
+    name: "Cuenca Polo Sur-Aitken",
+    lat: -53.0,
+    lon: -169.0,
+    type: "Mayor Cuenca de Impacto",
+    coord: "53,0° S · 169,0° W",
+    desc: "Cuenca gigantesca de 2.500 km y 8 km de profundidad que expone roca del manto lunar profundo.",
+    comparisonKey: "shackleton-mcmurdo",
+  },
+];
+
+const EARTH_GEOGRAPHIC_LANDMARKS: GeographicLandmark[] = [
+  {
+    id: "atacama",
+    name: "Salar de Atacama (Chile)",
+    lat: -23.86,
+    lon: -69.13,
+    type: "Análogo de Hiperaridez",
+    coord: "23,9° S · 69,1° W",
+    desc: "Costras salinas, evaporitas y radiación UV extrema, análogo natural de los lagos fósiles de Jezero.",
+    comparisonKey: "jezero-atacama",
+  },
+  {
+    id: "mcmurdo",
+    name: "Valles Secos de McMurdo (Antártida)",
+    lat: -77.50,
+    lon: 162.00,
+    type: "Análogo de Criosfera Polar",
+    coord: "77,5° S · 162,0° E",
+    desc: "Suelos poligonales secos y permafrost antártico, análogo directo de las trampas frías de Shackleton.",
+    comparisonKey: "shackleton-mcmurdo",
+  },
+  {
+    id: "rio_tinto",
+    name: "Río Tinto (España)",
+    lat: 37.69,
+    lon: -6.55,
+    type: "Análogo de Sulfatos y Jarosita",
+    coord: "37,7° N · 6,6° W",
+    desc: "Aguas ácidas con precipitados de jarosita y óxidos de hierro idénticos a los minerales sedimentarios marcianos.",
+    comparisonKey: "jezero-rio-tinto",
+  },
+  {
+    id: "haughton",
+    name: "Cráter Haughton (Isla Devon, Canadá)",
+    lat: 75.38,
+    lon: -89.67,
+    type: "Análogo Dual Luna/Marte",
+    coord: "75,4° N · 89,7° W",
+    desc: "Estructura de impacto de 23 km en el Alto Ártico usada por la NASA para probar rovers y trajes espaciales.",
+    comparisonKey: "shackleton-mcmurdo",
+  },
+  {
+    id: "askja",
+    name: "Caldera de Askja (Islandia)",
+    lat: 65.03,
+    lon: -16.75,
+    type: "Análogo de Basalto Lunar",
+    coord: "65,0° N · 16,8° W",
+    desc: "Campos de lava basáltica donde los astronautas del programa Apollo entrenaron geología lunar.",
+    comparisonKey: "shackleton-mcmurdo",
+  },
+];
+
 export default function HomePage() {
   const { dict } = useTranslation();
   const [activeBody, setActiveBody] = useState<CelestialBody>("mars");
@@ -53,6 +192,7 @@ export default function HomePage() {
   const [isExploring, setIsExploring] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [activeLandmark, setActiveLandmark] = useState<string | null>(null);
+  const [projectedLandmarks, setProjectedLandmarks] = useState<ProjectedLandmark[]>([]);
 
   // Side-by-side comparison modal state
   const [comparisonKey, setComparisonKey] = useState<string | null>(null);
@@ -249,70 +389,12 @@ export default function HomePage() {
     ];
   }, [activeBody, dict]);
 
-  // Interactive POIs per body
-  const currentLandmarks = useMemo(() => {
-    if (activeBody === "moon") {
-      return MOON_LANDMARKS.map((m) => ({
-        id: m.id,
-        name: m.name,
-        type: m.type,
-        coord: m.coord,
-        desc: m.desc,
-        positionClass: m.positionClass,
-        comparisonKey: "shackleton-mcmurdo",
-      }));
-    }
-    if (activeBody === "earth") {
-      return EARTH_LANDMARKS.map((e) => ({
-        id: e.id,
-        name: e.name,
-        type: e.type,
-        coord: e.coord,
-        desc: e.desc,
-        positionClass: e.positionClass,
-        comparisonKey: e.comparedWithTargetId === "mars-jezero" ? "jezero-atacama" : "shackleton-mcmurdo",
-      }));
-    }
-    // Mars
-    return [
-      {
-        id: "olympus",
-        name: dict.mars.landmarks.olympus.name,
-        type: dict.mars.landmarks.olympus.type,
-        coord: dict.mars.landmarks.olympus.altitude,
-        desc: dict.mars.landmarks.olympus.desc,
-        positionClass: "top-[32%] left-[26%]",
-        comparisonKey: null,
-      },
-      {
-        id: "valles",
-        name: dict.mars.landmarks.valles.name,
-        type: dict.mars.landmarks.valles.type,
-        coord: dict.mars.landmarks.valles.altitude,
-        desc: dict.mars.landmarks.valles.desc,
-        positionClass: "top-[54%] left-[64%]",
-        comparisonKey: null,
-      },
-      {
-        id: "curiosity",
-        name: dict.mars.landmarks.curiosity.name,
-        type: dict.mars.landmarks.curiosity.type,
-        coord: dict.mars.landmarks.curiosity.altitude,
-        desc: dict.mars.landmarks.curiosity.desc,
-        positionClass: "top-[62%] left-[34%]",
-        comparisonKey: "jezero-atacama",
-      },
-      {
-        id: "perseverance",
-        name: dict.mars.landmarks.perseverance.name,
-        type: dict.mars.landmarks.perseverance.type,
-        coord: dict.mars.landmarks.perseverance.altitude,
-        desc: dict.mars.landmarks.perseverance.desc,
-        positionClass: "top-[38%] left-[72%]",
-        comparisonKey: "jezero-atacama",
-      },
-    ];
-  }, [activeBody, dict]);
+  // Active geographic landmarks for the selected body
+  const currentGeographicLandmarks = useMemo(() => {
+    if (activeBody === "moon") return MOON_GEOGRAPHIC_LANDMARKS;
+    if (activeBody === "earth") return EARTH_GEOGRAPHIC_LANDMARKS;
+    return MARS_GEOGRAPHIC_LANDMARKS;
+  }, [activeBody]);
 
   const bodyTitles = {
     mars: { title: dict.mars.title, subtitle: dict.mars.subtitle, color: "text-[#ffab57]" },
@@ -332,156 +414,155 @@ export default function HomePage() {
         <div className={stars.comets} />
       </div>
 
-      {/* Top utility navigation */}
-      <div className="absolute top-4 right-4 z-40 flex flex-wrap items-center gap-2">
-        {/* Celestial Body Segmented Control */}
-        <div className="flex items-center rounded-full border border-white/15 bg-black/60 p-1 text-xs backdrop-blur-md shadow-xl">
-          <button
-            type="button"
-            onClick={() => {
-              setActiveBody("mars");
-              setActiveLandmark(null);
-            }}
-            className={cn(
-              "flex items-center gap-1.5 rounded-full px-3 py-1 font-medium transition cursor-pointer",
-              activeBody === "mars"
-                ? "bg-[#ffab57] text-black shadow-md font-semibold"
-                : "text-white/70 hover:text-white"
-            )}
-          >
-            <Sun className="size-3.5" />
-            Marte
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveBody("moon");
-              setActiveLandmark(null);
-            }}
-            className={cn(
-              "flex items-center gap-1.5 rounded-full px-3 py-1 font-medium transition cursor-pointer",
-              activeBody === "moon"
-                ? "bg-[#8de3ff] text-black shadow-md font-semibold"
-                : "text-white/70 hover:text-white"
-            )}
-          >
-            <Moon className="size-3.5" />
-            Luna
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveBody("earth");
-              setActiveLandmark(null);
-            }}
-            className={cn(
-              "flex items-center gap-1.5 rounded-full px-3 py-1 font-medium transition cursor-pointer",
-              activeBody === "earth"
-                ? "bg-[#38bdf8] text-black shadow-md font-semibold"
-                : "text-white/70 hover:text-white"
-            )}
-          >
-            <Globe2 className="size-3.5" />
-            Tierra
-          </button>
+      {/* Production Top Header Bar (No Collisions) */}
+      <header className="relative z-40 flex w-full flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-black/50 px-4 py-2.5 backdrop-blur-xl">
+        {/* Left Branding */}
+        <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-1.5 font-headline text-lg font-bold tracking-tight text-white transition hover:opacity-80">
+            {dict.common.appName}
+            <Sparkles aria-hidden="true" className={cn("size-3.5 fill-current", bodyTitles[activeBody].color)} />
+          </Link>
+          <span className="hidden md:inline-block text-xs text-white/50 border-l border-white/15 pl-2 font-mono">
+            Atlas Planetario 3D & Motor de Análogos
+          </span>
         </div>
 
-        {/* View Mode Toggle: 3D Globe vs 2D Map */}
-        <div className="flex items-center rounded-full border border-white/15 bg-black/60 p-1 text-xs backdrop-blur-md shadow-xl">
-          <button
-            type="button"
-            onClick={() => setViewMode("3d")}
-            className={cn(
-              "flex items-center gap-1 rounded-full px-2.5 py-1 font-medium transition cursor-pointer",
-              viewMode === "3d" ? "bg-white text-black font-semibold" : "text-white/70 hover:text-white"
-            )}
+        {/* Center / Right Controls */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Celestial Body Segmented Control */}
+          <div className="flex items-center rounded-full border border-white/15 bg-black/60 p-0.5 text-xs backdrop-blur-md shadow-md">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveBody("mars");
+                setActiveLandmark(null);
+              }}
+              className={cn(
+                "flex items-center gap-1.5 rounded-full px-3 py-1 font-medium transition cursor-pointer",
+                activeBody === "mars"
+                  ? "bg-[#ffab57] text-black shadow-md font-semibold"
+                  : "text-white/70 hover:text-white"
+              )}
+            >
+              <Sun className="size-3.5" />
+              Marte
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveBody("moon");
+                setActiveLandmark(null);
+              }}
+              className={cn(
+                "flex items-center gap-1.5 rounded-full px-3 py-1 font-medium transition cursor-pointer",
+                activeBody === "moon"
+                  ? "bg-[#8de3ff] text-black shadow-md font-semibold"
+                  : "text-white/70 hover:text-white"
+              )}
+            >
+              <Moon className="size-3.5" />
+              Luna
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveBody("earth");
+                setActiveLandmark(null);
+              }}
+              className={cn(
+                "flex items-center gap-1.5 rounded-full px-3 py-1 font-medium transition cursor-pointer",
+                activeBody === "earth"
+                  ? "bg-[#38bdf8] text-black shadow-md font-semibold"
+                  : "text-white/70 hover:text-white"
+              )}
+            >
+              <Globe2 className="size-3.5" />
+              Tierra
+            </button>
+          </div>
+
+          {/* View Mode Toggle: 3D Globe vs 2D Map */}
+          <div className="flex items-center rounded-full border border-white/15 bg-black/60 p-0.5 text-xs backdrop-blur-md shadow-md">
+            <button
+              type="button"
+              onClick={() => setViewMode("3d")}
+              className={cn(
+                "flex items-center gap-1 rounded-full px-2.5 py-1 font-medium transition cursor-pointer",
+                viewMode === "3d" ? "bg-white text-black font-semibold shadow" : "text-white/70 hover:text-white"
+              )}
+            >
+              <Globe2 className="size-3.5" />
+              3D
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("2d")}
+              className={cn(
+                "flex items-center gap-1 rounded-full px-2.5 py-1 font-medium transition cursor-pointer",
+                viewMode === "2d" ? "bg-white text-black font-semibold shadow" : "text-white/70 hover:text-white"
+              )}
+            >
+              <MapIcon className="size-3.5" />
+              Mapa 2D
+            </button>
+          </div>
+
+          {/* Compare Side-by-Side Action Button */}
+          <Button
+            onClick={() => setComparisonKey("jezero-atacama")}
+            size="sm"
+            className="rounded-full bg-linear-to-r from-[#ffab57] to-[#8de3ff] text-black font-semibold shadow-md hover:opacity-90 gap-1.5 text-xs h-7"
           >
-            <Globe2 className="size-3.5" />
-            3D
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode("2d")}
-            className={cn(
-              "flex items-center gap-1 rounded-full px-2.5 py-1 font-medium transition cursor-pointer",
-              viewMode === "2d" ? "bg-white text-black font-semibold" : "text-white/70 hover:text-white"
-            )}
+            <Scale className="size-3.5" />
+            Comparar Lado a Lado
+          </Button>
+
+          {/* Link to Dedicated DSS Explorer */}
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="border-white/20 bg-white/5 text-white hover:bg-white/15 hover:text-white backdrop-blur-md rounded-full text-xs h-7"
           >
-            <MapIcon className="size-3.5" />
-            Mapa 2D
-          </button>
+            <Link href="/explorer">
+              DSS Análogos
+              <ExternalLink className="size-3 ml-1" />
+            </Link>
+          </Button>
+
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="text-white/80 hover:text-white hover:bg-white/10 rounded-full text-xs h-7"
+          >
+            <Link href="/">
+              <ArrowLeft className="size-3.5 mr-1" />
+              Landing
+            </Link>
+          </Button>
+          <LanguageSwitcher
+            variant="outline"
+            size="sm"
+            className="border-white/15 bg-white/5 text-white hover:bg-white/15 hover:text-white backdrop-blur-md rounded-full h-7 text-xs"
+          />
         </div>
-
-        {/* Compare Side-by-Side Action Button */}
-        <Button
-          onClick={() => setComparisonKey("jezero-atacama")}
-          size="sm"
-          className="rounded-full bg-linear-to-r from-[#ffab57] to-[#8de3ff] text-black font-semibold shadow-lg hover:opacity-90 gap-1.5 text-xs"
-        >
-          <Scale className="size-3.5" />
-          Comparar Lado a Lado
-        </Button>
-
-        {/* Link to Dedicated DSS Explorer */}
-        <Button
-          asChild
-          variant="outline"
-          size="sm"
-          className="border-white/20 bg-white/5 text-white hover:bg-white/15 hover:text-white backdrop-blur-md rounded-full text-xs"
-        >
-          <Link href="/explorer">
-            DSS Análogos
-            <ExternalLink className="size-3 ml-1" />
-          </Link>
-        </Button>
-
-        <Button
-          asChild
-          variant="ghost"
-          size="sm"
-          className="text-white/80 hover:text-white hover:bg-white/10 rounded-full"
-        >
-          <Link href="/">
-            <ArrowLeft className="size-4 mr-1.5" />
-            Landing
-          </Link>
-        </Button>
-        <LanguageSwitcher
-          variant="outline"
-          size="sm"
-          className="border-white/15 bg-white/5 text-white hover:bg-white/15 hover:text-white backdrop-blur-md rounded-full"
-        />
-      </div>
+      </header>
 
       {/* Main Dashboard Section */}
       <section
         aria-labelledby="dashboard-title"
-        className="relative mx-auto grid max-w-[1600px] gap-7 px-4 py-5 sm:px-7 lg:min-h-[max(680px,100svh)] lg:gap-0 lg:px-4"
+        className="relative mx-auto grid max-w-[1600px] gap-7 px-4 py-4 sm:px-7 lg:min-h-[max(660px,calc(100svh-55px))] lg:gap-0 lg:px-4"
       >
-        {/* Header Branding */}
-        <header
-          className={cn(
-            "text-app-primary-foreground lg:absolute lg:top-5 lg:left-4 z-30 motion-safe:transition-opacity motion-safe:duration-200",
-            isExploring && "opacity-0"
-          )}
-        >
-          <div className="flex items-start gap-1 font-headline text-3xl font-semibold leading-none tracking-tight">
-            {dict.common.appName}{" "}
-            <Sparkles aria-hidden="true" className={cn("size-3.5 fill-current", bodyTitles[activeBody].color)} />
-          </div>
-          <p className="mt-1 text-xs text-white/60">
-            Atlas 3D Interactivo y Explorador de Análogos
-          </p>
-        </header>
-
         {/* 2D Map View or 3D Globe View */}
         {viewMode === "2d" ? (
-          <div className="relative z-20 order-1 mx-auto w-full max-w-5xl pt-20 pb-10">
+          <div className="relative z-20 order-1 mx-auto w-full max-w-5xl py-4">
             <InteractiveAnalogMap
               sites={earthSites}
               ranking={FALLBACK_DEFAULT_RANKINGS}
               selectedSiteId="earth-atacama-desert"
               secondarySiteId="earth-mcmurdo-dry-valleys"
+              activeBody={activeBody}
               queriedCoord={null}
               onSelectSite={(id) => {
                 const presetKey = id.includes("mcmurdo") ? "shackleton-mcmurdo" : "jezero-atacama";
@@ -489,17 +570,6 @@ export default function HomePage() {
               }}
               onMapCoordinateClick={() => {}}
             />
-            <div className="mt-4 flex items-center justify-between text-xs text-white/60">
-              <span>Haz clic en un sitio análogo terrestre para abrir la comparación con Marte / Luna.</span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setViewMode("3d")}
-                className="rounded-full border-white/20 text-white"
-              >
-                Volver a Globo 3D
-              </Button>
-            </div>
           </div>
         ) : (
           <>
@@ -507,7 +577,7 @@ export default function HomePage() {
             <aside
               aria-label="Características Superficiales"
               className={cn(
-                "order-4 grid grid-cols-1 gap-2.5 sm:grid-cols-3 lg:absolute lg:top-20 lg:left-4 lg:z-20 lg:flex lg:w-52 lg:flex-col lg:gap-3 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+                "order-4 grid grid-cols-1 gap-2.5 sm:grid-cols-3 lg:absolute lg:top-8 lg:left-4 lg:z-20 lg:flex lg:w-52 lg:flex-col lg:gap-3 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
                 isExploring ? "lg:-translate-x-72 lg:opacity-0 pointer-events-none" : "lg:translate-x-0 lg:opacity-100"
               )}
             >
@@ -563,29 +633,48 @@ export default function HomePage() {
                   isExploring ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"
                 )}
               >
-                {/* Dynamically active 3D planet */}
+                {/* Dynamically active 3D planet with real lat/lon projection */}
                 {activeBody === "mars" && (
-                  <MarsPlanet isHovered={isHovered && !isExploring} isExploring={isExploring} />
+                  <MarsPlanet
+                    isHovered={isHovered && !isExploring}
+                    isExploring={isExploring}
+                    landmarks={currentGeographicLandmarks}
+                    onProjectedLandmarksChange={setProjectedLandmarks}
+                  />
                 )}
                 {activeBody === "moon" && (
-                  <MoonPlanet isHovered={isHovered && !isExploring} isExploring={isExploring} />
+                  <MoonPlanet
+                    isHovered={isHovered && !isExploring}
+                    isExploring={isExploring}
+                    landmarks={currentGeographicLandmarks}
+                    onProjectedLandmarksChange={setProjectedLandmarks}
+                  />
                 )}
                 {activeBody === "earth" && (
-                  <EarthPlanet isHovered={isHovered && !isExploring} isExploring={isExploring} />
+                  <EarthPlanet
+                    isHovered={isHovered && !isExploring}
+                    isExploring={isExploring}
+                    landmarks={currentGeographicLandmarks}
+                    onProjectedLandmarksChange={setProjectedLandmarks}
+                  />
                 )}
 
-                {/* Exploration Mode: Interactive Surface Landmarks / POIs */}
+                {/* Exploration Mode: Dynamically Projected Geographic Markers */}
                 {isExploring && (
-                  <div className="pointer-events-none absolute inset-0 z-30 animate-in fade-in fill-mode-both duration-240 lg:[animation-delay:120ms] motion-reduce:animate-none">
-                    {currentLandmarks.map((poi) => {
+                  <div className="pointer-events-none absolute inset-0 z-30">
+                    {projectedLandmarks.map((poi) => {
                       const isActive = activeLandmark === poi.id;
+                      if (!poi.visible || poi.opacity <= 0.05) return null;
+
                       return (
                         <div
                           key={poi.id}
-                          className={cn(
-                            "absolute -translate-x-1/2 -translate-y-1/2 transition-[transform,opacity] duration-300 motion-reduce:transition-none",
-                            poi.positionClass
-                          )}
+                          className="absolute -translate-x-1/2 -translate-y-1/2 transition-opacity duration-150"
+                          style={{
+                            left: `${poi.screenX}px`,
+                            top: `${poi.screenY}px`,
+                            opacity: poi.opacity,
+                          }}
                         >
                           <button
                             type="button"
@@ -594,10 +683,10 @@ export default function HomePage() {
                               setActiveLandmark(isActive ? null : poi.id);
                             }}
                             className={cn(
-                              "group pointer-events-auto flex items-center gap-1.5 rounded-full border px-2.5 py-1 backdrop-blur-md text-[0.68rem] font-semibold transition-[color,background-color,border-color,transform,box-shadow] duration-300 shadow-lg cursor-pointer motion-reduce:transition-none",
+                              "group pointer-events-auto flex items-center gap-1.5 rounded-full border px-2.5 py-1 backdrop-blur-md text-[0.68rem] font-semibold transition-[color,background-color,border-color,transform,box-shadow] duration-200 shadow-lg cursor-pointer",
                               isActive
-                                ? "border-[#ffab57] bg-[#39190d]/90 text-white scale-110 shadow-[0_0_20px_#ffab57a0]"
-                                : "border-white/20 bg-black/60 text-white/90 hover:border-white/40 hover:bg-black/80 hover:scale-105"
+                                ? "border-[#ffab57] bg-[#39190d]/95 text-white scale-110 shadow-[0_0_20px_#ffab57a0]"
+                                : "border-white/20 bg-black/70 text-white/90 hover:border-white/40 hover:bg-black/90 hover:scale-105"
                             )}
                           >
                             <span className="relative flex size-2">
@@ -611,7 +700,7 @@ export default function HomePage() {
                           {isActive && (
                             <div
                               onClick={(e) => e.stopPropagation()}
-                              className="pointer-events-auto absolute top-8 left-1/2 -translate-x-1/2 z-40 w-72 rounded-2xl border border-white/20 bg-[#160b1e]/95 p-3.5 shadow-2xl backdrop-blur-xl animate-in zoom-in-95 duration-200 motion-reduce:animate-none"
+                              className="pointer-events-auto absolute top-8 left-1/2 -translate-x-1/2 z-40 w-72 rounded-2xl border border-white/20 bg-[#160b1e]/95 p-3.5 shadow-2xl backdrop-blur-xl animate-in zoom-in-95 duration-200"
                             >
                               <div className="flex items-start justify-between gap-1">
                                 <div>
@@ -639,7 +728,7 @@ export default function HomePage() {
                               {poi.comparisonKey && (
                                 <div className="mt-3 pt-2 border-t border-white/10">
                                   <Button
-                                    onClick={() => setComparisonKey(poi.comparisonKey)}
+                                    onClick={() => setComparisonKey(poi.comparisonKey!)}
                                     size="sm"
                                     className="w-full rounded-xl bg-linear-to-r from-[#ffab57] to-[#8de3ff] text-black font-semibold text-xs h-7 gap-1"
                                   >
@@ -679,7 +768,7 @@ export default function HomePage() {
             {/* 4 Top Fact Cards */}
             <dl
               className={cn(
-                "order-3 grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:absolute lg:inset-x-4 lg:top-11 lg:left-[22.7%] lg:z-0 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+                "order-3 grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:absolute lg:inset-x-4 lg:top-4 lg:left-[22.7%] lg:z-0 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
                 isExploring ? "lg:-translate-y-48 lg:opacity-0 pointer-events-none" : "lg:translate-y-0 lg:opacity-100"
               )}
             >
@@ -719,7 +808,7 @@ export default function HomePage() {
               <div
                 className={cn(
                   styles.explorationControls,
-                  "absolute inset-x-4 top-5 z-40 flex items-center justify-between"
+                  "absolute inset-x-4 top-3 z-40 flex items-center justify-between"
                 )}
               >
                 <div className="flex items-center gap-3">

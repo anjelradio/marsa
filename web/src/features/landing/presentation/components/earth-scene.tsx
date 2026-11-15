@@ -44,7 +44,7 @@ export function EarthScene() {
     const loader = new TextureLoader();
     let disposed = false;
     let ready = false;
-    let orbitAngle = 0;
+    let orbitAngle = 2.1;
     let orbitWidth = 1;
     let previousTime: number | undefined;
 
@@ -156,14 +156,14 @@ export function EarthScene() {
       if (!ready || document.hidden) return;
 
       draw();
-      if (motion.matches) return;
 
       renderer.setAnimationLoop((time) => {
         const delta = Math.min(0.05, (time - (previousTime ?? time)) / 1000);
         previousTime = time;
-        earth.rotation.y += delta * 0.065;
-        clouds.rotation.y += delta * 0.081;
-        orbitAngle += delta * 0.16;
+        const speedFactor = motion.matches ? 0.6 : 1.0;
+        earth.rotation.y += delta * 0.065 * speedFactor;
+        clouds.rotation.y += delta * 0.081 * speedFactor;
+        orbitAngle += delta * 0.16 * speedFactor;
         draw();
       });
     }

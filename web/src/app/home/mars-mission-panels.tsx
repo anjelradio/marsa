@@ -91,14 +91,14 @@ export function MarsMissionPanels({ isExploring = false }: MarsMissionPanelsProp
           />
 
           {/* Key astronomical markers: Aphelion (Peak) & Perihelion (Base) */}
-          <span className="absolute top-1.5 left-1/2 -translate-x-1/2 rounded bg-black/60 px-1.5 py-0.5 text-[0.62rem] font-mono text-white/90">
+          <span className="absolute top-1.5 left-2 rounded bg-black/70 px-1.5 py-0.5 text-[0.62rem] font-mono text-white/90">
             {dict.mars.panels.aphelion}
           </span>
-          <span className="absolute bottom-1.5 left-2 rounded bg-black/60 px-1.5 py-0.5 text-[0.62rem] font-mono text-[#ffdb8a]">
+          <span className="absolute bottom-1.5 left-2 rounded bg-black/70 px-1.5 py-0.5 text-[0.62rem] font-mono text-[#ffdb8a]">
             {dict.mars.panels.perihelion}
           </span>
 
-          <p className="absolute right-2 bottom-1.5 rounded-md bg-black/60 px-2 py-0.5 text-[0.65rem] font-mono text-app-secondary">
+          <p className="absolute right-2 top-1.5 rounded-md bg-black/70 px-2 py-0.5 text-[0.62rem] font-mono text-app-secondary">
             {dict.mars.panels.distanceRange}
           </p>
         </div>

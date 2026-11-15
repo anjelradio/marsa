@@ -2,30 +2,56 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { createMarsSurfaceOverlay } from "./mars-surface-overlay";
+import { latLonToVector3, ProjectedLandmark } from "@/features/shared/domain/geographic-coordinates";
 
 const radius = 0.96;
 
-// Superficie y atmósfera adaptadas de Aditya-567/3D-Planets (Apache-2.0).
-export function MarsPlanet({
-  className,
-  isHovered = false,
-  isExploring = false,
-  showSurfaceOverlay = true,
-  rotationSpeed = 0.012,
-}: {
+export interface GeographicLandmark {
+  id: string;
+  name: string;
+  lat: number;
+  lon: number;
+  type: string;
+  coord: string;
+  desc: string;
+  comparisonKey?: string | null;
+}
+
+export interface MarsPlanetProps {
   className?: string;
   isHovered?: boolean;
   isExploring?: boolean;
   showSurfaceOverlay?: boolean;
   rotationSpeed?: number;
-}) {
+  landmarks?: GeographicLandmark[];
+  onProjectedLandmarksChange?: (landmarks: ProjectedLandmark[]) => void;
+}
+
+export function MarsPlanet({
+  className,
+  isHovered = false,
+  isExploring = false,
+  showSurfaceOverlay = false,
+  rotationSpeed = 0.012,
+  landmarks,
+  onProjectedLandmarksChange,
+}: MarsPlanetProps) {
   const mount = useRef<HTMLDivElement>(null);
   const isExploringRef = useRef(isExploring);
+  const landmarksRef = useRef(landmarks);
+  const onProjectedLandmarksChangeRef = useRef(onProjectedLandmarksChange);
 
   useEffect(() => {
     isExploringRef.current = isExploring;
   }, [isExploring]);
+
+  useEffect(() => {
+    landmarksRef.current = landmarks;
+  }, [landmarks]);
+
+  useEffect(() => {
+    onProjectedLandmarksChangeRef.current = onProjectedLandmarksChange;
+  }, [onProjectedLandmarksChange]);
 
   useEffect(() => {
     const container = mount.current;
@@ -36,7 +62,11 @@ export function MarsPlanet({
     camera.position.z = 2.8;
 
     const canvas = document.createElement("canvas");
-    const context = canvas.getContext("webgl2", { alpha: true, antialias: true, powerPreference: "high-performance" });
+    const context = canvas.getContext("webgl2", {
+      alpha: true,
+      antialias: true,
+      powerPreference: "high-performance",
+    });
     if (!context) return;
 
     const renderer = new THREE.WebGLRenderer({
@@ -46,8 +76,6 @@ export function MarsPlanet({
       antialias: true,
       powerPreference: "high-performance",
     });
-    // A 1.75 DPR cap keeps the globe crisp without doubling the fragment cost
-    // on high-density displays.
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
     renderer.domElement.style.width = "100%";
     renderer.domElement.style.height = "100%";
@@ -57,15 +85,18 @@ export function MarsPlanet({
     const loader = new THREE.TextureLoader();
     let disposed = false;
     let ready = false;
+
     const texture = loader.load("/mars/marsmap.jpg", () => {
       if (disposed) return;
       ready = true;
       syncMotion();
     });
     texture.colorSpace = THREE.SRGBColorSpace;
+
     const bump = loader.load("/mars/marsbump.jpg", () => {
       if (!disposed && ready && !document.hidden) renderer.render(scene, camera);
     });
+
     const geometry = new THREE.SphereGeometry(radius, 80, 64);
     const material = new THREE.MeshPhongMaterial({
       map: texture,
@@ -101,20 +132,54 @@ export function MarsPlanet({
     planet.rotation.set(-0.08, -2.12, 0.22, "ZYX");
     scene.add(planet);
 
-    const surfaceOverlay = showSurfaceOverlay ? createMarsSurfaceOverlay(radius) : null;
-    if (surfaceOverlay) scene.add(surfaceOverlay.group);
-
     scene.add(new THREE.AmbientLight(0xff411b, 0.09));
     const light = new THREE.DirectionalLight(0xffefe7, 10.5);
     light.position.set(6, 2.2, 3.6);
     scene.add(light);
 
-    // Optimized Drag Interaction: Only listen to pointermove while dragging
+    // Update projected landmark 2D coordinates on current viewport
+    const tempV = new THREE.Vector3();
+    const updateLandmarkProjections = () => {
+      const currentLandmarks = landmarksRef.current;
+      const callback = onProjectedLandmarksChangeRef.current;
+      if (!currentLandmarks || currentLandmarks.length === 0 || !callback) return;
+
+      planet.updateMatrixWorld(true);
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      if (!width || !height) return;
+
+      const projected: ProjectedLandmark[] = currentLandmarks.map((lm) => {
+        const localPos = latLonToVector3(lm.lat, lm.lon, radius);
+        tempV.copy(localPos).applyMatrix4(planet.matrixWorld);
+        const zWorld = tempV.z;
+        const isFrontFacing = zWorld > 0.02;
+
+        tempV.project(camera);
+        const screenX = (tempV.x * 0.5 + 0.5) * width;
+        const screenY = (-tempV.y * 0.5 + 0.5) * height;
+
+        return {
+          ...lm,
+          screenX,
+          screenY,
+          visible: isFrontFacing,
+          opacity: Math.max(0, Math.min(1, (zWorld - 0.02) / 0.18)),
+        };
+      });
+
+      callback(projected);
+    };
+
+    // Drag Interaction
     let isDragging = false;
     let prevX = 0;
     let prevY = 0;
 
-    const renderOnce = () => renderer.render(scene, camera);
+    const renderOnce = () => {
+      renderer.render(scene, camera);
+      updateLandmarkProjections();
+    };
 
     const onPointerMove = (e: PointerEvent) => {
       if (!isDragging) return;
@@ -126,7 +191,7 @@ export function MarsPlanet({
       planet.rotation.y += dx * 0.006;
       planet.rotation.x = Math.max(-0.65, Math.min(0.65, planet.rotation.x + dy * 0.004));
 
-      if (reducedMotion.matches) renderOnce();
+      renderOnce();
     };
 
     const onPointerUp = () => {
@@ -158,84 +223,62 @@ export function MarsPlanet({
       if (!width || !height || (width === lastWidth && height === lastHeight)) return;
       lastWidth = width;
       lastHeight = height;
-      camera.left = -width / height;
-      camera.right = width / height;
-      camera.updateProjectionMatrix();
-      renderer.setSize(width, height);
-      if (ready && !document.hidden) renderer.render(scene, camera);
+      renderer.setSize(width, height, false);
+      renderOnce();
     };
 
-    const observer = new ResizeObserver(resize);
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(container);
+
+    let animationFrameId: number;
+    let lastTime = performance.now();
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-    function syncMotion() {
-      renderer.setAnimationLoop(null);
-      if (!ready || document.hidden) return;
+    const animate = (time: number) => {
+      const delta = (time - lastTime) / 1000;
+      lastTime = time;
+
+      if (!isDragging && !isExploringRef.current) {
+        planet.rotation.y += rotationSpeed * delta;
+      }
 
       renderer.render(scene, camera);
-      canvas.dataset.rendered = "";
-      if (reducedMotion.matches) return;
+      if (isExploringRef.current) {
+        updateLandmarkProjections();
+      }
+      animationFrameId = requestAnimationFrame(animate);
+    };
 
-      let previousTime: number | undefined;
-      renderer.setAnimationLoop((time) => {
-        const delta = Math.min(0.05, (time - (previousTime ?? time)) / 1000);
-        previousTime = time;
-        planet.rotation.y += delta * rotationSpeed;
-        renderer.render(scene, camera);
-      });
-    }
+    const syncMotion = () => {
+      if (!ready || disposed) return;
+      lastTime = performance.now();
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = requestAnimationFrame(animate);
+    };
 
-    observer.observe(container);
-    resize();
     reducedMotion.addEventListener("change", syncMotion);
-    document.addEventListener("visibilitychange", syncMotion);
+    resize();
 
     return () => {
       disposed = true;
-      onPointerUp();
-      domElement.removeEventListener("pointerdown", onPointerDown);
-      renderer.setAnimationLoop(null);
-      observer.disconnect();
       reducedMotion.removeEventListener("change", syncMotion);
-      document.removeEventListener("visibilitychange", syncMotion);
+      resizeObserver.disconnect();
+      cancelAnimationFrame(animationFrameId);
+      domElement.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerUp);
+
       geometry.dispose();
       material.dispose();
       texture.dispose();
       bump.dispose();
-      surfaceOverlay?.dispose();
       renderer.dispose();
-      renderer.forceContextLoss();
-      renderer.domElement.remove();
+      if (domElement.parentNode === container) {
+        container.removeChild(domElement);
+      }
     };
-  }, [showSurfaceOverlay, rotationSpeed]);
+  }, [rotationSpeed]);
 
-  return (
-    <div
-      aria-hidden="true"
-      className={className ?? "absolute inset-0"}
-    >
-      {/* Outer atmospheric coronal diffusion */}
-      <div
-        className={`absolute -inset-[22%] pointer-events-none transition-[transform,opacity] duration-700 ease-out motion-reduce:transition-none ${
-          isHovered
-            ? "scale-105 opacity-100 bg-[radial-gradient(ellipse_28%_18%_at_52%_18%,#ffaf7ba0,transparent),radial-gradient(ellipse_20%_30%_at_81%_48%,#ffa775a0,transparent),radial-gradient(ellipse_23%_21%_at_68%_76%,#ff854b80,transparent)]"
-            : "scale-100 opacity-80 bg-[radial-gradient(ellipse_25%_16%_at_52%_18%,#ffaf7b85,transparent),radial-gradient(ellipse_18%_28%_at_81%_48%,#ffa77585,transparent),radial-gradient(ellipse_21%_19%_at_68%_76%,#ff854b64,transparent)]"
-        }`}
-      />
-      {/* Soft limb rim glow */}
-      <div
-        className={`absolute inset-[2.5%] pointer-events-none rounded-full bg-[#251006] transition-[box-shadow] duration-700 ease-out motion-reduce:transition-none [background-image:radial-gradient(ellipse_at_73%_38%,#ff975f,#180603_75%)] ${
-          isHovered
-            ? "shadow-[4px_-3px_24px_#ffba78df,13px_-7px_65px_#ff763aab]"
-            : "shadow-[4px_-3px_14px_#ffba78b0,13px_-7px_50px_#ff763a86]"
-        }`}
-      />
-      <div
-        ref={mount}
-        className={`absolute inset-0 transition-transform duration-700 ease-out motion-reduce:transition-none ${
-          isHovered && !isExploring ? "scale-[1.018]" : "scale-100"
-        }`}
-      />
-    </div>
-  );
+  return <div ref={mount} className={className ?? "size-full"} />;
 }
