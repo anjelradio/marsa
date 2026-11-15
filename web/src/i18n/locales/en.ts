@@ -57,7 +57,7 @@ export const en = {
     limitsBody:
       "Earth cannot reproduce reduced gravity (Mars 3.73 m/s², Moon 1.62 m/s²), the lunar vacuum, the thin Martian atmosphere, or their radiation environments. Similarity here only compares the listed surface properties.",
     dataNote:
-      "Earth cloudiness comes from the Copernicus Sentinel-2 STAC API (one-year mean); temperature and dust from NASA POWER (MERRA-2) and elevation from SRTM 30 m; Mars temperature and dust from the Mars Climate Database (one seasonal snapshot). Moon elevation comes from LRO LOLA and mean temperature from LRO Diviner. Ice, roughness, thermal inertia, Mars elevation, the Moon's zero dust and cloud values and McMurdo elevation are approximate reference figures.",
+      "Earth cloudiness, temperature and dust come from NASA POWER (MERRA-2, 25-year mean) and elevation from SRTM 30 m; Mars temperature and dust from the Mars Climate Database (one seasonal snapshot). Moon elevation comes from LRO LOLA and mean temperature from LRO Diviner. Ice, roughness, thermal inertia, Mars elevation, the Moon's zero dust and cloud values and McMurdo elevation are approximate reference figures.",
     planetFilter: "Planet",
     planets: { mars: "Mars", moon: "Moon", earth: "Earth" },
     stage: {
@@ -162,9 +162,9 @@ export const en = {
       meanDistance: "Mean: 149.6M km",
       orbitalSpeed: "Orbital speed",
       orbitalSpeedRange: "29.3–30.3 km/s",
-      missionCuriosity: "Sentinel-2",
-      missionCuriosityCoord: "10 m",
-      missionCuriosityDesc: "Optical imaging · ESA Copernicus",
+      missionCuriosity: "Terra",
+      missionCuriosityCoord: "250 m",
+      missionCuriosityDesc: "Daily imaging · NASA MODIS",
       measurements: {
         gravity: "Gravity",
         gravityVal: "9.81",
