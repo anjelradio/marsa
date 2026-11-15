@@ -15,6 +15,8 @@ export interface EarthPlanetProps {
   isHovered?: boolean;
   isExploring?: boolean;
   rotationSpeed?: number;
+  /** Sigue girando solo aunque esté en modo exploración (hasta que se arrastre). */
+  autoRotate?: boolean;
   landmarks?: GeographicLandmark[];
   onProjectedLandmarksChange?: (landmarks: ProjectedLandmark[]) => void;
 }
@@ -24,17 +26,23 @@ export function EarthPlanet({
   isHovered = false,
   isExploring = false,
   rotationSpeed = 0.010,
+  autoRotate = false,
   landmarks,
   onProjectedLandmarksChange,
 }: EarthPlanetProps) {
   const mount = useRef<HTMLDivElement>(null);
   const isExploringRef = useRef(isExploring);
+  const autoRotateRef = useRef(autoRotate);
   const landmarksRef = useRef(landmarks);
   const onProjectedLandmarksChangeRef = useRef(onProjectedLandmarksChange);
 
   useEffect(() => {
     isExploringRef.current = isExploring;
   }, [isExploring]);
+
+  useEffect(() => {
+    autoRotateRef.current = autoRotate;
+  }, [autoRotate]);
 
   useEffect(() => {
     landmarksRef.current = landmarks;
@@ -248,7 +256,7 @@ export function EarthPlanet({
       const delta = (time - lastTime) / 1000;
       lastTime = time;
 
-      if (!isDragging && !isExploringRef.current) {
+      if (!isDragging && (!isExploringRef.current || autoRotateRef.current)) {
         earth.rotation.y += rotationSpeed * delta;
         clouds.rotation.y += (rotationSpeed * 1.25) * delta;
       }
