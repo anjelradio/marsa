@@ -1,14 +1,19 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { useId } from "react";
+import { Globe2, Moon, Orbit } from "lucide-react";
 import { useTranslation } from "@/i18n/context";
+import styles from "./planet-filter.module.css";
 
 export type HomePlanet = "mars" | "moon" | "earth";
 
-const PLANETS: HomePlanet[] = ["mars", "moon", "earth"];
+const PLANETS = [
+  { id: "earth", icon: Globe2 },
+  { id: "mars", icon: Orbit },
+  { id: "moon", icon: Moon },
+] as const;
+const positions = ["center", "below", "above"] as const;
 
-/** Filtro superior para elegir el planeta que ocupa el centro de /home. */
 export function PlanetFilter({
   value,
   onChange,
@@ -18,29 +23,29 @@ export function PlanetFilter({
 }) {
   const { dict } = useTranslation();
   const copy = dict.analogs;
+  const groupName = useId();
+  const selectedIndex = PLANETS.findIndex(({ id }) => id === value);
 
   return (
-    <div
-      role="group"
-      aria-label={copy.planetFilter}
-      className="flex gap-1 rounded-full border border-white/15 bg-black/50 p-1 backdrop-blur-md"
-    >
-      {PLANETS.map((planet) => (
-        <Button
-          key={planet}
-          type="button"
-          size="sm"
-          variant="ghost"
-          aria-pressed={value === planet}
-          onClick={() => onChange(planet)}
-          className={cn(
-            "rounded-full px-4 text-white/80 hover:bg-white/10 hover:text-white",
-            value === planet && "bg-[#ffab57] text-black hover:bg-[#ffab57] hover:text-black",
-          )}
-        >
-          {copy.planets[planet]}
-        </Button>
-      ))}
-    </div>
+    <fieldset className={styles.wheel}>
+      <legend className="sr-only">{copy.planetFilter}</legend>
+      {PLANETS.map(({ id, icon: Icon }, index) => {
+        const position = positions[(index - selectedIndex + PLANETS.length) % PLANETS.length];
+        return (
+          <label key={id} className={styles.option} data-position={position}>
+            <input
+              className="sr-only"
+              type="radio"
+              name={groupName}
+              value={id}
+              checked={id === value}
+              onChange={() => onChange(id)}
+            />
+            <span aria-hidden="true" className={styles.icon}><Icon size={22} strokeWidth={1.5} /></span>
+            <span className={styles.label}>{copy.planets[id]}</span>
+          </label>
+        );
+      })}
+    </fieldset>
   );
 }

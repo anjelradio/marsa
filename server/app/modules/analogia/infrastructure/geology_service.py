@@ -8,9 +8,14 @@ from typing import Any, Dict, List, Optional
 import httpx
 
 from app.modules.analogia.infrastructure.api.schemas.geology_schemas import (
+    CandidatoTerrestre,
     CeldaAnalogico,
+    ComparacionLitologica,
+    CoordenadasCelda,
+    LimitesCelda,
     MetadatosFuente,
     MuestraLaboratorio,
+    RankingTerrestrePunto,
     RespuestaComparacion,
     RespuestaGeologiaPunto,
     UnidadMacrostrat,
@@ -262,6 +267,62 @@ async def comparar_analogo_tierra(
     )
 
 
+def _contiene_coordenadas(limites: LimitesCelda, lat: float, lng: float) -> bool:
+    # El antimeridiano tiene dos representaciones válidas en los catálogos.
+    lng = -180.0 if lng == 180.0 else lng
+    en_latitud = limites.lat_min <= lat < limites.lat_max or lat == limites.lat_max == 90
+    en_longitud = limites.lon_min <= lng < limites.lon_max or (
+        lng == -180.0 and limites.lon_max == 180.0
+    )
+    return en_latitud and en_longitud
+
+
+def _ranking_terrestre(categorias_marte: Dict[str, float]) -> RankingTerrestrePunto:
+    if not any(v > 0 for v in categorias_marte.values()):
+        return RankingTerrestrePunto()
+
+    evaluadas = 0
+    candidatos = []
+    celdas_tierra = cargar_json_seguro("celdas_glim_10x10.json", {})
+    for celda_id, datos in celdas_tierra.items():
+        limites = LimitesCelda(**datos["limites"])
+        categorias_tierra = datos["categorias_area_pct"]
+        if not any(v > 0 for v in categorias_tierra.values()):
+            continue
+
+        evaluadas += 1
+        similitud = calcular_similitud_coseno(categorias_marte, categorias_tierra)
+        if similitud <= 0:
+            continue
+
+        categorias = categorias_marte.keys() | categorias_tierra.keys()
+        comparacion = [
+            ComparacionLitologica(
+                categoria=categoria,
+                marte_pct=categorias_marte.get(categoria, 0.0),
+                tierra_pct=categorias_tierra.get(categoria, 0.0),
+            )
+            for categoria in sorted(categorias)
+            if categorias_marte.get(categoria, 0.0) > 0 or categorias_tierra.get(categoria, 0.0) > 0
+        ]
+        candidatos.append(CandidatoTerrestre(
+            celda_id=celda_id,
+            region_referencia=datos["nombre_region"],
+            centro=CoordenadasCelda(
+                lat=(limites.lat_min + limites.lat_max) / 2,
+                lng=(limites.lon_min + limites.lon_max) / 2,
+            ),
+            limites=limites,
+            similitud_pct=similitud,
+            cobertura_pct=datos.get("cobertura_pct"),
+            rocas_principales=datos.get("litologias_dominantes", []),
+            comparacion_litologica=comparacion,
+        ))
+
+    candidatos.sort(key=lambda candidato: (-candidato.similitud_pct, candidato.celda_id))
+    return RankingTerrestrePunto(regiones_evaluadas=evaluadas, candidatos=candidatos[:3])
+
+
 async def analizar_geologia_punto(
     cuerpo: str,
     lat: float,
@@ -312,28 +373,32 @@ async def analizar_geologia_punto(
 
     elif "marte" in cuerpo_norm or "mars" in cuerpo_norm:
         celdas_marte = cargar_json_seguro("celdas_marte_10x10.json", [])
-        cm = buscar_celda_mas_cercana(lat, lng, celdas_marte)
-        celda_id = cm.get("celda_id", obtener_id_celda_10x10(lat, lng, "M"))
+        cm = next((
+            celda for celda in celdas_marte
+            if _contiene_coordenadas(LimitesCelda(**celda["limites"]), lat, lng)
+        ), None)
+        if cm is None:
+            return RespuestaGeologiaPunto(
+                cuerpo="Marte",
+                coordenadas={"lat": lat, "lng": lng},
+                celda_id=obtener_id_celda_10x10(lat, lng, "M"),
+                region_nombre="Marte",
+                unidad_geologica="",
+                tipo_terreno="",
+                cobertura_geologica=False,
+                ranking_terrestre=RankingTerrestrePunto(),
+            )
 
+        limites_marte = LimitesCelda(**cm["limites"])
         muestras_marte = [
-            MuestraLaboratorio(**m) for m in muestras_todas if m.get("cuerpo", "").lower() == "marte"
+            MuestraLaboratorio(**m) for m in muestras_todas
+            if m.get("cuerpo", "").lower() == "marte"
+            and (coordenadas := m.get("coordenadas"))
+            and _contiene_coordenadas(limites_marte, coordenadas["lat"], coordenadas["lon"])
         ]
 
-        # Comparar con la Tierra para encontrar el mejor análogo terrestre
-        celdas_tierra = cargar_json_seguro("celdas_glim_10x10.json", {})
-        mejor_tierra = None
-        mejor_score = -1.0
-        for tid, tdata in celdas_tierra.items():
-            sc = calcular_similitud_coseno(cm.get("categorias_area_pct", {}), tdata.get("categorias_area_pct", {}))
-            if sc > mejor_score:
-                mejor_score = sc
-                mejor_tierra = {
-                    "celda_id": tid,
-                    "region_referencia": tdata.get("region_referencia", tid),
-                    "similitud_pct": sc,
-                    "rocas_principales": tdata.get("rocas_principales", []),
-                    "minerales_detectados": tdata.get("minerales_detectados", []),
-                }
+        ranking = _ranking_terrestre(cm.get("categorias_area_pct", {}))
+        mejor_tierra = ranking.candidatos[0] if ranking.candidatos else None
 
         atribuciones = [
             MetadatosFuente(
@@ -354,24 +419,35 @@ async def analizar_geologia_punto(
                 resolucion_o_escala="Difracción de Rayos X (XRD) in-situ en el Cráter Gale",
                 nota_metodologica="Porcentajes cuantitativos de peso (% wt) de cada fase mineral.",
             ),
+            MetadatosFuente(
+                fuente="GLiM (Global Lithological Map - Hartmann & Moosdorf 2012)",
+                licencia="CC BY 3.0",
+                resolucion_o_escala="Celdas de 10° x 10° del catálogo terrestre",
+                nota_metodologica="El ranking compara las proporciones de área por categoría litológica.",
+            ),
         ]
 
         return RespuestaGeologiaPunto(
             cuerpo="Marte",
             coordenadas={"lat": lat, "lng": lng},
-            celda_id=celda_id,
+            celda_id=cm["celda_id"],
             region_nombre=cm.get("region_referencia", f"Región Marciana ({lat:.2f}°, {lng:.2f}°)"),
             unidad_geologica=cm.get("unidad_geologica_usgs", "Unidad Noeica / Hespérica sin diferenciar"),
-            tipo_terreno="Planicie volcánica basáltica y lechos sedimentarios ricos en sulfatos",
+            tipo_terreno="",
             rocas_predominantes=cm.get("rocas_principales", ["Basalto toleítico", "Lutita lacustre", "Arenisca sulfatada"]),
             minerales_principales=cm.get("minerales_omega_detectados", ["Olivino", "Piroxeno", "Óxidos férricos", "Sulfatos hidratados"]),
             distribucion_litologica=cm.get("categorias_area_pct", {}),
             unidades_macrostrat=[],
             muestras_laboratorio_in_situ=muestras_marte,
+            cobertura_geologica=True,
+            ranking_terrestre=ranking,
             mejor_analogo={
                 "cuerpo_destino": "Tierra",
-                "sitio_analogo_terrestre": mejor_tierra,
-            },
+                "sitio_analogo_terrestre": {
+                    **mejor_tierra.model_dump(),
+                    "minerales_detectados": [],
+                },
+            } if mejor_tierra else None,
             atribuciones=atribuciones,
         )
 

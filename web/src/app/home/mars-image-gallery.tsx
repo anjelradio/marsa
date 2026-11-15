@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, ExternalLink, Images } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import {
   type MarsImage,
   type MarsImageView,
 } from "@/features/mars/infrastructure/mars-images";
+import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n/context";
 
 const views = ["regional", "detail"] as const;
@@ -34,7 +35,8 @@ async function preparePreview(photo: MarsImage, signal: AbortSignal) {
   }
 }
 
-export function MarsImageGallery({ point }: { point: MarsCoordinates }) {
+export function MarsImageGallery({ point, className }: { point: MarsCoordinates; className?: string }) {
+  const titleId = useId();
   const { dict } = useTranslation();
   const copy = dict.mars.images;
   const [view, setView] = useState<MarsImageView>("regional");
@@ -74,17 +76,21 @@ export function MarsImageGallery({ point }: { point: MarsCoordinates }) {
   if (!gallery && !error) return null;
 
   return (
-    <aside aria-labelledby="mars-gallery-title" className="min-w-0 rounded-3xl max-sm:order-last sm:col-start-1 sm:row-start-1 lg:col-start-1">
-      <Card className="gap-3 rounded-3xl border border-[#ffab57]/25 bg-linear-to-br from-[#302016]/95 to-[#110c0a]/95 p-4 text-white shadow-2xl backdrop-blur-md">
-        <h2 id="mars-gallery-title" className="flex items-center gap-2 text-base font-medium text-white">
-          <Images aria-hidden="true" className="size-4 shrink-0 text-[#ffab57]" />
-          {copy.title}
-        </h2>
+    <aside aria-labelledby={titleId} className={cn("min-w-0 rounded-4xl", className ?? "max-sm:order-last sm:col-start-1 sm:row-start-1 lg:col-start-1")}>
+      <Card className="gap-3.5 rounded-4xl border-0 bg-[#2d1e14]/65 p-5 text-app-primary-foreground shadow-none ring-0 dark:ring-0 backdrop-blur-xl">
+        <div className="flex items-center gap-2.5 pb-2">
+          <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-white/7 text-[#ffab57]">
+            <Images aria-hidden="true" className="size-4" />
+          </span>
+          <h2 id={titleId} className="font-headline text-base font-semibold text-white">
+            {copy.title}
+          </h2>
+        </div>
 
         <div
           role="group"
           aria-label={copy.selectView}
-          className="grid grid-cols-2 gap-0.5 rounded-xl border border-white/10 bg-black/35 p-0.5"
+          className="grid grid-cols-2 gap-1 rounded-2xl bg-white/7 p-1"
         >
           {views.map((option) => (
             <Button
@@ -98,7 +104,7 @@ export function MarsImageGallery({ point }: { point: MarsCoordinates }) {
                 setError(null);
                 setView(option);
               }}
-              className="h-auto min-h-8 rounded-[0.6rem] px-1.5 py-1.5 text-center text-xs whitespace-normal text-white/80 hover:bg-white/10 hover:text-white aria-pressed:bg-[#ffab57]/15 aria-pressed:text-[#ffd1a4]"
+              className="h-auto min-h-8 rounded-xl px-2 py-1.5 text-center text-xs font-medium text-white/60 hover:text-white aria-pressed:bg-white/15 aria-pressed:text-white shadow-none transition-colors"
             >
               {copy.views[option]}
             </Button>
@@ -107,7 +113,7 @@ export function MarsImageGallery({ point }: { point: MarsCoordinates }) {
 
         {gallery && <MarsImageCarousel key={gallery.view} photos={gallery.photos} />}
         {error && (
-          <div role="status" className="space-y-2">
+          <div role="status" className="space-y-2 rounded-2xl bg-white/7 p-4">
             <p className="text-sm text-white/80">
               {error === "request" ? copy.error : error === "preview" ? copy.previewError : copy.empty}
             </p>
@@ -116,7 +122,7 @@ export function MarsImageGallery({ point }: { point: MarsCoordinates }) {
                 type="button"
                 variant="outline"
                 size="sm"
-                className="rounded-full border-white/20 bg-white/5 text-white hover:bg-white/15 hover:text-white"
+                className="rounded-full border-0 bg-white/10 text-white hover:bg-white/20 hover:text-white"
                 onClick={() => {
                   setError(null);
                   setAttempt((previous) => previous + 1);
@@ -140,11 +146,11 @@ function MarsImageCarousel({ photos }: { photos: MarsImage[] }) {
   const active = index % photos.length;
   const photo = photos[active];
   const source = copy.sources[photo.source];
-  const arrowStyle = "rounded-full border border-white/10 bg-white/5 text-white hover:bg-white/15 hover:text-white";
+  const arrowStyle = "rounded-full border-0 bg-white/10 text-white hover:bg-white/20 hover:text-white";
 
   return (
-    <figure className="overflow-hidden rounded-2xl border border-white/10 bg-black/40">
-      <div className="relative aspect-square bg-black/60">
+    <figure className="overflow-hidden rounded-2xl bg-white/7">
+      <div className="relative aspect-square bg-black/40">
         {failedPhoto === photo.id ? (
           <p className="grid h-full place-items-center px-3 text-center text-xs text-white/75">
             {copy.previewError}

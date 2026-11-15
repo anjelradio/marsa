@@ -51,6 +51,34 @@ export const celdaAnalogicoSchema = z.object({
   nota_similitud: z.string().nullable().optional(),
 });
 
+const coordenadasCeldaSchema = z.object({ lat: z.number(), lng: z.number() });
+
+const candidatoTerrestreSchema = z.object({
+  celda_id: z.string(),
+  region_referencia: z.string(),
+  centro: coordenadasCeldaSchema,
+  limites: z.object({
+    lat_min: z.number(),
+    lat_max: z.number(),
+    lon_min: z.number(),
+    lon_max: z.number(),
+  }),
+  similitud_pct: z.number(),
+  cobertura_pct: z.number().nullable().optional(),
+  comparacion_litologica: z.array(z.object({
+    categoria: z.string(),
+    marte_pct: z.number(),
+    tierra_pct: z.number(),
+  })),
+});
+
+const rankingTerrestreSchema = z.object({
+  regiones_evaluadas: z.number(),
+  candidatos: z.array(candidatoTerrestreSchema),
+});
+
+export type RankingTerrestre = z.infer<typeof rankingTerrestreSchema>;
+
 export const respuestaGeologiaPuntoSchema = z.object({
   cuerpo: z.string(),
   coordenadas: z.object({ lat: z.number(), lng: z.number() }),
@@ -63,7 +91,13 @@ export const respuestaGeologiaPuntoSchema = z.object({
   distribucion_litologica: z.record(z.string(), z.number()).default({}),
   unidades_macrostrat: z.array(unidadMacrostratSchema).default([]),
   muestras_laboratorio_in_situ: z.array(muestraLaboratorioSchema).default([]),
-  mejor_analogo: z.record(z.string(), z.unknown()).nullable().optional(),
+  cobertura_geologica: z.boolean().nullable().optional(),
+  ranking_terrestre: rankingTerrestreSchema.nullable().optional(),
+  mejor_analogo: z.object({
+    cuerpo_destino: z.string(),
+    celda_analoga: celdaAnalogicoSchema.nullish(),
+    sitio_analogo_terrestre: celdaAnalogicoSchema.extend({ similitud_pct: z.number().optional() }).nullish(),
+  }).nullish(),
   atribuciones: z.array(metadatosFuenteSchema).default([]),
 });
 

@@ -82,7 +82,7 @@ export function PlanetMissionPanels({ planet = "mars", isExploring = false }: Pl
       {/* 1. Heliocentric Distance & Keplerian Orbit Panel */}
       <figure
         className={cn(
-          "relative min-w-0 rounded-3xl bg-app-primary/40 p-4 ring-1 ring-inset ring-white/10 backdrop-blur-md lg:absolute lg:top-[26%] lg:right-[14%] lg:z-0 lg:w-[30%] lg:p-2.5 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+          "relative min-w-0 rounded-4xl bg-app-primary/40 px-4 py-5 ring-0 dark:ring-0 backdrop-blur-xl lg:absolute lg:top-[26%] lg:right-[14%] lg:z-0 lg:w-[30%] lg:px-2.5 lg:py-3.5 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
           isExploring
             ? "lg:translate-x-[160%] lg:opacity-0 pointer-events-none"
             : "lg:translate-x-0 lg:opacity-100"
@@ -95,7 +95,7 @@ export function PlanetMissionPanels({ planet = "mars", isExploring = false }: Pl
           {/* Orbital distance profile polygon */}
           <div
             aria-hidden="true"
-            className="absolute inset-0 bg-linear-to-b from-[#b75d99] via-[#733460] to-[#31152e]"
+            className="planet-orbit-chart absolute inset-0 bg-linear-to-b from-[#b75d99] via-[#733460] to-[#31152e]"
             style={{ clipPath: `polygon(${profile})` }}
           />
 
@@ -112,7 +112,7 @@ export function PlanetMissionPanels({ planet = "mars", isExploring = false }: Pl
           </span>
 
           <div className="absolute inset-x-2 bottom-1.5 flex items-center justify-between text-[0.65rem] font-mono">
-            <span className="text-[#ffdb8a]/90 drop-shadow-xs">
+            <span className="planet-orbit-accent text-[#ffdb8a]/90 drop-shadow-xs">
               {p.perihelion}
             </span>
             <span className="text-white/70 drop-shadow-xs">
@@ -145,13 +145,18 @@ export function PlanetMissionPanels({ planet = "mars", isExploring = false }: Pl
       {/* 2. Reference mission card */}
       <Card
         className={cn(
-          "relative z-10 flex-row items-center gap-3 rounded-3xl bg-app-primary/65 p-1.5 text-app-primary-foreground shadow-none ring-1 ring-inset ring-white/10 backdrop-blur-md lg:absolute lg:top-[65%] lg:right-[14%] lg:w-[31%] lg:gap-4 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+          "relative z-10 flex-row items-center gap-3 rounded-4xl bg-app-primary/65 px-1.5 py-2.5 text-app-primary-foreground shadow-none ring-0 dark:ring-0 backdrop-blur-xl lg:absolute lg:top-[65%] lg:right-[14%] lg:w-[31%] lg:gap-4 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
           isExploring
             ? "lg:translate-x-[160%] lg:opacity-0 pointer-events-none"
             : "lg:translate-x-0 lg:opacity-100"
         )}
       >
-        <span className="grid min-h-16 shrink-0 place-items-center rounded-[1.15rem] bg-linear-to-br from-[#ffdb8a] to-[#f3824a] px-4 text-sm font-semibold text-[#39190d] shadow-[0_0_26px_#ffab5760] lg:min-h-[clamp(4rem,10svh,6rem)] lg:basis-[34%]">
+        <span className={cn(
+          "grid min-h-16 shrink-0 place-items-center rounded-[1.15rem] px-4 text-sm font-semibold shadow-[0_0_26px_#ffab5760] lg:min-h-[clamp(4rem,10svh,6rem)] lg:basis-[34%]",
+          planet === "earth" && "bg-linear-to-br from-[#2876a8] via-[#1c5687] to-[#163b63] text-white shadow-[0_0_18px_#1c568740]",
+          planet === "moon" && "bg-linear-to-br from-slate-200 to-slate-500 text-slate-950 shadow-[0_0_26px_#cbd5e160]",
+          planet === "mars" && "bg-linear-to-br from-[#ffdb8a] to-[#f3824a] text-[#39190d] shadow-[0_0_26px_#ffab5760]",
+        )}>
           {p.missionCuriosity}
         </span>
         <div className="min-w-0 py-2 pr-2">
@@ -165,7 +170,7 @@ export function PlanetMissionPanels({ planet = "mars", isExploring = false }: Pl
       {/* 3. Physical Characteristics Circular Gauges */}
       <dl
         className={cn(
-          "relative z-10 grid grid-cols-3 gap-1 rounded-3xl bg-app-primary/65 p-2 ring-1 ring-inset ring-white/10 backdrop-blur-md lg:absolute lg:top-[79.5%] lg:right-[14%] lg:w-[37%] lg:p-3 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+          "relative z-10 grid grid-cols-3 gap-1 rounded-4xl bg-app-primary/65 px-2 py-3 ring-0 dark:ring-0 backdrop-blur-xl lg:absolute lg:top-[79.5%] lg:right-[14%] lg:w-[37%] lg:px-3 lg:py-4 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
           isExploring
             ? "lg:translate-x-[160%] lg:opacity-0 pointer-events-none"
             : "lg:translate-x-0 lg:opacity-100"

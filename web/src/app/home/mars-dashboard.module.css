@@ -1,8 +1,14 @@
-@media (min-width: 64rem) {
-  .dashboard {
-    --exploration-panel-width: clamp(14rem, 22vw, 20rem);
-  }
+.explorationPanels > aside {
+  grid-area: auto;
+}
 
+@media (max-width: 63.999rem) {
+  .planetStage[data-selected="true"] > .planet {
+    transform: translateX(-28%) scale(1.008);
+  }
+}
+
+@media (min-width: 64rem) {
   .planetStage {
     position: absolute;
     inset: 0;
@@ -28,7 +34,7 @@
   }
 
   .planetStage[data-selected="true"] > .planet {
-    transform: translate3d(0, 0, 0) scale(0.78);
+    transform: translate3d(-45.2cqw, 0, 0) scale(1.17);
   }
 
   @supports (scale: calc(1px / 1px)) {
@@ -37,35 +43,35 @@
     }
 
     .planetStage[data-selected="true"] > .planet {
-      --center-width: calc(100cqw - 2 * var(--exploration-panel-width) - 4rem);
-      transform: translate3d(0, 0, 0) scale(min(1, var(--center-width) / var(--exploration-width)));
+      --detail-width: min(63cqw, 124.2svh);
+      transform: translate3d(-45.2cqw, 0, 0) scale(calc(var(--detail-width) / var(--exploration-width)));
     }
   }
 
   .explorationPanels {
     position: absolute;
-    inset: 4.75rem 1rem;
-    grid-template-columns: var(--exploration-panel-width) minmax(0, 1fr) var(--exploration-panel-width);
-    align-items: center;
-    pointer-events: none;
-  }
-
-  .explorationPanels > aside {
-    max-height: 100%;
+    inset: 3.5rem clamp(1.5rem, 4vw, 4.5rem) 2.5rem 46%;
+    align-self: center;
+    max-height: calc(100% - 6rem);
     overflow-y: auto;
-    pointer-events: auto;
-  }
-}
-
-@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
-  .planetStage > .planet {
-    transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+    overscroll-behavior: contain;
+    padding-right: 0.35rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
   }
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .planetStage > .planet {
+    transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
   .explorationControls {
     animation: reveal-controls 240ms ease-out both;
+  }
+
+  .explorationPanels {
+    animation: reveal-controls 280ms ease-out both;
   }
 }
 
@@ -73,4 +79,33 @@
   from {
     opacity: 0;
   }
+}
+.planetTheme {
+  --planet-accent: #ff9b57;
+  --planet-accent-soft: rgb(255 130 64 / 20%);
+  --planet-accent-glow: rgb(255 130 64 / 27%);
+}
+
+.planetTheme[data-planet="earth"] {
+  --planet-accent: #69bfff;
+  --planet-accent-soft: rgb(59 149 255 / 20%);
+  --planet-accent-glow: rgb(59 149 255 / 28%);
+}
+
+.planetTheme[data-planet="moon"] {
+  --planet-accent: #c4c9d4;
+  --planet-accent-soft: rgb(180 190 208 / 17%);
+  --planet-accent-glow: rgb(180 190 208 / 24%);
+}
+
+.planetTheme > section .planetCard {
+  background-color: var(--planet-accent-soft);
+}
+
+.planetTheme :global(.planet-orbit-accent) {
+  color: var(--planet-accent);
+}
+
+.planetTheme :global(.planet-orbit-chart) {
+  background-image: linear-gradient(to bottom, color-mix(in srgb, var(--planet-accent) 70%, transparent), color-mix(in srgb, var(--planet-accent) 18%, transparent));
 }

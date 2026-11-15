@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import type { MarsCoordinates } from "@/features/mars/infrastructure/mars-climate";
+import { createSurfaceSelection } from "@/features/shared/presentation/create-surface-selection";
 import { createMarsSurfaceOverlay } from "./mars-surface-overlay";
 
 const radius = 0.96;
@@ -16,6 +17,8 @@ export function MarsPlanet({
   showSurfaceOverlay = true,
   rotationSpeed = 0.012,
   selectionLabel,
+  hasSelection = false,
+  onFocusGlobe,
   onSelect,
 }: {
   className?: string;
@@ -24,19 +27,33 @@ export function MarsPlanet({
   showSurfaceOverlay?: boolean;
   rotationSpeed?: number;
   selectionLabel?: string;
+  hasSelection?: boolean;
+  onFocusGlobe?: () => void;
   onSelect?: (point: MarsCoordinates) => void;
 }) {
   const mount = useRef<HTMLDivElement>(null);
   const isExploringRef = useRef(isExploring);
   const onSelectRef = useRef(onSelect);
+  const onFocusGlobeRef = useRef(onFocusGlobe);
+  const clearSelectionRef = useRef<() => void>(null);
+  const syncOverlayRef = useRef<() => void>(null);
 
   useEffect(() => {
     isExploringRef.current = isExploring;
+    syncOverlayRef.current?.();
   }, [isExploring]);
 
   useEffect(() => {
     onSelectRef.current = onSelect;
   }, [onSelect]);
+
+  useEffect(() => {
+    onFocusGlobeRef.current = onFocusGlobe;
+  }, [onFocusGlobe]);
+
+  useEffect(() => {
+    if (!hasSelection) clearSelectionRef.current?.();
+  }, [hasSelection]);
 
   useEffect(() => {
     const container = mount.current;
@@ -114,6 +131,7 @@ export function MarsPlanet({
 
     const surfaceOverlay = showSurfaceOverlay ? createMarsSurfaceOverlay(radius) : null;
     if (surfaceOverlay) scene.add(surfaceOverlay.group);
+    const selection = createSurfaceSelection(planet, planet, radius);
 
     scene.add(new THREE.AmbientLight(0xff411b, 0.09));
     const light = new THREE.DirectionalLight(0xffefe7, 10.5);
@@ -138,6 +156,10 @@ export function MarsPlanet({
       raycaster.setFromCamera(pointer, camera);
       const [hit] = raycaster.intersectObject(planet, false);
       if (!hit) return;
+      if (!isExploringRef.current && onFocusGlobeRef.current) {
+        onFocusGlobeRef.current();
+        return;
+      }
 
       // The texture begins at 0° east. Convert in mesh space so drag and tilt
       // affect which surface point is visible without changing its coordinates.
@@ -145,6 +167,8 @@ export function MarsPlanet({
       const east = THREE.MathUtils.radToDeg(Math.atan2(local.z, -local.x));
       const latitude = THREE.MathUtils.radToDeg(Math.asin(local.y));
       const longitude = THREE.MathUtils.euclideanModulo(east + 180, 360) - 180;
+      selection.select(local, reducedMotion.matches);
+      syncMotion();
       onSelectRef.current({ latitude, longitude });
     };
 
@@ -156,7 +180,7 @@ export function MarsPlanet({
       gesture.moved = true;
       gesture.x = e.clientX;
       gesture.y = e.clientY;
-      if (!isExploringRef.current) return;
+      if (!isExploringRef.current || selection.active) return;
 
       planet.rotation.y += dx * 0.006;
       planet.rotation.x = Math.max(-0.65, Math.min(0.65, planet.rotation.x + dy * 0.004));
@@ -226,18 +250,36 @@ export function MarsPlanet({
       renderer.setAnimationLoop(null);
       if (!ready || document.hidden) return;
 
+      if (reducedMotion.matches) selection.advance(0.5);
       renderer.render(scene, camera);
       canvas.dataset.rendered = "";
-      if (reducedMotion.matches) return;
+      if (reducedMotion.matches || (selection.active && !selection.animating)) return;
 
       let previousTime: number | undefined;
       renderer.setAnimationLoop((time) => {
         const delta = Math.min(0.05, (time - (previousTime ?? time)) / 1000);
         previousTime = time;
-        planet.rotation.y += delta * rotationSpeed;
+        if (selection.active) {
+          selection.advance(delta);
+          if (!selection.animating) renderer.setAnimationLoop(null);
+        } else if (!gesture) {
+          planet.rotation.y += delta * rotationSpeed;
+        }
         renderer.render(scene, camera);
       });
     }
+
+    clearSelectionRef.current = () => {
+      if (!selection.active) return;
+      selection.clear();
+      syncMotion();
+    };
+    syncOverlayRef.current = () => {
+      if (!surfaceOverlay) return;
+      surfaceOverlay.group.visible = !isExploringRef.current;
+      if (ready && !document.hidden) renderOnce();
+    };
+    syncOverlayRef.current();
 
     observer.observe(container);
     resize();
@@ -258,6 +300,9 @@ export function MarsPlanet({
       texture.dispose();
       bump.dispose();
       surfaceOverlay?.dispose();
+      selection.clear();
+      clearSelectionRef.current = null;
+      syncOverlayRef.current = null;
       renderer.dispose();
       renderer.forceContextLoss();
       renderer.domElement.remove();
@@ -271,18 +316,16 @@ export function MarsPlanet({
     >
       {/* Outer atmospheric coronal diffusion */}
       <div
-        className={`absolute -inset-[22%] pointer-events-none transition-[transform,opacity] duration-700 ease-out motion-reduce:transition-none ${
-          isHovered
-            ? "scale-105 opacity-100 bg-[radial-gradient(ellipse_28%_18%_at_52%_18%,#ffaf7ba0,transparent),radial-gradient(ellipse_20%_30%_at_81%_48%,#ffa775a0,transparent),radial-gradient(ellipse_23%_21%_at_68%_76%,#ff854b80,transparent)]"
-            : "scale-100 opacity-80 bg-[radial-gradient(ellipse_25%_16%_at_52%_18%,#ffaf7b85,transparent),radial-gradient(ellipse_18%_28%_at_81%_48%,#ffa77585,transparent),radial-gradient(ellipse_21%_19%_at_68%_76%,#ff854b64,transparent)]"
+        className={`absolute -inset-[22%] pointer-events-none bg-[radial-gradient(ellipse_25%_16%_at_52%_18%,#ffaf7b85,transparent),radial-gradient(ellipse_18%_28%_at_81%_48%,#ffa77585,transparent),radial-gradient(ellipse_21%_19%_at_68%_76%,#ff854b64,transparent)] transition-[transform,opacity] duration-700 ease-out motion-reduce:transition-none ${
+          isHovered ? "scale-[1.01] opacity-65" : "scale-100 opacity-60"
         }`}
       />
       {/* Soft limb rim glow */}
       <div
         className={`absolute inset-[2.5%] pointer-events-none rounded-full bg-[#251006] transition-[box-shadow] duration-700 ease-out motion-reduce:transition-none [background-image:radial-gradient(ellipse_at_73%_38%,#ff975f,#180603_75%)] ${
           isHovered
-            ? "shadow-[4px_-3px_24px_#ffba78df,13px_-7px_65px_#ff763aab]"
-            : "shadow-[4px_-3px_14px_#ffba78b0,13px_-7px_50px_#ff763a86]"
+            ? "shadow-[3px_-2px_12px_#ffba7880,9px_-5px_38px_#ff763a55]"
+            : "shadow-[3px_-2px_10px_#ffba7875,9px_-5px_34px_#ff763a4d]"
         }`}
       />
       <div

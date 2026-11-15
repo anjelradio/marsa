@@ -92,7 +92,7 @@ export function AnalogsPanel({
               const isOpen = openId === item.sitio_tierra_id;
               return (
                 <li key={item.sitio_tierra_id}>
-                  <Card className="gap-0 rounded-3xl border border-white/10 bg-white/5 p-0 text-white shadow-none backdrop-blur-md">
+                  <Card className="gap-0 rounded-3xl ring-0 dark:ring-0 bg-white/5 p-0 text-white shadow-none backdrop-blur-xl">
                     <button
                       type="button"
                       aria-expanded={isOpen}

@@ -45,12 +45,37 @@
 }
 
 .dashboardCard {
-  animation: card-arrival 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation: card-arrival 760ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
+
+.dashboardCard:nth-child(1) { --card-order: 0; }
+.dashboardCard:nth-child(2) { --card-order: 1; }
+.dashboardCard:nth-child(3) { --card-order: 2; }
+.dashboardCard:nth-child(4) { --card-order: 3; }
+
+.leftCards .dashboardCard {
+  animation-name: card-unfold-down;
+  transform-origin: top center;
+}
+
+.leftCards .dashboardCard:nth-child(2) { --stack-offset: -9.25rem; }
+.leftCards .dashboardCard:nth-child(3) { --stack-offset: -18.5rem; }
+
+.centerCards .dashboardCard {
+  animation-name: card-arrival-left;
+}
+
+.centerCards .dashboardCard:nth-child(2) { --stack-offset: -100%; }
+.centerCards .dashboardCard:nth-child(3) { --stack-offset: -200%; }
+.centerCards .dashboardCard:nth-child(4) { --stack-offset: -300%; }
 
 @media (prefers-reduced-motion: no-preference) {
   .nebula {
     animation: nebula-breathe 18s ease-in-out infinite alternate;
+  }
+
+  .dashboardCard {
+    animation-delay: calc(var(--card-order, 0) * 110ms);
   }
 
   .distantStars {
@@ -113,6 +138,30 @@
   from {
     opacity: 0;
     transform: translate3d(0, 14px, 0) scale(0.975);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes card-unfold-down {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--stack-offset, 0), 0) scaleY(0.78);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scaleY(1);
+  }
+}
+
+@keyframes card-arrival-left {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--stack-offset, 0), 0, 0) scale(0.96);
   }
 
   to {

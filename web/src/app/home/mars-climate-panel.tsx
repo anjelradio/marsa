@@ -48,11 +48,11 @@ export function MarsClimatePanel({
   return (
     <aside
       aria-labelledby="mars-climate-title"
-      className="min-w-0 rounded-3xl max-sm:order-first sm:col-start-2 sm:row-start-1 lg:col-start-3"
+      className="min-w-0 rounded-4xl max-sm:order-first sm:col-start-2 sm:row-start-1 lg:col-start-3"
     >
-      <Card className="gap-4 rounded-3xl border border-white/15 bg-linear-to-br from-[#281810]/95 to-[#120d0b]/95 p-4 text-white shadow-2xl backdrop-blur-md">
+      <Card className="gap-4 rounded-4xl border-0 bg-[#2d1e14]/65 p-5 text-app-primary-foreground shadow-none ring-0 dark:ring-0 backdrop-blur-xl">
         {onToggleViewMode && (
-          <div className="grid grid-cols-2 gap-1 rounded-2xl border border-white/10 bg-black/50 p-1 text-xs">
+          <div className="grid grid-cols-2 gap-1 rounded-2xl bg-white/7 p-1 text-xs">
             <button
               type="button"
               onClick={() => onToggleViewMode("geology")}
@@ -64,20 +64,24 @@ export function MarsClimatePanel({
             <button
               type="button"
               onClick={() => onToggleViewMode("climate")}
-              className="flex items-center justify-center gap-1.5 rounded-xl bg-orange-600/80 py-1.5 font-medium text-white shadow transition-colors"
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-white/15 py-1.5 font-medium text-white shadow-none transition-colors"
             >
-              <Thermometer className="size-3.5 text-white" />
+              <Thermometer className="size-3.5 text-amber-400" />
               <span>Clima y Atmósfera</span>
             </button>
           </div>
         )}
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <h2 id="mars-climate-title" className="flex items-center gap-2 font-headline text-base font-medium text-white">
-              <MapPin aria-hidden="true" className="size-4 shrink-0 text-[#ffab57]" />
-              {copy.title}
-            </h2>
-            <p className="mt-1 font-mono text-xs text-white/75">
+        <div className="flex items-start justify-between gap-2 pb-2">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2.5">
+              <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-white/7 text-[#ffab57]">
+                <MapPin aria-hidden="true" className="size-4" />
+              </span>
+              <h2 id="mars-climate-title" className="truncate font-headline text-base font-semibold text-white">
+                {copy.title}
+              </h2>
+            </div>
+            <p className="mt-1 pl-10.5 font-mono text-xs text-white/60">
               <span className="whitespace-nowrap">{copy.latitude} {format(latitude, 2)}°</span>
               {" · "}
               <span className="whitespace-nowrap">{copy.longitude} {format(longitude, 2)}°</span>
@@ -89,22 +93,22 @@ export function MarsClimatePanel({
             size="icon-sm"
             aria-label={copy.close}
             onClick={onClose}
-            className="shrink-0 rounded-full text-white/80 hover:bg-white/10 hover:text-white"
+            className="shrink-0 rounded-full text-white/70 hover:bg-white/10 hover:text-white"
           >
-            <X aria-hidden="true" />
+            <X aria-hidden="true" className="size-4" />
           </Button>
         </div>
 
         <div aria-live="polite">
           {result === null && <p className="text-sm text-white/75">{copy.loading}</p>}
           {result === "error" && (
-            <div className="space-y-2">
-              <p className="text-sm text-white/85">{copy.error}</p>
+            <div className="space-y-2 rounded-2xl bg-white/7 p-4 text-center">
+              <p className="text-xs text-red-300">{copy.error}</p>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                className="rounded-full border-white/20 bg-white/5 text-white hover:bg-white/15 hover:text-white"
+                className="mt-2 rounded-full border-0 bg-white/10 text-xs text-white hover:bg-white/20"
                 onClick={() => {
                   setResult(null);
                   setAttempt((previous) => previous + 1);
@@ -116,22 +120,27 @@ export function MarsClimatePanel({
           )}
           {metrics && result && result !== "error" && (
             <>
-              <dl className="space-y-1">
+              <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {metrics.map(({ label, value, unit, digits, icon: Icon }) => (
-                  <div key={label} className="flex items-center justify-between gap-2 rounded-xl bg-white/5 px-2.5 py-2 text-xs">
-                    <dt className="flex items-center gap-2 text-white/75">
-                      <Icon aria-hidden="true" className="size-3.5 shrink-0 text-[#ffab57]" />
-                      {label}
+                  <div key={label} className="flex flex-col justify-between gap-2 rounded-2xl bg-white/7 p-3.5 min-h-[5.5rem]">
+                    <dt className="flex items-center gap-1.5 text-xs text-app-secondary/75">
+                      <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-white/7">
+                        <Icon aria-hidden="true" className="size-3.5 text-[#ffab57]" />
+                      </span>
+                      <span className="truncate">{label}</span>
                     </dt>
-                    <dd className="shrink-0 font-mono text-white">{format(value, digits)}{unit && ` ${unit}`}</dd>
+                    <dd className="pl-1 font-mono text-base font-medium tracking-tight text-white tabular-nums">
+                      {format(value, digits)}
+                      {unit && <span className="ml-1 text-xs font-normal text-app-secondary/65">{unit}</span>}
+                    </dd>
                   </div>
                 ))}
               </dl>
-              <p className="mt-3 border-t border-white/10 pt-2 text-xs leading-relaxed text-white/70">
+              <p className="mt-3 pt-2 text-xs leading-relaxed text-white/70">
                 {copy.model} · Ls {result.solar_longitude_deg}°<br />
                 <a
                   href="https://www-mars.lmd.jussieu.fr/mars/info_web/index.html#quotes"
-                  className="text-[#ffbd80] underline underline-offset-2"
+                  className="text-[#ffab57] underline underline-offset-2 hover:text-[#ffbe7a]"
                   target="_blank"
                   rel="noreferrer"
                 >

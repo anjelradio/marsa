@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import Link from "next/link";
 import {
   CalendarDays,
   Clock3,
@@ -11,8 +10,6 @@ import {
   ArrowLeft,
   Wind,
   Mountain,
-  Compass,
-  RotateCcw,
   Atom,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -44,9 +41,13 @@ export default function HomePage() {
   const [isHovered, setIsHovered] = useState(false);
   const [selectedPoint, setSelectedPoint] = useState<MarsCoordinates | null>(null);
   const [explorationView, setExplorationView] = useState<"geology" | "climate">("geology");
+  const hasSelection = selectedPoint !== null;
+
+  const focusGlobe = useCallback(() => setIsExploring(true), []);
+
+  const clearSelection = useCallback(() => setSelectedPoint(null), []);
 
   const selectPoint = useCallback((point: MarsCoordinates) => {
-    setIsExploring(true);
     setSelectedPoint(point);
   }, []);
 
@@ -60,14 +61,15 @@ export default function HomePage() {
   const [openSiteId, setOpenSiteId] = useState<number | null>(null);
   const { result: ranking, retry: retryRanking } = useAnalogRanking(destination, dict.analogs.error);
   const profile = dict[planet];
+  const globeLabel = isExploring ? profile.explore.selectCenter : profile.explore.focusGlobe;
   const [markers, setMarkers] = useState<ProjectedLandmark[]>([]);
   const rankingList = ranking && ranking !== "error" ? ranking : null;
   const landmarks = useMemo(() => {
-    if (!rankingList) return [];
+    if (!rankingList || isExploring) return [];
     if (planet === "earth") return earthLandmarks(rankingList);
     if (planet === "moon") return targetLandmarks(rankingList);
     return [];
-  }, [rankingList, planet]);
+  }, [rankingList, planet, isExploring]);
 
   const selectPlanet = useCallback((next: HomePlanet) => {
     setPlanet(next);
@@ -88,12 +90,13 @@ export default function HomePage() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && !e.defaultPrevented && isExploring) {
-        exitExploration();
+        if (hasSelection) clearSelection();
+        else exitExploration();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isExploring, exitExploration]);
+  }, [isExploring, hasSelection, clearSelection, exitExploration]);
 
   const facts = useMemo(
     () => [
@@ -151,7 +154,7 @@ export default function HomePage() {
   );
 
   return (
-    <main className="relative isolate min-h-svh overflow-hidden bg-black text-app-secondary select-none">
+    <main data-planet={planet} className={cn("relative isolate min-h-svh overflow-hidden bg-black text-app-secondary select-none", styles.planetTheme)}>
       {/* Background Starfield */}
       <div aria-hidden="true" className="pointer-events-none absolute -inset-8 -z-10">
         <div className={cn(stars.nebula, "absolute inset-0")} />
@@ -161,19 +164,13 @@ export default function HomePage() {
       </div>
 
       {/* Top right utility navigation */}
-      <div className="absolute top-4 right-4 z-40 flex items-center gap-2">
+      <div hidden={isExploring} className={cn("absolute top-4 right-4 z-40", !isExploring && "flex items-center gap-2")}>
         <LanguageSwitcher
           variant="outline"
           size="sm"
           className="border-white/15 bg-white/5 text-white hover:bg-white/15 hover:text-white backdrop-blur-md rounded-full"
         />
       </div>
-
-      {!isExploring && (
-        <div className="absolute top-16 left-1/2 z-50 -translate-x-1/2 sm:top-4">
-          <PlanetFilter value={planet} onChange={selectPlanet} />
-        </div>
-      )}
 
       <section
         aria-labelledby="planet-title"
@@ -198,22 +195,23 @@ export default function HomePage() {
           aria-label={`${profile.title} · ${profile.leftCards.topography.label}`}
           inert={isExploring}
           className={cn(
+            stars.leftCards,
             "order-4 grid grid-cols-1 gap-2.5 sm:grid-cols-3 lg:absolute lg:top-20 lg:left-[14%] lg:z-20 lg:flex lg:w-52 lg:flex-col lg:gap-3 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
             isExploring ? "max-lg:hidden lg:-translate-x-72 lg:opacity-0 pointer-events-none" : "lg:translate-x-0 lg:opacity-100"
           )}
         >
-          {surfaceCards.map(({ label, value, unit, detail, icon: Icon, color }, index) => (
+          {surfaceCards.map(({ label, value, unit, icon: Icon, color }, index) => (
             <Card
               key={label}
               className={cn(
                 stars.dashboardCard,
-                "group min-w-0 justify-between gap-1.5 rounded-3xl p-3.5 text-app-primary-foreground shadow-none ring-1 ring-inset ring-white/10 backdrop-blur-md transition-[transform,background-color,box-shadow] duration-300 hover:-translate-y-1 hover:ring-white/20 hover:shadow-[0_16px_36px_#00000045] motion-reduce:transition-none lg:min-h-32",
+                "min-h-32 min-w-0 justify-between gap-1.5 rounded-4xl px-3.5 py-4 text-app-primary-foreground shadow-none ring-0 dark:ring-0 backdrop-blur-xl lg:min-h-34",
                 color,
               )}
               style={{ animationDelay: `${120 + index * 90}ms` }}
             >
               <p className="flex items-center gap-2 text-xs leading-tight text-app-secondary/75">
-                <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-white/7 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110 motion-reduce:transition-none">
+                <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-white/7">
                   <Icon aria-hidden="true" className="size-4 text-app-primary-foreground" />
                 </span>
                 {label}
@@ -232,7 +230,7 @@ export default function HomePage() {
         <div
           className={cn(styles.planetStage, "relative z-10 order-1")}
           data-exploring={isExploring}
-          data-selected={selectedPoint !== null}
+          data-selected={hasSelection}
         >
           <div
             onMouseEnter={() => setIsHovered(true)}
@@ -240,20 +238,27 @@ export default function HomePage() {
             className={cn(
               styles.planet,
               "pointer-events-auto relative mx-auto aspect-square w-full max-w-[580px]",
-              isExploring ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"
+              isExploring && !hasSelection ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"
             )}
           >
             {planet === "mars" && (
               <MarsPlanet
                 isHovered={isHovered && !isExploring}
                 isExploring={isExploring}
-                selectionLabel={profile.explore.selectCenter}
+                selectionLabel={globeLabel}
+                hasSelection={hasSelection}
+                onFocusGlobe={focusGlobe}
                 onSelect={selectPoint}
               />
             )}
             {planet === "earth" && (
               <EarthPlanet
+                isHovered={isHovered && !isExploring}
                 isExploring={isExploring}
+                selectionLabel={globeLabel}
+                hasSelection={hasSelection}
+                onFocusGlobe={focusGlobe}
+                autoRotate
                 onSelect={selectPoint}
                 landmarks={landmarks}
                 onProjectedLandmarksChange={setMarkers}
@@ -261,13 +266,18 @@ export default function HomePage() {
             )}
             {planet === "moon" && (
               <MoonPlanet
+                isHovered={isHovered && !isExploring}
                 isExploring={isExploring}
+                selectionLabel={globeLabel}
+                hasSelection={hasSelection}
+                onFocusGlobe={focusGlobe}
+                autoRotate
                 onSelect={selectPoint}
                 landmarks={landmarks}
                 onProjectedLandmarksChange={setMarkers}
               />
             )}
-            {planet !== "mars" && (
+            {!isExploring && planet !== "mars" && (
               <GlobeMarkers
                 points={markers}
                 activeId={planet === "earth" && openSiteId !== null ? String(openSiteId) : null}
@@ -280,6 +290,11 @@ export default function HomePage() {
             )}
           </div>
         </div>
+        {!isExploring && (
+          <div className="relative z-20 order-0 flex justify-center lg:absolute lg:inset-y-0 lg:right-0 lg:z-20 lg:order-none lg:block">
+            <PlanetFilter value={planet} onChange={selectPlanet} />
+          </div>
+        )}
 
         {/* Mars Title & Subtitle */}
         <div
@@ -304,7 +319,8 @@ export default function HomePage() {
         <dl
           inert={isExploring}
           className={cn(
-            "order-3 grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:absolute lg:top-14 lg:right-[14%] lg:left-[29.4%] lg:z-0 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+            stars.centerCards,
+            "order-3 grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:absolute lg:top-20 lg:right-[14%] lg:left-[29.4%] lg:z-0 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
             isExploring ? "max-lg:hidden lg:-translate-y-48 lg:opacity-0 pointer-events-none" : "lg:translate-y-0 lg:opacity-100"
           )}
         >
@@ -313,7 +329,7 @@ export default function HomePage() {
               key={label}
               className={cn(
                 stars.dashboardCard,
-                "min-w-0 gap-2 rounded-3xl px-3 py-3 text-app-primary-foreground shadow-none ring-1 ring-inset ring-white/10 backdrop-blur-md transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_14px_32px_#00000040] motion-reduce:transition-none sm:px-4 lg:min-h-28 lg:gap-1 lg:py-2.5",
+                "min-h-28 min-w-0 gap-2 rounded-4xl px-3 py-4 text-app-primary-foreground shadow-none ring-0 dark:ring-0 backdrop-blur-xl sm:px-4 lg:min-h-30 lg:gap-1 lg:py-3.5",
                 color
               )}
               style={{ animationDelay: `${index * 70}ms` }}
@@ -340,7 +356,7 @@ export default function HomePage() {
         {isExploring && selectedPoint && (
           <div
             key={`${selectedPoint.latitude}:${selectedPoint.longitude}`}
-            className={cn(styles.explorationPanels, "relative z-30 order-3 grid items-start gap-3 sm:grid-cols-2")}
+            className={cn(styles.explorationPanels, "relative z-30 order-3 grid content-start gap-4")}
           >
             {planet === "mars" ? (
               <>
@@ -348,14 +364,14 @@ export default function HomePage() {
                   <PointGeologyPanel
                     cuerpo="Marte"
                     point={selectedPoint}
-                    onClose={() => setSelectedPoint(null)}
+                    onClose={clearSelection}
                     viewMode="geology"
                     onToggleViewMode={setExplorationView}
                   />
                 ) : (
                   <MarsClimatePanel
                     point={selectedPoint}
-                    onClose={() => setSelectedPoint(null)}
+                    onClose={clearSelection}
                     onToggleViewMode={setExplorationView}
                   />
                 )}
@@ -365,7 +381,7 @@ export default function HomePage() {
               <PlanetExplorationPanels
                 planet={planet}
                 point={selectedPoint}
-                onClose={() => setSelectedPoint(null)}
+                onClose={clearSelection}
                 explorationView={explorationView}
                 onToggleViewMode={setExplorationView}
               />
@@ -373,31 +389,16 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Exploration Mode Overlays: Return button & subtle drag hint */}
         {isExploring && (
-          <div className={cn(styles.explorationControls, "absolute inset-x-4 top-5 z-40 flex items-center justify-between")}>
-            <div className="flex items-center gap-3">
-              <Button
-                onClick={exitExploration}
-                variant="outline"
-                size="sm"
-                className="rounded-full border-white/20 bg-black/60 px-4 text-white hover:bg-white/20 hover:text-white backdrop-blur-md shadow-xl gap-2 font-medium cursor-pointer"
-              >
-                <ArrowLeft className="size-4" />
-                {profile.explore.exit}
-              </Button>
-              <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80 backdrop-blur-md">
-                <Compass className="size-3.5 text-[#ffab57]" />
-                {profile.explore.modeBadge}
-              </span>
-            </div>
-          </div>
-        )}
-        {isExploring && (
-          <div className="pointer-events-none z-20 order-2 mx-auto -mt-4 flex w-fit items-center gap-2 rounded-full border border-white/15 bg-black/60 px-4 py-1.5 text-center text-xs text-white/85 shadow-2xl backdrop-blur-md lg:absolute lg:bottom-6 lg:left-1/2 lg:mt-0 lg:-translate-x-1/2">
-            <RotateCcw className="size-3.5 shrink-0 text-[#ffab57] animate-spin [animation-duration:8s] motion-reduce:animate-none" />
-            {profile.explore.dragHint}
-          </div>
+          <Button
+            onClick={exitExploration}
+            variant="ghost"
+            size="icon"
+            aria-label={profile.explore.exit}
+            className={cn(styles.explorationControls, "absolute top-4 left-4 z-40 rounded-full text-white/70 hover:bg-white/10 hover:text-white")}
+          >
+            <ArrowLeft aria-hidden="true" className="size-4" />
+          </Button>
         )}
       </section>
 
