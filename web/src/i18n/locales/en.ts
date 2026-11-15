@@ -57,7 +57,20 @@ export const en = {
     limitsBody:
       "Earth cannot reproduce reduced gravity (Mars 3.73 m/s², Moon 1.62 m/s²), the lunar vacuum, the thin Martian atmosphere, or their radiation environments. Similarity here only compares the listed surface properties.",
     dataNote:
-      "Site values are approximate reference figures, not yet computed from the satellite datasets.",
+      "Earth temperature, cloudiness, dust and elevation come from NASA POWER (MERRA-2) and SRTM 30 m; Mars temperature and dust from the Mars Climate Database (one seasonal snapshot). Ice, roughness, thermal inertia, all Moon values and McMurdo elevation are approximate reference figures.",
+    usesTitle: "Use in exploration",
+    uses: {
+      "Desierto de Atacama (Yungay)":
+        "Test rovers and life-detection instruments in hyper-arid soils almost free of organic matter; a standard rehearsal ground for Mars missions.",
+      "Salar de Uyuni":
+        "Very flat salt crust to calibrate orbital altimeters and radiometers, and to study evaporite minerals like those left by ancient Martian lakes.",
+      "Valles Secos de McMurdo":
+        "Cold, dry permafrost terrain to rehearse drilling and subsurface-ice detection and to operate in extreme cold, relevant to Martian ice and lunar polar ice.",
+      "Tarso Toussidé":
+        "Rough, dusty basaltic volcanic terrain to test rover mobility, navigation and machinery under dust, like volcanic plains on Mars and the Moon.",
+      "Cueva de los Verdes (Lanzarote)":
+        "Accessible lava tube to practice robotic underground exploration, GPS-free mapping and radiation-sheltered habitats, an analog of lunar and Martian lava tubes.",
+    },
     features: {
       "Temperatura Superficial": "Surface temperature",
       Nubosidad: "Cloudiness",

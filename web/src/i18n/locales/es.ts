@@ -59,7 +59,20 @@ export const es: TranslationDict = {
     limitsBody:
       "La Tierra no reproduce la gravedad reducida (Marte 3,73 m/s², Luna 1,62 m/s²), el vacío lunar, la atmósfera delgada de Marte ni su radiación. La similitud solo compara las propiedades de superficie listadas.",
     dataNote:
-      "Los valores de los sitios son cifras de referencia aproximadas, aún no calculadas con los datasets satelitales.",
+      "La temperatura, nubosidad, polvo y elevación de la Tierra vienen de NASA POWER (MERRA-2) y SRTM 30 m; la temperatura y el polvo de Marte, de la Mars Climate Database (una foto estacional). El hielo, la rugosidad, la inercia térmica, todos los valores de la Luna y la elevación de McMurdo son cifras de referencia aproximadas.",
+    usesTitle: "Uso en la exploración",
+    uses: {
+      "Desierto de Atacama (Yungay)":
+        "Probar rovers e instrumentos de búsqueda de vida en suelos hiperáridos casi sin materia orgánica; terreno habitual de ensayo para misiones a Marte.",
+      "Salar de Uyuni":
+        "Costra salina muy plana para calibrar altímetros y radiómetros orbitales y estudiar evaporitas como las que dejaron los antiguos lagos marcianos.",
+      "Valles Secos de McMurdo":
+        "Terreno frío y seco con permafrost para ensayar perforación y detección de hielo subterráneo y operar con frío extremo, útil para el hielo de Marte y de los polos lunares.",
+      "Tarso Toussidé":
+        "Terreno volcánico basáltico, rugoso y polvoriento para probar movilidad de rovers, navegación y maquinaria bajo polvo, como las llanuras volcánicas de Marte y la Luna.",
+      "Cueva de los Verdes (Lanzarote)":
+        "Tubo de lava accesible para practicar exploración robótica subterránea, mapeo sin GPS y hábitats protegidos de la radiación; análogo de los tubos de lava de la Luna y Marte.",
+    },
     features: {
       "Temperatura Superficial": "Temperatura superficial",
       Nubosidad: "Nubosidad",

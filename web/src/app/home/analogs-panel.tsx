@@ -138,6 +138,12 @@ export function AnalogsPanel() {
 
                     {isOpen && (
                       <div className="space-y-3 border-t border-white/10 px-4 py-3 text-xs">
+                        {(copy.uses as Record<string, string>)[item.sitio_tierra] && (
+                          <p className="rounded-xl bg-[#ffab57]/10 px-2.5 py-2 leading-relaxed text-white/85">
+                            <span className="text-[#ffbd80]">{copy.usesTitle}:</span>{" "}
+                            {(copy.uses as Record<string, string>)[item.sitio_tierra]}
+                          </p>
+                        )}
                         <p>
                           <span className="text-[#9be29b]">{copy.matches}:</span>{" "}
                           <span className="text-white/80">{list(item.coincide)}</span>
