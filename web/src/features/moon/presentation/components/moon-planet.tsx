@@ -9,6 +9,8 @@ import {
 } from "@/features/shared/domain/geographic-coordinates";
 
 const radius = 0.96;
+// Ver la nota equivalente en earth-planet.tsx: alinea marcadores y clics con la textura.
+const TEXTURE_LON_OFFSET = Math.PI / 2;
 
 export interface MoonPlanetProps {
   className?: string;
@@ -17,6 +19,8 @@ export interface MoonPlanetProps {
   rotationSpeed?: number;
   /** Sigue girando solo aunque esté en modo exploración (hasta que se arrastre). */
   autoRotate?: boolean;
+  /** Se llama con la coordenada seleccionada al hacer clic sobre el globo. */
+  onSelect?: (point: { latitude: number; longitude: number }) => void;
   landmarks?: GeographicLandmark[];
   onProjectedLandmarksChange?: (landmarks: ProjectedLandmark[]) => void;
 }
@@ -27,12 +31,14 @@ export function MoonPlanet({
   isExploring = false,
   rotationSpeed = 0.008,
   autoRotate = false,
+  onSelect,
   landmarks,
   onProjectedLandmarksChange,
 }: MoonPlanetProps) {
   const mount = useRef<HTMLDivElement>(null);
   const isExploringRef = useRef(isExploring);
   const autoRotateRef = useRef(autoRotate);
+  const onSelectRef = useRef(onSelect);
   const landmarksRef = useRef(landmarks);
   const onProjectedLandmarksChangeRef = useRef(onProjectedLandmarksChange);
 
@@ -43,6 +49,10 @@ export function MoonPlanet({
   useEffect(() => {
     autoRotateRef.current = autoRotate;
   }, [autoRotate]);
+
+  useEffect(() => {
+    onSelectRef.current = onSelect;
+  }, [onSelect]);
 
   useEffect(() => {
     landmarksRef.current = landmarks;
@@ -143,7 +153,7 @@ export function MoonPlanet({
       if (!width || !height) return;
 
       const projected: ProjectedLandmark[] = currentLandmarks.map((lm) => {
-        const localPos = latLonToVector3(lm.lat, lm.lon, radius);
+        const localPos = latLonToVector3(lm.lat, lm.lon, radius, TEXTURE_LON_OFFSET);
         tempV.copy(localPos).applyMatrix4(planet.matrixWorld);
         const zWorld = tempV.z;
         const isFrontFacing = zWorld > 0.02;
@@ -174,12 +184,42 @@ export function MoonPlanet({
       updateLandmarkProjections();
     };
 
+    // Click-to-select: raycast the globe and convert the hit to latitude/longitude.
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    let downX = 0;
+    let downY = 0;
+    let moved = false;
+
+    const selectPoint = (clientX: number, clientY: number) => {
+      const select = onSelectRef.current;
+      if (!select) return;
+      const bounds = renderer.domElement.getBoundingClientRect();
+      if (!bounds.width || !bounds.height) return;
+      pointer.set(
+        (2 * (clientX - bounds.left)) / bounds.width - 1,
+        1 - (2 * (clientY - bounds.top)) / bounds.height,
+      );
+      raycaster.setFromCamera(pointer, camera);
+      const [hit] = raycaster.intersectObject(planet, false);
+      if (!hit) return;
+      const local = planet.worldToLocal(hit.point).normalize();
+      const theta = THREE.MathUtils.radToDeg(Math.atan2(local.z, -local.x));
+      select({
+        latitude: THREE.MathUtils.radToDeg(Math.asin(local.y)),
+        longitude: THREE.MathUtils.euclideanModulo(theta, 360) - 180,
+      });
+    };
+
     const onPointerMove = (e: PointerEvent) => {
       if (!isDragging) return;
+      if (!moved && Math.hypot(e.clientX - downX, e.clientY - downY) < 5) return;
+      moved = true;
       const dx = e.clientX - prevX;
       const dy = e.clientY - prevY;
       prevX = e.clientX;
       prevY = e.clientY;
+      if (!isExploringRef.current) return;
 
       planet.rotation.y += dx * 0.006;
       planet.rotation.x = Math.max(-0.65, Math.min(0.65, planet.rotation.x + dy * 0.004));
@@ -187,17 +227,21 @@ export function MoonPlanet({
       renderOnce();
     };
 
-    const onPointerUp = () => {
+    const onPointerUp = (e: PointerEvent) => {
       if (!isDragging) return;
       isDragging = false;
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointercancel", onPointerUp);
+      if (!moved && e.type === "pointerup") selectPoint(e.clientX, e.clientY);
     };
 
     const onPointerDown = (e: PointerEvent) => {
-      if (!isExploringRef.current) return;
+      if (!isExploringRef.current && !onSelectRef.current) return;
       isDragging = true;
+      moved = false;
+      downX = e.clientX;
+      downY = e.clientY;
       prevX = e.clientX;
       prevY = e.clientY;
       window.addEventListener("pointermove", onPointerMove, { passive: true });
@@ -236,9 +280,7 @@ export function MoonPlanet({
       }
 
       renderer.render(scene, camera);
-      if (isExploringRef.current) {
-        updateLandmarkProjections();
-      }
+      updateLandmarkProjections();
       animationFrameId = requestAnimationFrame(animate);
     };
 
