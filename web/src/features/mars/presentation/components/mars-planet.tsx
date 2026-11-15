@@ -6,18 +6,14 @@ import { createMarsSurfaceOverlay } from "./mars-surface-overlay";
 
 const radius = 0.96;
 
-interface MarsPlanetProps {
-  isHovered?: boolean;
-  isExploring?: boolean;
-  className?: string;
-}
-
-// Surface and atmosphere adapted from Aditya-567/3D-Planets (Apache-2.0)
+// Superficie y atmósfera adaptadas de Aditya-567/3D-Planets (Apache-2.0).
 export function MarsPlanet({
-  isHovered = false,
-  isExploring = false,
-  className,
-}: MarsPlanetProps) {
+  showSurfaceOverlay = true,
+  rotationSpeed = 0.012,
+}: {
+  showSurfaceOverlay?: boolean;
+  rotationSpeed?: number;
+}) {
   const mount = useRef<HTMLDivElement>(null);
   const isExploringRef = useRef(isExploring);
 
@@ -53,9 +49,17 @@ export function MarsPlanet({
     container.appendChild(renderer.domElement);
 
     const loader = new THREE.TextureLoader();
-    const texture = loader.load("/mars/marsmap.jpg");
+    let disposed = false;
+    let ready = false;
+    const texture = loader.load("/mars/marsmap.jpg", () => {
+      if (disposed) return;
+      ready = true;
+      syncMotion();
+    });
     texture.colorSpace = THREE.SRGBColorSpace;
-    const bump = loader.load("/mars/marsbump.jpg");
+    const bump = loader.load("/mars/marsbump.jpg", () => {
+      if (!disposed && ready && !document.hidden) renderer.render(scene, camera);
+    });
     const geometry = new THREE.SphereGeometry(radius, 80, 64);
     const material = new THREE.MeshPhongMaterial({
       map: texture,
@@ -91,8 +95,8 @@ export function MarsPlanet({
     planet.rotation.set(-0.08, -2.12, 0.22, "ZYX");
     scene.add(planet);
 
-    const surfaceOverlay = createMarsSurfaceOverlay(radius);
-    scene.add(surfaceOverlay.group);
+    const surfaceOverlay = showSurfaceOverlay ? createMarsSurfaceOverlay(radius) : null;
+    if (surfaceOverlay) scene.add(surfaceOverlay.group);
 
     scene.add(new THREE.AmbientLight(0xff411b, 0.09));
     const light = new THREE.DirectionalLight(0xffefe7, 10.5);
@@ -159,88 +163,51 @@ export function MarsPlanet({
       camera.left = -width / height;
       camera.right = width / height;
       camera.updateProjectionMatrix();
-      renderer.setSize(width, height, false);
-      renderOnce();
+      renderer.setSize(width, height);
+      if (ready && !document.hidden) renderer.render(scene, camera);
     };
 
     const observer = new ResizeObserver(resize);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    function syncMotion() {
+      renderer.setAnimationLoop(null);
+      if (!ready || document.hidden) return;
+
+      renderer.render(scene, camera);
+      canvas.dataset.rendered = "";
+      if (reducedMotion.matches) return;
+
+      let previousTime: number | undefined;
+      renderer.setAnimationLoop((time) => {
+        const delta = Math.min(0.05, (time - (previousTime ?? time)) / 1000);
+        previousTime = time;
+        planet.rotation.y += delta * rotationSpeed;
+        renderer.render(scene, camera);
+      });
+    }
+
     observer.observe(container);
     resize();
-
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let previousTime = performance.now();
-    let frameId: number | null = null;
-    let isInViewport = true;
-
-    const animate = (time: number) => {
-      const delta = Math.min(0.05, (time - previousTime) / 1000);
-      previousTime = time;
-
-      if (!isDragging) {
-        planet.rotation.y += delta * (0.012 + angularVelocity);
-        angularVelocity = THREE.MathUtils.damp(angularVelocity, 0, 4.8, delta);
-      }
-      renderer.render(scene, camera);
-
-      frameId = requestAnimationFrame(animate);
-    };
-
-    const stopAnimation = () => {
-      if (frameId === null) return;
-      cancelAnimationFrame(frameId);
-      frameId = null;
-    };
-
-    const syncAnimation = () => {
-      const shouldAnimate =
-        !reducedMotion.matches &&
-        isInViewport &&
-        document.visibilityState === "visible";
-
-      if (!shouldAnimate) {
-        stopAnimation();
-        renderOnce();
-        return;
-      }
-
-      if (frameId === null) {
-        previousTime = performance.now();
-        frameId = requestAnimationFrame(animate);
-      }
-    };
-
-    const intersectionObserver = new IntersectionObserver(
-      ([entry]) => {
-        isInViewport = entry?.isIntersecting ?? true;
-        syncAnimation();
-      },
-      { rootMargin: "120px" },
-    );
-    intersectionObserver.observe(container);
-
-    document.addEventListener("visibilitychange", syncAnimation);
-    reducedMotion.addEventListener("change", syncAnimation);
-    syncAnimation();
+    reducedMotion.addEventListener("change", syncMotion);
+    document.addEventListener("visibilitychange", syncMotion);
 
     return () => {
-      domElement.removeEventListener("pointerdown", onPointerDown);
-      window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("pointerup", onPointerUp);
-      window.removeEventListener("pointercancel", onPointerUp);
-      document.removeEventListener("visibilitychange", syncAnimation);
-      reducedMotion.removeEventListener("change", syncAnimation);
-      stopAnimation();
-      intersectionObserver.disconnect();
+      disposed = true;
+      renderer.setAnimationLoop(null);
       observer.disconnect();
+      reducedMotion.removeEventListener("change", syncMotion);
+      document.removeEventListener("visibilitychange", syncMotion);
       geometry.dispose();
       material.dispose();
       texture.dispose();
       bump.dispose();
-      surfaceOverlay.dispose();
+      surfaceOverlay?.dispose();
       renderer.dispose();
+      renderer.forceContextLoss();
       renderer.domElement.remove();
     };
-  }, []);
+  }, [showSurfaceOverlay, rotationSpeed]);
 
   return (
     <div

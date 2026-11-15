@@ -1,5 +1,11 @@
+from pathlib import Path
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Ruta absoluta al directorio 'server' y ubicación esperada de .env
+SERVER_DIR = Path(__file__).resolve().parent.parent.parent
+ENV_FILE_PATH = SERVER_DIR / ".env"
+ROOT_ENV_FILE_PATH = SERVER_DIR.parent / ".env"
 
 
 class Settings(BaseSettings):
@@ -14,17 +20,37 @@ class Settings(BaseSettings):
     SQL_ECHO: bool = Field(default=False, env="SQL_ECHO")
 
     # ── CORS ──────────────────────────────────────────────────────────────────
-    CORS_ORIGINS: list[str] = Field(
+    CORS_ORIGINS: str | list[str] = Field(
         default_factory=lambda: ["http://localhost:3000", "http://localhost:5173"],
         env="CORS_ORIGINS",
     )
 
-    @field_validator("CORS_ORIGINS", mode="before")
+    # ── Servicios Satelitales & Topográficos ─────────────────────────────────
+    OPENTOPOGRAPHY_API_KEY: str = Field(default="", env="OPENTOPOGRAPHY_API_KEY")
+
+    USGS_STAC_API_URL: str = Field(
+        default="https://stac.astrogeology.usgs.gov/api",
+        env="USGS_STAC_API_URL",
+    )
+
+    CDSE_STAC_API_URL: str = Field(
+        default="https://stac.dataspace.copernicus.eu/v1",
+        env="CDSE_STAC_API_URL",
+    )
+    CDSE_TOKEN_URL: str = Field(
+        default="https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token",
+        env="CDSE_TOKEN_URL",
+    )
+    CDSE_CLIENT_ID: str = Field(default="cdse-public", env="CDSE_CLIENT_ID")
+    CDSE_USERNAME: str = Field(default="", env="CDSE_USERNAME")
+    CDSE_PASSWORD: str = Field(default="", env="CDSE_PASSWORD")
+
+    @field_validator("CORS_ORIGINS", mode="after")
     @classmethod
-    def parse_cors_origins(cls, value: object) -> list[str]:
+    def parse_cors_origins(cls, value: str | list[str]) -> list[str]:
         if isinstance(value, str):
             return [o.strip() for o in value.split(",") if o.strip()]
-        return value  # type: ignore[return-value]
+        return value
 
     @property
     def database_url_normalized(self) -> str:
@@ -54,7 +80,11 @@ class Settings(BaseSettings):
     def is_sqlite(self) -> bool:
         return self.database_url_normalized.startswith("sqlite")
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=[str(ENV_FILE_PATH), str(ROOT_ENV_FILE_PATH), ".env"],
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
 
 settings = Settings()

@@ -21,10 +21,26 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # ==============================================================================
-# IMPORTACIONES DE ROUTERS (descomenta cuando crees los módulos)
+# IMPORTACIONES DE ROUTERS
 # ==============================================================================
-# from app.modules.module_a.infrastructure.api.routers.module_a_router import router as module_a_router
-# from app.modules.module_b.infrastructure.api.routers.module_b_router import router as module_b_router
+from app.modules.cuerpo_celeste.infrastructure.api.routers.cuerpo_celeste_router import (
+    router as cuerpo_celeste_router,
+)
+from app.modules.sitio.infrastructure.api.routers.sitio_router import (
+    router as sitio_router,
+)
+from app.modules.dataset.infrastructure.api.routers.dataset_router import (
+    router as dataset_router,
+)
+from app.modules.caracteristica.infrastructure.api.routers.caracteristica_router import (
+    router as caracteristica_router,
+)
+from app.modules.medicion.infrastructure.api.routers.medicion_router import (
+    router as medicion_router,
+)
+from app.modules.analogia.infrastructure.api.routers.analogia_router import (
+    router as analogia_router,
+)
 
 
 # ==============================================================================
@@ -42,6 +58,11 @@ async def lifespan(app: FastAPI):
     if settings.ENVIRONMENT == "DEV" and settings.is_sqlite:
         logger.info("DEV + SQLite — inicializando tablas con SQLModel...")
         init_db()
+        # Sembrar datos iniciales (Tierra, Marte, datasets y características)
+        from sqlmodel import Session
+        from app.shared.infrastructure.db.seed import seed_initial_data
+        with Session(engine) as session:
+            seed_initial_data(session)
     else:
         logger.info(
             "Modo %s con %s — las migraciones deben ejecutarse con Alembic.",
@@ -113,7 +134,15 @@ def health_check():
 
 
 # ==============================================================================
-# REGISTRO DE ROUTERS (descomenta según vayas agregando módulos)
+# REGISTRO DE ROUTERS
 # ==============================================================================
-# app.include_router(module_a_router, prefix="/api/module-a", tags=["Module A"])
-# app.include_router(module_b_router, prefix="/api/module-b", tags=["Module B"])
+app.include_router(
+    cuerpo_celeste_router, prefix="/api/cuerpo-celeste", tags=["CuerpoCeleste"]
+)
+app.include_router(sitio_router, prefix="/api/sitio", tags=["Sitio"])
+app.include_router(dataset_router, prefix="/api/dataset", tags=["Dataset"])
+app.include_router(
+    caracteristica_router, prefix="/api/caracteristica", tags=["Caracteristica"]
+)
+app.include_router(medicion_router, prefix="/api/medicion", tags=["Medicion"])
+app.include_router(analogia_router, prefix="/api/analogia", tags=["Analogia"])
