@@ -10,6 +10,10 @@ from app.core.dependencies import DBSession
 from app.modules.cuerpo_celeste.infrastructure.api.schemas.cuerpo_celeste_schemas import (
     CuerpoCelesteResponse,
 )
+from app.modules.cuerpo_celeste.infrastructure.earth_climate import (
+    EarthClimateResponse,
+    get_earth_climate,
+)
 from app.modules.cuerpo_celeste.infrastructure.mars_climate import (
     MarsClimateResponse,
     get_mars_climate,
@@ -41,6 +45,15 @@ def read_mars_climate(
 ) -> MarsClimateResponse:
     """Devuelve el promedio diurno de la celda más cercana de MCD 6.2 para Ls 105°."""
     return get_mars_climate(lat, lon)
+
+
+@router.get("/tierra/clima", summary="Consultar climatología de la Tierra por coordenadas")
+def read_earth_climate(
+    lat: MarsLatitude,
+    lon: MarsLongitude,
+) -> EarthClimateResponse:
+    """Devuelve la media anual de NASA POWER (MERRA-2) para el punto indicado."""
+    return get_earth_climate(lat, lon)
 
 
 @router.get("/marte/imagenes", summary="Buscar imágenes orbitales de Marte por coordenadas")
