@@ -16,3 +16,24 @@
 # ============================================================
 
 # ruff: noqa: F401
+try:
+    from app.modules.cuerpo_celeste.infrastructure.persistence.models.cuerpo_celeste_model import (
+        CuerpoCelesteModel,
+    )
+    from app.modules.sitio.infrastructure.persistence.models.sitio_model import (
+        SitioModel,
+    )
+    from app.modules.dataset.infrastructure.persistence.models.dataset_model import (
+        DatasetModel,
+    )
+    from app.modules.caracteristica.infrastructure.persistence.models.caracteristica_model import (
+        CaracteristicaModel,
+    )
+    from app.modules.medicion.infrastructure.persistence.models.medicion_model import (
+        MedicionModel,
+    )
+    from app.modules.analogia.infrastructure.persistence.models.analogia_model import (
+        AnalogiaModel,
+    )
+except ImportError:
+    pass

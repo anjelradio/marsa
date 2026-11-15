@@ -219,3 +219,27 @@ def test_natural_language_parser() -> None:
     assert parsed["aridity_preference"] == "hyperarid"
     assert abs(sum(parsed["weights"].values()) - 1.0) < 0.01
 
+
+def test_mars_mcd_temperature_sampler_returns_real_value() -> None:
+    import sys
+
+    sat_path = ROOT_DIR / "server" / "app" / "shared" / "application" / "satelital_service.py"
+    source = sat_path.read_text(encoding="utf-8")
+    assert "215.0 if items else 200.0" not in source
+    assert "210.0 + (len(items)" not in source
+
+    # Verify direct bilinear sampling for Jezero Crater (18.38 N, 77.58 E) -> ~227.65 K
+    pipelines_dir = str(ROOT_DIR / "pipelines")
+    if pipelines_dir not in sys.path:
+        sys.path.insert(0, pipelines_dir)
+    from parse_mcd_mars import parse_mcd_ascii_blocks, sample_bilinear
+
+    mcd_file = ROOT_DIR / "datos-marte" / "datos-marte" / "marte_ls105_temperatura_presion.txt"
+    if mcd_file.exists():
+        blocks = parse_mcd_ascii_blocks(mcd_file)
+        sampled = sample_bilinear(
+            blocks[0]["latitudes"], blocks[0]["longitudes"], blocks[0]["matrix_lon_lat"], 18.38, 77.58
+        )
+        assert 227.0 <= sampled["bilinear"] <= 228.5
+
+
