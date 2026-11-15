@@ -1,7 +1,7 @@
 import { sileo } from "sileo";
 import { CircleCheck, CircleX, CircleAlert, TriangleAlert } from "lucide-react";
 
-const DEFAULT_ERROR_MESSAGE = "Ocurrió un error inesperado";
+const DEFAULT_ERROR_MESSAGE = "An unexpected error occurred";
 const DEFAULT_ERROR_TITLE = "Error";
 
 type ErrorToastOptions = {

@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
+import { useTranslation } from "@/i18n/context";
 
 function GoogleIcon() {
   return (
@@ -38,15 +39,17 @@ function GitHubIcon() {
 }
 
 export default function SocialSignInButtons() {
+  const { dict } = useTranslation();
+
   return (
     <Field className="grid gap-4 sm:grid-cols-2">
       <Button variant="outline" type="button" disabled>
         <GitHubIcon />
-        Continuar con GitHub
+        {dict.auth.social.github}
       </Button>
       <Button variant="outline" type="button" disabled>
         <GoogleIcon />
-        Continuar con Google
+        {dict.auth.social.google}
       </Button>
     </Field>
   );

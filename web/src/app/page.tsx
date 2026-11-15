@@ -1,3 +1,6 @@
+"use client";
+
+import Link from "next/link";
 import { LandingHeader } from "@/features/shared/presentation/components/layout/landing-header";
 import {
   Card,
@@ -6,74 +9,82 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/i18n/context";
+import { Rocket } from "lucide-react";
 
 export default function Home() {
+  const { dict } = useTranslation();
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <LandingHeader />
 
-      <main className="flex flex-1 flex-col items-center px-6 py-20">
+      <main className="flex flex-1 flex-col items-center px-6 py-16">
         <div className="mx-auto w-full max-w-3xl space-y-12">
           {/* Hero */}
-          <section className="space-y-4 text-center">
+          <section className="space-y-5 text-center">
             <div className="mx-auto w-fit rounded-full border border-border bg-muted px-4 py-1.5 text-xs font-medium text-muted-foreground">
-              Scaffold · Template
+              {dict.landing.badge}
             </div>
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-              next-scaffoldcito
+            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl font-headline">
+              {dict.landing.heroTitle}
             </h1>
             <p className="mx-auto max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Un scaffold de Next.js diseñado para partir rápido. Incluye
-              componentes con shadcn/ui y una
-              arquitectura limpia basada en features.
+              {dict.landing.heroSubtitle}
             </p>
+
+            <div className="pt-2">
+              <Button asChild size="lg" className="rounded-full shadow-md gap-2 font-medium">
+                <Link href="/home">
+                  <Rocket className="size-4" />
+                  {dict.landing.viewDashboard}
+                </Link>
+              </Button>
+            </div>
           </section>
 
           <Separator />
 
           {/* Tech Stack */}
           <section className="space-y-6">
-            <h2 className="text-center text-xl font-semibold tracking-tight">
-              ¿Qué incluye?
+            <h2 className="text-center text-xl font-semibold tracking-tight font-headline">
+              {dict.landing.featuresTitle}
             </h2>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <Card>
                 <CardHeader>
-                  <CardTitle>⚡ Next.js (App Router)</CardTitle>
+                  <CardTitle>{dict.landing.nextjsTitle}</CardTitle>
                   <CardDescription>
-                    React Server Components, Server Actions, layouts anidados y
-                    enrutamiento basado en archivos.
+                    {dict.landing.nextjsDesc}
                   </CardDescription>
                 </CardHeader>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>🔐 Autenticación</CardTitle>
+                  <CardTitle>{dict.landing.authTitle}</CardTitle>
                   <CardDescription>
-                    Pantallas de login, registro, verificación de
-                    email y recuperación de contraseña.
+                    {dict.landing.authDesc}
                   </CardDescription>
                 </CardHeader>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>🎨 shadcn/ui</CardTitle>
+                  <CardTitle>{dict.landing.shadcnTitle}</CardTitle>
                   <CardDescription>
-                    Componentes accesibles y estilizados con Tailwind CSS y Radix
-                    UI. Listos para personalizar.
+                    {dict.landing.shadcnDesc}
                   </CardDescription>
                 </CardHeader>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>🏗️ Clean Architecture</CardTitle>
+                  <CardTitle>{dict.landing.cleanArchTitle}</CardTitle>
                   <CardDescription>
-                    Estructura modular por features con capas de dominio,
-                    infraestructura, aplicación y presentación.
+                    {dict.landing.cleanArchDesc}
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -84,25 +95,11 @@ export default function Home() {
 
           {/* Explore */}
           <section className="space-y-4 text-center">
-            <h2 className="text-xl font-semibold tracking-tight">
-              Explora el proyecto
+            <h2 className="text-xl font-semibold tracking-tight font-headline">
+              {dict.landing.exploreTitle}
             </h2>
             <p className="mx-auto max-w-lg text-sm leading-relaxed text-muted-foreground">
-              Este scaffold ya tiene componentes de UI, formularios de
-              autenticación, notificaciones, headers y más creados para ti. Siéntete
-              libre de explorar las carpetas{" "}
-              <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono">
-                features/
-              </code>
-              ,{" "}
-              <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono">
-                components/ui/
-              </code>{" "}
-              y{" "}
-              <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono">
-                app/
-              </code>{" "}
-              para descubrir todo lo disponible y adaptarlo a tu proyecto.
+              {dict.landing.exploreDesc}
             </p>
           </section>
         </div>
@@ -110,7 +107,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t border-border/40 py-6 text-center text-xs text-muted-foreground">
-        next-scaffoldcito — hecho con Next.js y shadcn/ui
+        {dict.landing.footer}
       </footer>
     </div>
   );
