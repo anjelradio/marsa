@@ -36,7 +36,7 @@ def extraer_satelital(
     request: ExtraerSatelitalRequest,
     db: DBSession,
 ) -> Sequence[MedicionModel]:
-    """Consulta la API satelital correspondiente (Copernicus o USGS) según el cuerpo celeste del sitio."""
+    """Consulta la API satelital correspondiente (NASA POWER o USGS) según el cuerpo celeste del sitio."""
     service = SatelitalService(db)
     try:
         mediciones = service.procesar_extraccion_sitio(

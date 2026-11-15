@@ -14,7 +14,10 @@ from app.modules.medicion.infrastructure.persistence.models.medicion_model impor
     MedicionModel,
 )
 from app.modules.sitio.infrastructure.persistence.models.sitio_model import SitioModel
-from app.shared.infrastructure.external.stac_clients import CopernicusClient, USGSStacClient
+from fastapi import HTTPException
+
+from app.modules.cuerpo_celeste.infrastructure.earth_climate import get_earth_climate
+from app.shared.infrastructure.external.stac_clients import USGSStacClient
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +49,6 @@ class SatelitalService:
 
     def __init__(self, db: Session) -> None:
         self.db = db
-        self.copernicus = CopernicusClient()
         self.usgs = USGSStacClient()
 
     def procesar_extraccion_sitio(
@@ -81,33 +83,38 @@ class SatelitalService:
         bbox: list[float],
         datetime_range: str | None,
     ) -> list[MedicionModel]:
-        """Procesa datos de Copernicus (Nubosidad Sentinel-2, etc.)."""
-        mediciones: list[MedicionModel] = []
+        """Nubosidad media anual de NASA POWER (MERRA-2) en el centro del área del sitio.
 
-        # 1. Nubosidad con Sentinel-2
-        ds_s2 = self.db.exec(
-            select(DatasetModel).where(DatasetModel.nombre == "Copernicus Sentinel-2 L2A")
+        ``datetime_range`` no se usa: POWER entrega la climatología de 25 años.
+        """
+        ds_power = self.db.exec(
+            select(DatasetModel).where(DatasetModel.nombre == "NASA POWER (MERRA-2)")
         ).first()
         car_nub = self.db.exec(
             select(CaracteristicaModel).where(CaracteristicaModel.nombre == "Nubosidad")
         ).first()
+        if not (ds_power and car_nub):
+            return []
 
-        if ds_s2 and car_nub:
-            cl_info = self.copernicus.get_cloud_cover_and_weather(bbox, datetime_range)
-            cloud_val = cl_info.get("cloud_cover")
-            if cloud_val is not None:
-                norm = min(max(cloud_val / (car_nub.rango or 100.0), 0.0), 1.0)
-                med = self._upsert_medicion(
-                    sitio_id=sitio.id,  # type: ignore[arg-type]
-                    caracteristica_id=car_nub.id,  # type: ignore[arg-type]
-                    dataset_id=ds_s2.id,  # type: ignore[arg-type]
-                    valor=cloud_val,
-                    resolucion=ds_s2.resolucion,
-                    valor_normalizado=norm,
-                )
-                mediciones.append(med)
+        lon = (bbox[0] + bbox[2]) / 2.0
+        lat = (bbox[1] + bbox[3]) / 2.0
+        try:
+            clima = get_earth_climate(lat, lon)
+        except HTTPException as exc:  # sin datos en el punto o servicio caído
+            logger.warning("NASA POWER no devolvió nubosidad para %s: %s", sitio.nombre, exc.detail)
+            return []
 
-        return mediciones
+        cloud_val = clima.values.cloud_cover_pct
+        norm = min(max(cloud_val / (car_nub.rango or 100.0), 0.0), 1.0)
+        medicion = self._upsert_medicion(
+            sitio_id=sitio.id,  # type: ignore[arg-type]
+            caracteristica_id=car_nub.id,  # type: ignore[arg-type]
+            dataset_id=ds_power.id,  # type: ignore[arg-type]
+            valor=cloud_val,
+            resolucion=ds_power.resolucion,
+            valor_normalizado=norm,
+        )
+        return [medicion]
 
     def _procesar_marte(
         self,
