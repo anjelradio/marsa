@@ -184,6 +184,24 @@ def test_orders_cells_by_similarity_and_counts_the_unusable_ones(client, escenar
     assert escenario["escasa"] not in {x["sitio_id"] for x in cuerpo["resultados"]}
 
 
+def test_the_minimum_coverage_can_be_raised_or_lowered(client, escenario) -> None:
+    def pedir(**extra):
+        return client.get(
+            "/api/analogia/celdas-similares",
+            params={"sitio_id": escenario["origen"], **extra},
+        ).json()
+
+    estricta = pedir(cobertura_minima=0.99)  # la cobertura de las celdas completas es 0,91
+    assert (estricta["validas"], estricta["resultados"]) == (0, [])
+    assert estricta["cobertura_minima"] == 0.99
+    laxa = pedir(cobertura_minima=0.2)
+    assert laxa["validas"] == 3 and len(laxa["resultados"]) == 3  # entra la celda casi sin datos
+    assert client.get(
+        "/api/analogia/celdas-similares",
+        params={"sitio_id": escenario["origen"], "cobertura_minima": 1.5},
+    ).status_code == 422
+
+
 def test_stability_and_the_similarity_range_come_with_each_cell(client, escenario) -> None:
     cuerpo = client.get(
         "/api/analogia/celdas-similares",

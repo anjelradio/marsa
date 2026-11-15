@@ -88,6 +88,9 @@ def celdas_similares_endpoint(
     lat: Annotated[float | None, Query(ge=-90, le=90, description="Latitud del punto terrestre.")] = None,
     lng: Annotated[float | None, Query(ge=-180, le=180, description="Longitud del punto terrestre.")] = None,
     limite: Annotated[int, Query(ge=1, le=50)] = 10,
+    cobertura_minima: Annotated[
+        float | None, Query(ge=0, le=1, description="Cobertura mínima de datos para ordenar una celda.")
+    ] = None,
 ) -> dict:
     """Ordena las celdas de 10° del destino por similitud con el sitio o el punto terrestre.
 
@@ -97,7 +100,10 @@ def celdas_similares_endpoint(
     """
     nombre = {"marte": "Marte", "luna": "Luna"}[destino]
     try:
-        return celdas_similares(db, nombre, sitio_id=sitio_id, lat=lat, lng=lng, limite=limite)
+        extra = {} if cobertura_minima is None else {"cobertura_minima": cobertura_minima}
+        return celdas_similares(
+            db, nombre, sitio_id=sitio_id, lat=lat, lng=lng, limite=limite, **extra
+        )
     except (OrigenNoEncontrado, DestinoNoEncontrado) as exc:
         raise HTTPException(status_code=404, detail=str(exc))
     except OrigenInvalido as exc:

@@ -23,7 +23,9 @@ from app.modules.analogia.domain.services.similarity import (
 from app.modules.sitio.domain.services.malla import celda_de
 from app.modules.sitio.infrastructure.persistence.models.sitio_model import SitioModel
 
-COBERTURA_MINIMA = 0.6  # por debajo, la celda no se ordena: faltan demasiados datos
+# Por debajo, la celda no se ordena: faltan demasiados datos. Las celdas reales solo tienen 4 de las
+# 8 características (temperatura, polvo, elevación y relieve), así que su cobertura ronda el 44 %.
+COBERTURA_MINIMA = 0.4
 
 
 class OrigenNoEncontrado(Exception):
@@ -65,6 +67,7 @@ def celdas_similares(
     lat: float | None = None,
     lng: float | None = None,
     limite: int = 10,
+    cobertura_minima: float = COBERTURA_MINIMA,
 ) -> dict:
     """Las ``limite`` celdas del destino más parecidas al origen, con su estabilidad."""
     if limite < 1:
@@ -84,7 +87,7 @@ def celdas_similares(
     validas = {
         i: par
         for i, par in resultados.items()
-        if par[1].cobertura >= COBERTURA_MINIMA and par[1].por_grupo
+        if par[1].cobertura >= cobertura_minima and par[1].por_grupo
     }
     estabilidad = estabilidad_del_ranking(
         {i: r.por_grupo for i, (_, r) in validas.items()}, limite
@@ -123,7 +126,7 @@ def celdas_similares(
         "destino": destino,
         "metodo": METODO,
         "pesos_grupo": PESOS_GRUPO,
-        "cobertura_minima": COBERTURA_MINIMA,
+        "cobertura_minima": cobertura_minima,
         "evaluadas": len(celdas),
         "validas": len(validas),
         "descartadas_por_cobertura": len(celdas) - len(validas),
