@@ -34,16 +34,6 @@ Catálogo SpatioTemporal Asset Catalog (STAC) público de la USGS para datos pla
 
 ---
 
-## ⛰️ OpenTopography API
-
-API para descarga y procesamiento de Modelos Digitales de Elevación (DEMs) globales.
-- **Documentación:** [https://portal.opentopography.org/apidocs/](https://portal.opentopography.org/apidocs/)
-- **Autenticación:** Requiere parámetro de consulta `API_Key` configurado en `server/.env` (`OPENTOPOGRAPHY_API_KEY`).
-
-
-
----
-
 ## 🌍 Copernicus Data Space Ecosystem (CDSE - Datos de la Tierra)
 
 Catálogo oficial de la Agencia Espacial Europea (ESA) para datos de observación terrestre (Sentinel-1, Sentinel-2, Sentinel-3, Landsat, etc.).

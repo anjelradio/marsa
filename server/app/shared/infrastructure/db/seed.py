@@ -60,12 +60,6 @@ def seed_initial_data(session: Session) -> None:
             "url": "https://stac.astrogeology.usgs.gov/api",
             "resolucion": 6.0,
         },
-        {
-            "nombre": "OpenTopography Global DEM",
-            "agencia": "OpenTopography / NSF",
-            "url": "https://portal.opentopography.org/apidocs/",
-            "resolucion": 30.0,
-        },
     ]
     for d in datasets:
         exists = session.exec(

@@ -26,8 +26,6 @@ class Settings(BaseSettings):
     )
 
     # ── Servicios Satelitales & Topográficos ─────────────────────────────────
-    OPENTOPOGRAPHY_API_KEY: str = Field(default="", env="OPENTOPOGRAPHY_API_KEY")
-
     USGS_STAC_API_URL: str = Field(
         default="https://stac.astrogeology.usgs.gov/api",
         env="USGS_STAC_API_URL",

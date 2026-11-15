@@ -16,7 +16,7 @@ Resumen técnico de los aspectos más importantes para el desarrollo del backend
 * **Nubosidad (Tierra):** Se extrae directo de `properties.eo:cloud_cover` (% de cobertura) y se clasifica píxel por píxel con la banda `SCL`.
 * **Temperatura (Tierra):** Se obtiene de Sentinel-3 SLSTR en Kelvin (LST - Land Surface Temperature).
 * **Temperatura e Inercia Térmica (Marte):** Se obtiene de mosaicos `THEMIS IR` diurnos y nocturnos.
-* **Topografía:** DEMs de OpenTopography y CTX DTMs para correlacionar altitud y clima.
+* **Topografía:** SRTM 30 m (OpenTopoData, sin clave) en la Tierra, LOLA en la Luna y CTX DTMs en Marte para correlacionar altitud y clima.
 
 ---
 
