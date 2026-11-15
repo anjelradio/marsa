@@ -91,6 +91,7 @@ def test_ranking_ordenado_y_con_explicacion(client: TestClient, destino: str) ->
         assert f["cobertura"] == pytest.approx(1.0)
         assert f["metodo"] == "ponderado-v1"
         assert f["geom"]["type"] == "Point"
+        assert f["geom_destino"]["type"] == "Point"
         assert len(f["detalle"]) == len(CARACTERISTICAS)
 
 

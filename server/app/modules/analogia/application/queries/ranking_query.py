@@ -88,6 +88,7 @@ def ranking_analogos(session: Session, destino: str) -> list[dict]:
                 "geom": tierra.geom,
                 "sitio_destino_id": sitio_destino.id,
                 "sitio_destino": sitio_destino.nombre,
+                "geom_destino": sitio_destino.geom,
                 "similitud": r.similitud,
                 "cobertura": r.cobertura,
                 "metodo": r.metodo,

@@ -29,6 +29,7 @@ class RankingItemResponse(BaseModel):
     geom: dict | None
     sitio_destino_id: int
     sitio_destino: str
+    geom_destino: dict | None
     similitud: float
     cobertura: float
     metodo: str
