@@ -31,18 +31,6 @@ class Settings(BaseSettings):
         env="USGS_STAC_API_URL",
     )
 
-    CDSE_STAC_API_URL: str = Field(
-        default="https://stac.dataspace.copernicus.eu/v1",
-        env="CDSE_STAC_API_URL",
-    )
-    CDSE_TOKEN_URL: str = Field(
-        default="https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token",
-        env="CDSE_TOKEN_URL",
-    )
-    CDSE_CLIENT_ID: str = Field(default="cdse-public", env="CDSE_CLIENT_ID")
-    CDSE_USERNAME: str = Field(default="", env="CDSE_USERNAME")
-    CDSE_PASSWORD: str = Field(default="", env="CDSE_PASSWORD")
-
     @field_validator("CORS_ORIGINS", mode="after")
     @classmethod
     def parse_cors_origins(cls, value: str | list[str]) -> list[str]:

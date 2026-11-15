@@ -34,41 +34,16 @@ Catálogo SpatioTemporal Asset Catalog (STAC) público de la USGS para datos pla
 
 ---
 
-## 🌍 Copernicus Data Space Ecosystem (CDSE - Datos de la Tierra)
-
-Catálogo oficial de la Agencia Espacial Europea (ESA) para datos de observación terrestre (Sentinel-1, Sentinel-2, Sentinel-3, Landsat, etc.).
-
-### 1. Endpoints Base
-- **STAC API (Público para consultas/búsquedas):**  
-  `https://stac.dataspace.copernicus.eu/v1`
-- **OAuth2 Token Endpoint (Keycloak):**  
-  `https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token`
-
-### 2. Autenticación & Cuotas
-- **Consultas anónimas/públicas:** Se pueden consultar las colecciones y buscar items sin autenticación (límite aprox. 60 req/min).
-- **Descargas y alta cuota:** Requiere cuenta gratuita en [dataspace.copernicus.eu](https://dataspace.copernicus.eu/) y obtención de token Bearer (límite de 240 req/min y descarga de bandas/assets).
-
-### 3. Endpoints Principales
-
-| Endpoint | Método | Descripción |
-| :--- | :---: | :--- |
-| `/collections` | `GET` | Lista de colecciones (ej. `sentinel-2-l2a`, `sentinel-1-grd`). |
-| `/collections/{collection_id}` | `GET` | Información y detalles de una colección satelital específica. |
-| `/collections/{collection_id}/items` | `GET` | Granos/escenas dentro de la colección. |
-| `/search` | `GET` / `POST` | Búsqueda global por `bbox`, polígono geoespacial y rangos de fecha (`datetime`). |
-
-
----
-
 ## 📊 Guía de Datos: Temperatura, Nubosidad y Clima (Tierra vs Marte)
 
-### 1. 🌍 Para la Tierra (Copernicus CDSE STAC)
+### 1. 🌍 Para la Tierra (NASA POWER y SRTM, APIs públicas sin clave)
 
 | Variable | Colección / Instrumento | Atributos y Bandas clave |
 | :--- | :--- | :--- |
-| **Nubosidad (Cloud Cover)** | `sentinel-2-l2a` | Metadato directo: `eo:cloud_cover` (% de nubes de la escena). Máscara de clasificación: banda `SCL` (Scene Classification Layer) que separa píxeles de nubes altas, cirros y cielo despejado. |
-| **Temperatura Superficial** | `sentinel-3-slstr` | Sensor infrarrojo térmico (LST - *Land Surface Temperature*). Mide temperatura superficial terrestre y marina día/noche en Kelvin. |
-| **Clima / Atmósfera** | `sentinel-5p-l2` | Aerosoles, monóxido de carbono, ozono y vapor de agua atmosférico. |
+| **Nubosidad (Cloud Cover)** | NASA POWER `CLOUD_AMT` | Fracción de nubes en % (media anual de 25 años, MERRA-2). |
+| **Temperatura Superficial** | NASA POWER `TS` | Temperatura de la piel en °C; el proyecto la convierte a Kelvin. |
+| **Polvo / Aerosoles** | NASA POWER `AOD_55` | Profundidad óptica de aerosoles a 550 nm. |
+| **Elevación** | OpenTopoData SRTM 30 m | Altura en metros del punto (hasta 1 petición por segundo). |
 
 ### 2. 🔴 Para Marte (USGS Astrogeology STAC)
 
@@ -94,9 +69,9 @@ Se define qué área del planeta se va a observar:
 
 ### 2. ⏱️ Dimensión Temporal (Tiempo y Estaciones)
 Define la ventana de tiempo en formato ISO 8601 UTC (`YYYY-MM-DDTHH:MM:SSZ`):
-- **Tierra (Copernicus):** 
-  - `datetime`: `"2024-01-01T00:00:00Z/2024-02-01T23:59:59Z"`
-  - Permite evaluar variaciones estacionales (verano/invierno) y evolución climática día a día.
+- **Tierra (NASA POWER):**
+  - Devuelve la climatología de 25 años (`ANN` = media anual, más los 12 meses).
+  - No admite rango de fechas: es la media climatológica del punto.
 - **Marte (USGS STAC):**
   - Misiones históricas y en curso (año de adquisición terrestre o año marciano $L_s$ - longitud solar para estaciones marcianas).
   - Día vs Noche: Permite contrastar la inercia térmica diurna y nocturna (`themis_day` vs `themis_night`).

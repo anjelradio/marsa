@@ -4,47 +4,27 @@ Ejemplos reales capturados de las APIs satelitales en vivo para la Tierra y Mart
 
 ---
 
-## 1. 🌍 Tierra (Copernicus CDSE - Sentinel-2 L2A)
-**Endpoint:** `POST https://stac.dataspace.copernicus.eu/v1/search`  
-**Query:** Bbox Salar de Uyuni `[-68.0, -21.0, -67.0, -20.0]`
+## 1. 🌍 Tierra (NASA POWER, climatología)
+**Endpoint:** `GET https://power.larc.nasa.gov/api/temporal/climatology/point`  
+**Query:** `parameters=TS,CLOUD_AMT,AOD_55&community=SB&longitude=-69.9&latitude=-24.1&format=JSON` (Atacama)
+
+Respuesta real, recortada a los valores anuales (`ANN`); cada serie trae también los 12 meses:
 
 ```json
 {
   "type": "Feature",
-  "id": "S2B_MSIL2A_20261113T143649_N0513_R096_T19KGT_20261113T181914",
-  "collection": "sentinel-2-l2a",
-  "bbox": [-68.0, -21.0, -67.0, -20.0],
+  "geometry": { "type": "Point", "coordinates": [-69.9, -24.1, 1261.0] },
   "properties": {
-    "datetime": "2026-11-13T14:36:49.024000Z",
-    "platform": "sentinel-2b",
-    "constellation": "sentinel-2",
-    "instruments": ["msi"],
-    "eo:cloud_cover": 54.38
-  },
-  "assets": {
-    "thumbnail": {
-      "href": "https://zipper.dataspace.copernicus.eu/.../thumbnail.png",
-      "type": "image/png"
-    },
-    "B02_10m": {
-      "href": "https://zipper.dataspace.copernicus.eu/.../B02.jp2",
-      "title": "Banda Azul (10m)"
-    },
-    "B04_10m": {
-      "href": "https://zipper.dataspace.copernicus.eu/.../B04.jp2",
-      "title": "Banda Roja (10m)"
-    },
-    "B08_10m": {
-      "href": "https://zipper.dataspace.copernicus.eu/.../B08.jp2",
-      "title": "Infrarrojo Cercano (NIR 10m)"
-    },
-    "SCL_20m": {
-      "href": "https://zipper.dataspace.copernicus.eu/.../SCL.jp2",
-      "title": "Scene Classification (Máscara de nubes, suelo y agua)"
+    "parameter": {
+      "CLOUD_AMT": { "ANN": 20.57 },
+      "AOD_55": { "ANN": 0.04 }
     }
-  }
+  },
+  "header": { "api": { "name": "POWER Climatology API" }, "fill_value": -999.0 }
 }
 ```
+
+Los valores `-999.0` indican que no hay dato; el backend responde 404 en ese caso.
 
 ---
 
