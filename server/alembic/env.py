@@ -59,7 +59,8 @@ def include_object(object, name, type_, reflected, compare_to):  # noqa: A002
 
 target_metadata = SQLModel.metadata
 
-DATABASE_URL: str = settings.database_url_normalized
+# Una URL fijada en la configuración de Alembic (por ejemplo, desde las pruebas) manda sobre .env.
+DATABASE_URL: str = config.get_main_option("sqlalchemy.url") or settings.database_url_normalized
 
 
 def _is_sqlite(url: str) -> bool:
