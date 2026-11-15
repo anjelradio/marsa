@@ -21,6 +21,7 @@ import { Card } from "@/components/ui/card";
 import { MarsPlanet } from "@/features/mars/presentation/components/mars-planet";
 import { cn } from "@/lib/utils";
 import { MarsMissionPanels } from "./mars-mission-panels";
+import styles from "./mars-dashboard.module.css";
 import stars from "./starfield.module.css";
 import { useTranslation } from "@/i18n/context";
 import { LanguageSwitcher } from "@/features/shared/presentation/components/language-switcher";
@@ -172,7 +173,10 @@ export default function HomePage() {
         className="relative mx-auto grid max-w-[1600px] gap-7 px-4 py-5 sm:px-7 lg:min-h-[max(680px,100svh)] lg:gap-0 lg:px-4"
       >
         {/* Header Branding */}
-        <header className="text-app-primary-foreground lg:absolute lg:top-5 lg:left-4 z-30">
+        <header className={cn(
+          "text-app-primary-foreground lg:absolute lg:top-5 lg:left-4 z-30 motion-safe:transition-opacity motion-safe:duration-200",
+          isExploring && "opacity-0",
+        )}>
           <div className="flex items-start gap-1 font-headline text-3xl font-semibold leading-none tracking-tight">
             {dict.common.appName} <Sparkles aria-hidden="true" className="size-3.5 fill-current text-[#ffab57]" />
           </div>
@@ -182,7 +186,7 @@ export default function HomePage() {
         <aside
           aria-label="Mars Surface Characteristics"
           className={cn(
-            "order-4 grid grid-cols-1 gap-2.5 sm:grid-cols-3 lg:absolute lg:top-20 lg:left-4 lg:z-20 lg:flex lg:w-52 lg:flex-col lg:gap-3 transform-gpu transition-[transform,opacity] duration-700 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+            "order-4 grid grid-cols-1 gap-2.5 sm:grid-cols-3 lg:absolute lg:top-20 lg:left-4 lg:z-20 lg:flex lg:w-52 lg:flex-col lg:gap-3 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
             isExploring ? "lg:-translate-x-72 lg:opacity-0 pointer-events-none" : "lg:translate-x-0 lg:opacity-100"
           )}
         >
@@ -216,105 +220,107 @@ export default function HomePage() {
         </aside>
 
         {/* 3D Planet Container: Implicit Interaction (pointer cursor, soft ambient glow, click to explore) */}
-        <div
-          role="button"
-          tabIndex={0}
-          aria-label={dict.mars.title}
-          onClick={() => {
-            if (!isExploring) setIsExploring(true);
-          }}
-          onKeyDown={(e) => {
-            if ((e.key === "Enter" || e.key === " ") && !isExploring) {
-              setIsExploring(true);
-            }
-          }}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          className={cn(
-            "relative order-1 mx-auto aspect-square w-full max-w-[580px] z-10 outline-none transform-gpu transition-[transform,top,left,width] duration-1000 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] focus-visible:ring-2 focus-visible:ring-[#ffab57]/80 focus-visible:ring-offset-4 focus-visible:ring-offset-black motion-reduce:transition-none",
-            isExploring
-              ? "lg:absolute lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 lg:w-[min(65%,82svh)] lg:max-w-none cursor-grab active:cursor-grabbing"
-              : "lg:pointer-events-auto lg:absolute lg:top-[50.3%] lg:left-[38.4%] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:w-[min(50%,71svh)] lg:max-w-none cursor-pointer"
-          )}
-        >
-          <MarsPlanet
-            isHovered={isHovered && !isExploring}
-            isExploring={isExploring}
-          />
+        <div className={cn(styles.planetStage, "relative z-10 order-1")} data-exploring={isExploring}>
+          <div
+            role="button"
+            tabIndex={0}
+            aria-label={dict.mars.title}
+            onClick={() => {
+              if (!isExploring) setIsExploring(true);
+            }}
+            onKeyDown={(e) => {
+              if ((e.key === "Enter" || e.key === " ") && !isExploring) {
+                e.preventDefault();
+                setIsExploring(true);
+              }
+            }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            className={cn(
+              styles.planet,
+              "pointer-events-auto relative mx-auto aspect-square w-full max-w-[580px] outline-none focus-visible:ring-2 focus-visible:ring-[#ffab57]/80 focus-visible:ring-offset-4 focus-visible:ring-offset-black",
+              isExploring ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"
+            )}
+          >
+            <MarsPlanet
+              isHovered={isHovered && !isExploring}
+              isExploring={isExploring}
+            />
 
-          {/* Exploration Mode: Interactive Surface Landmarks / POIs */}
-          {isExploring && (
-            <div className="pointer-events-auto absolute inset-0 z-30 animate-in fade-in duration-700 delay-500 motion-reduce:animate-none">
-              {landmarks.map((poi) => {
-                const isActive = activeLandmark === poi.id;
-                return (
-                  <div
-                    key={poi.id}
-                    className={cn(
-                      "absolute -translate-x-1/2 -translate-y-1/2 transition-[transform,opacity] duration-300 motion-reduce:transition-none",
-                      poi.positionClass
-                    )}
-                  >
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveLandmark(isActive ? null : poi.id);
-                      }}
+            {/* Exploration Mode: Interactive Surface Landmarks / POIs */}
+            {isExploring && (
+              <div className="pointer-events-none absolute inset-0 z-30 animate-in fade-in fill-mode-both duration-240 lg:[animation-delay:120ms] motion-reduce:animate-none">
+                {landmarks.map((poi) => {
+                  const isActive = activeLandmark === poi.id;
+                  return (
+                    <div
+                      key={poi.id}
                       className={cn(
-                        "group flex items-center gap-1.5 rounded-full border px-2.5 py-1 backdrop-blur-md text-[0.68rem] font-semibold transition-[color,background-color,border-color,transform,box-shadow] duration-300 shadow-lg cursor-pointer motion-reduce:transition-none",
-                        isActive
-                          ? "border-[#ffab57] bg-[#39190d]/90 text-white scale-110 shadow-[0_0_20px_#ffab57a0]"
-                          : "border-white/20 bg-black/60 text-white/90 hover:border-white/40 hover:bg-black/80 hover:scale-105"
+                        "absolute -translate-x-1/2 -translate-y-1/2 transition-[transform,opacity] duration-300 motion-reduce:transition-none",
+                        poi.positionClass
                       )}
                     >
-                      <span className="relative flex size-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ffab57] opacity-75 motion-reduce:animate-none" />
-                        <span className="relative inline-flex rounded-full size-2 bg-[#ffab57]" />
-                      </span>
-                      <span>{poi.name}</span>
-                    </button>
-
-                    {/* Popover detail card for active landmark */}
-                    {isActive && (
-                      <div
-                        onClick={(e) => e.stopPropagation()}
-                        className="absolute top-8 left-1/2 -translate-x-1/2 z-40 w-64 rounded-2xl border border-white/20 bg-[#160b1e]/90 p-3 shadow-2xl backdrop-blur-xl animate-in zoom-in-95 duration-200 motion-reduce:animate-none"
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveLandmark(isActive ? null : poi.id);
+                        }}
+                        className={cn(
+                          "group pointer-events-auto flex items-center gap-1.5 rounded-full border px-2.5 py-1 backdrop-blur-md text-[0.68rem] font-semibold transition-[color,background-color,border-color,transform,box-shadow] duration-300 shadow-lg cursor-pointer motion-reduce:transition-none",
+                          isActive
+                            ? "border-[#ffab57] bg-[#39190d]/90 text-white scale-110 shadow-[0_0_20px_#ffab57a0]"
+                            : "border-white/20 bg-black/60 text-white/90 hover:border-white/40 hover:bg-black/80 hover:scale-105"
+                        )}
                       >
-                        <div className="flex items-start justify-between gap-1">
-                          <div>
-                            <p className="text-xs font-bold text-white flex items-center gap-1">
-                              <MapPin className="size-3 text-[#ffab57]" /> {poi.name}
-                            </p>
-                            <p className="text-[0.62rem] text-[#ffab57] font-medium">{poi.type}</p>
+                        <span className="relative flex size-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ffab57] opacity-75 motion-reduce:animate-none" />
+                          <span className="relative inline-flex rounded-full size-2 bg-[#ffab57]" />
+                        </span>
+                        <span>{poi.name}</span>
+                      </button>
+
+                      {/* Popover detail card for active landmark */}
+                      {isActive && (
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          className="pointer-events-auto absolute top-8 left-1/2 -translate-x-1/2 z-40 w-64 rounded-2xl border border-white/20 bg-[#160b1e]/90 p-3 shadow-2xl backdrop-blur-xl animate-in zoom-in-95 duration-200 motion-reduce:animate-none"
+                        >
+                          <div className="flex items-start justify-between gap-1">
+                            <div>
+                              <p className="text-xs font-bold text-white flex items-center gap-1">
+                                <MapPin className="size-3 text-[#ffab57]" /> {poi.name}
+                              </p>
+                              <p className="text-[0.62rem] text-[#ffab57] font-medium">{poi.type}</p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setActiveLandmark(null)}
+                              className="rounded-full p-0.5 text-white/60 hover:text-white hover:bg-white/10"
+                            >
+                              <X className="size-3.5" />
+                            </button>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => setActiveLandmark(null)}
-                            className="rounded-full p-0.5 text-white/60 hover:text-white hover:bg-white/10"
-                          >
-                            <X className="size-3.5" />
-                          </button>
+                          <p className="mt-1.5 text-[0.68rem] leading-relaxed text-app-secondary/85">
+                            {poi.desc}
+                          </p>
+                          <p className="mt-2 text-[0.62rem] font-mono text-white/60 border-t border-white/10 pt-1">
+                            📍 {poi.coord}
+                          </p>
                         </div>
-                        <p className="mt-1.5 text-[0.68rem] leading-relaxed text-app-secondary/85">
-                          {poi.desc}
-                        </p>
-                        <p className="mt-2 text-[0.62rem] font-mono text-white/60 border-t border-white/10 pt-1">
-                          📍 {poi.coord}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Mars Title & Subtitle */}
         <div
           className={cn(
-            "relative z-20 order-2 -mt-[18%] pl-[5%] lg:absolute lg:top-[74.5%] lg:left-[14%] lg:mt-0 lg:pl-0 transform-gpu transition-[transform,opacity] duration-700 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+            "relative z-20 order-2 -mt-[18%] pl-[5%] lg:absolute lg:top-[74.5%] lg:left-[14%] lg:mt-0 lg:pl-0 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
             isExploring ? "lg:translate-y-36 lg:opacity-0 pointer-events-none" : "lg:translate-y-0 lg:opacity-100"
           )}
         >
@@ -332,7 +338,7 @@ export default function HomePage() {
         {/* 4 Top Fact Cards */}
         <dl
           className={cn(
-            "order-3 grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:absolute lg:inset-x-4 lg:top-11 lg:left-[22.7%] lg:z-0 transform-gpu transition-[transform,opacity] duration-700 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+            "order-3 grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:absolute lg:inset-x-4 lg:top-11 lg:left-[22.7%] lg:z-0 transform-gpu transition-[translate,opacity] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
             isExploring ? "lg:-translate-y-48 lg:opacity-0 pointer-events-none" : "lg:translate-y-0 lg:opacity-100"
           )}
         >
@@ -367,7 +373,7 @@ export default function HomePage() {
 
         {/* Exploration Mode Overlays: Return button & subtle drag hint */}
         {isExploring && (
-          <div className="absolute inset-x-4 top-5 z-40 flex items-center justify-between animate-in fade-in duration-700 delay-500 motion-reduce:animate-none">
+          <div className={cn(styles.explorationControls, "absolute inset-x-4 top-5 z-40 flex items-center justify-between")}>
             <div className="flex items-center gap-3">
               <Button
                 onClick={() => {

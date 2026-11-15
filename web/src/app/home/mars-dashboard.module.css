@@ -1,0 +1,49 @@
+@media (min-width: 64rem) {
+  .planetStage {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    container-type: size;
+    pointer-events: none;
+  }
+
+  .planetStage > .planet {
+    --overview-width: min(50cqw, 71svh);
+    --exploration-width: min(65cqw, 82svh);
+    --overview-scale: 0.82;
+
+    width: var(--exploration-width);
+    max-width: none;
+    /* Keep the canvas at a stable layout size while the visible globe moves. */
+    transform: translate3d(-11.6cqw, 0.3cqh, 0) scale(var(--overview-scale));
+  }
+
+  .planetStage[data-exploring="true"] > .planet {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  @supports (scale: calc(1px / 1px)) {
+    .planetStage > .planet {
+      --overview-scale: calc(var(--overview-width) / var(--exploration-width));
+    }
+  }
+}
+
+@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+  .planetStage > .planet {
+    transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .explorationControls {
+    animation: reveal-controls 240ms ease-out both;
+  }
+}
+
+@keyframes reveal-controls {
+  from {
+    opacity: 0;
+  }
+}

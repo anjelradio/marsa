@@ -8,9 +8,15 @@ const radius = 0.96;
 
 // Superficie y atmósfera adaptadas de Aditya-567/3D-Planets (Apache-2.0).
 export function MarsPlanet({
+  className,
+  isHovered = false,
+  isExploring = false,
   showSurfaceOverlay = true,
   rotationSpeed = 0.012,
 }: {
+  className?: string;
+  isHovered?: boolean;
+  isExploring?: boolean;
   showSurfaceOverlay?: boolean;
   rotationSpeed?: number;
 }) {
@@ -107,8 +113,6 @@ export function MarsPlanet({
     let isDragging = false;
     let prevX = 0;
     let prevY = 0;
-    let previousPointerTime = 0;
-    let angularVelocity = 0;
 
     const renderOnce = () => renderer.render(scene, camera);
 
@@ -116,15 +120,11 @@ export function MarsPlanet({
       if (!isDragging) return;
       const dx = e.clientX - prevX;
       const dy = e.clientY - prevY;
-      const now = performance.now();
-      const elapsed = Math.max(16, now - previousPointerTime) / 1000;
       prevX = e.clientX;
       prevY = e.clientY;
-      previousPointerTime = now;
 
       planet.rotation.y += dx * 0.006;
       planet.rotation.x = Math.max(-0.65, Math.min(0.65, planet.rotation.x + dy * 0.004));
-      angularVelocity = THREE.MathUtils.clamp((dx * 0.006) / elapsed, -1.8, 1.8);
 
       if (reducedMotion.matches) renderOnce();
     };
@@ -142,8 +142,6 @@ export function MarsPlanet({
       isDragging = true;
       prevX = e.clientX;
       prevY = e.clientY;
-      previousPointerTime = performance.now();
-      angularVelocity = 0;
       window.addEventListener("pointermove", onPointerMove, { passive: true });
       window.addEventListener("pointerup", onPointerUp, { passive: true });
       window.addEventListener("pointercancel", onPointerUp, { passive: true });
@@ -194,6 +192,8 @@ export function MarsPlanet({
 
     return () => {
       disposed = true;
+      onPointerUp();
+      domElement.removeEventListener("pointerdown", onPointerDown);
       renderer.setAnimationLoop(null);
       observer.disconnect();
       reducedMotion.removeEventListener("change", syncMotion);
