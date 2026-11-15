@@ -7,7 +7,13 @@ import { createMarsSurfaceOverlay } from "./mars-surface-overlay";
 const radius = 0.96;
 
 // Superficie y atmósfera adaptadas de Aditya-567/3D-Planets (Apache-2.0).
-export function MarsPlanet() {
+export function MarsPlanet({
+  showSurfaceOverlay = true,
+  rotationSpeed = 0.012,
+}: {
+  showSurfaceOverlay?: boolean;
+  rotationSpeed?: number;
+}) {
   const mount = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -26,9 +32,17 @@ export function MarsPlanet() {
     container.appendChild(renderer.domElement);
 
     const loader = new THREE.TextureLoader();
-    const texture = loader.load("/mars/marsmap.jpg");
+    let disposed = false;
+    let ready = false;
+    const texture = loader.load("/mars/marsmap.jpg", () => {
+      if (disposed) return;
+      ready = true;
+      syncMotion();
+    });
     texture.colorSpace = THREE.SRGBColorSpace;
-    const bump = loader.load("/mars/marsbump.jpg");
+    const bump = loader.load("/mars/marsbump.jpg", () => {
+      if (!disposed && ready && !document.hidden) renderer.render(scene, camera);
+    });
     const geometry = new THREE.SphereGeometry(radius, 80, 64);
     const material = new THREE.MeshPhongMaterial({
       map: texture,
@@ -64,8 +78,8 @@ export function MarsPlanet() {
     planet.rotation.set(-0.08, -2.12, 0.22, "ZYX");
     scene.add(planet);
 
-    const surfaceOverlay = createMarsSurfaceOverlay(radius);
-    scene.add(surfaceOverlay.group);
+    const surfaceOverlay = showSurfaceOverlay ? createMarsSurfaceOverlay(radius) : null;
+    if (surfaceOverlay) scene.add(surfaceOverlay.group);
 
     scene.add(new THREE.AmbientLight(0xff411b, 0.08));
     const light = new THREE.DirectionalLight(0xffefe7, 10);
@@ -80,31 +94,49 @@ export function MarsPlanet() {
       camera.right = width / height;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height);
+      if (ready && !document.hidden) renderer.render(scene, camera);
     };
     const observer = new ResizeObserver(resize);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    function syncMotion() {
+      renderer.setAnimationLoop(null);
+      if (!ready || document.hidden) return;
+
+      renderer.render(scene, camera);
+      canvas.dataset.rendered = "";
+      if (reducedMotion.matches) return;
+
+      let previousTime: number | undefined;
+      renderer.setAnimationLoop((time) => {
+        const delta = Math.min(0.05, (time - (previousTime ?? time)) / 1000);
+        previousTime = time;
+        planet.rotation.y += delta * rotationSpeed;
+        renderer.render(scene, camera);
+      });
+    }
+
     observer.observe(container);
     resize();
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let previousTime = performance.now();
-    renderer.setAnimationLoop((time) => {
-      const delta = Math.min(0.05, (time - previousTime) / 1000);
-      previousTime = time;
-      if (!reducedMotion.matches) planet.rotation.y += delta * 0.012;
-      renderer.render(scene, camera);
-    });
+    reducedMotion.addEventListener("change", syncMotion);
+    document.addEventListener("visibilitychange", syncMotion);
 
     return () => {
+      disposed = true;
       renderer.setAnimationLoop(null);
       observer.disconnect();
+      reducedMotion.removeEventListener("change", syncMotion);
+      document.removeEventListener("visibilitychange", syncMotion);
       geometry.dispose();
       material.dispose();
       texture.dispose();
       bump.dispose();
-      surfaceOverlay.dispose();
+      surfaceOverlay?.dispose();
       renderer.dispose();
+      renderer.forceContextLoss();
       renderer.domElement.remove();
     };
-  }, []);
+  }, [showSurfaceOverlay, rotationSpeed]);
 
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0">
