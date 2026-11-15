@@ -21,11 +21,8 @@ export function LandingHeader() {
           <LanguageSwitcher variant="ghost" size="sm" />
 
           <nav className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/auth/login">{dict.common.signIn}</Link>
-            </Button>
             <Button size="sm" asChild>
-              <Link href="/auth/signup">{dict.common.signUp}</Link>
+              <Link href="/home">Explore</Link>
             </Button>
           </nav>
         </div>

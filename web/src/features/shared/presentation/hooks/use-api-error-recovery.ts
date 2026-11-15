@@ -22,7 +22,7 @@ export function useApiErrorRecovery() {
         clearJWT();
 
         startTransition(() => {
-          router.replace("/auth/login?reason=session-expired");
+          router.replace("/");
         });
         return true;
       }
