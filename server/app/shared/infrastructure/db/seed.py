@@ -2,6 +2,9 @@
 
 import json
 import logging
+import re
+import unicodedata
+from datetime import datetime, timezone
 from pathlib import Path
 
 from sqlmodel import Session, select
@@ -9,9 +12,20 @@ from sqlmodel import Session, select
 from app.modules.caracteristica.infrastructure.persistence.models.caracteristica_model import (
     CaracteristicaModel,
 )
+from app.modules.composicion_celda.domain.entities.composicion_celda import (
+    ComposicionCelda,
+)
+from app.modules.composicion_celda.infrastructure.persistence.models.composicion_celda_model import (
+    ComposicionCeldaModel,
+)
+from app.modules.corrida_analisis.infrastructure.persistence.models.corrida_analisis_model import (
+    CorridaAnalisisModel,
+)
 from app.modules.cuerpo_celeste.infrastructure.persistence.models.cuerpo_celeste_model import (
     CuerpoCelesteModel,
 )
+from app.modules.medicion.domain.entities.medicion import Medicion
+from app.modules.sitio.domain.entities.sitio import Sitio
 from app.modules.dataset.infrastructure.persistence.models.dataset_model import (
     DatasetModel,
 )
@@ -23,9 +37,9 @@ def seed_initial_data(session: Session) -> None:
     """Inserta cuerpos celestes, características y datasets iniciales si no existen."""
     # 1. Cuerpos celestes
     cuerpos = [
-        {"nombre": "Tierra", "tipo": "Planeta rocoso", "radio_km": 6371.0},
-        {"nombre": "Marte", "tipo": "Planeta rocoso", "radio_km": 3389.5},
-        {"nombre": "Luna", "tipo": "Satélite natural", "radio_km": 1737.4},
+        {"nombre": "Tierra", "radio_km": 6371.0},
+        {"nombre": "Marte", "radio_km": 3389.5},
+        {"nombre": "Luna", "radio_km": 1737.4},
     ]
     for c in cuerpos:
         exists = session.exec(
@@ -33,6 +47,9 @@ def seed_initial_data(session: Session) -> None:
         ).first()
         if not exists:
             session.add(CuerpoCelesteModel(**c))
+        elif exists.radio_km is None:
+            exists.radio_km = c["radio_km"]
+            session.add(exists)
 
     # 2. Datasets
     datasets = [
@@ -148,7 +165,7 @@ def seed_initial_data(session: Session) -> None:
         ).first():
             session.add(DatasetModel(**d))
 
-    # 3. Características (los pesos suman 1.0). Si ya existen se actualizan.
+    # 3. Características (los pesos de cada grupo suman 1.0). Si ya existen se actualizan.
     for car in CARACTERISTICAS:
         existente = session.exec(
             select(CaracteristicaModel).where(CaracteristicaModel.nombre == car["nombre"])
@@ -157,6 +174,9 @@ def seed_initial_data(session: Session) -> None:
             existente.unidad = car["unidad"]
             existente.rango = car["rango"]
             existente.peso = car["peso"]
+            existente.grupo = car["grupo"]
+            existente.valor_min = car["valor_min"]
+            existente.valor_max = car["valor_max"]
             session.add(existente)
         else:
             session.add(CaracteristicaModel(**car))
@@ -167,34 +187,28 @@ def seed_initial_data(session: Session) -> None:
 
 
 
-# Rango y mínimo usados para normalizar a [0, 1] cada característica.
+# Características físicas. El ORDEN importa: los valores de SITIOS van por posición.
+# `peso` es el peso dentro de su grupo (los de cada grupo suman 1) y
+# valor_min/valor_max el rango físicamente posible, que se usa para validar y normalizar.
 CARACTERISTICAS = [
-    {"nombre": "Temperatura Superficial", "unidad": "K", "rango": 350.0, "peso": 0.25},
-    {"nombre": "Nubosidad", "unidad": "%", "rango": 100.0, "peso": 0.10},
-    {
-        "nombre": "Inercia Térmica",
-        "unidad": "J m^-2 K^-1 s^-1/2",
-        "rango": 800.0,
-        "peso": 0.15,
-    },
-    {"nombre": "Elevación", "unidad": "m", "rango": 30000.0, "peso": 0.10},
-    {"nombre": "Profundidad Óptica de Polvo", "unidad": "tau", "rango": 5.0, "peso": 0.10},
-    {"nombre": "Hielo/Agua Superficial", "unidad": "%", "rango": 100.0, "peso": 0.15},
-    {"nombre": "Rugosidad del Terreno", "unidad": "m", "rango": 100.0, "peso": 0.15},
-]
-_MINIMO = {"Elevación": -8000.0}
-
-CARACTERISTICAS_MINERALOGICAS = [
-    {"nombre": "Plagioclasa", "unidad": "% wt", "rango": 100.0, "peso": 0.15},
-    {"nombre": "Piroxeno (Augita/Pigeonita)", "unidad": "% wt", "rango": 100.0, "peso": 0.15},
-    {"nombre": "Olivino (Forsterita)", "unidad": "% wt", "rango": 100.0, "peso": 0.15},
-    {"nombre": "Óxidos Férricos (Hematita/Magnetita)", "unidad": "% wt", "rango": 100.0, "peso": 0.15},
-    {"nombre": "Filosilicatos / Minerales Hidratados", "unidad": "% wt", "rango": 100.0, "peso": 0.15},
-    {"nombre": "Ilmenita", "unidad": "% wt", "rango": 100.0, "peso": 0.15},
-    {"nombre": "Sulfatos (Jarosita/Yeso)", "unidad": "% wt", "rango": 100.0, "peso": 0.10},
+    {"nombre": "Temperatura Superficial", "unidad": "K", "rango": 350.0, "peso": 1 / 3,
+     "grupo": "fisico", "valor_min": 0.0, "valor_max": 500.0},
+    {"nombre": "Nubosidad", "unidad": "%", "rango": 100.0, "peso": 2 / 15,
+     "grupo": "fisico", "valor_min": 0.0, "valor_max": 100.0},
+    {"nombre": "Inercia Térmica", "unidad": "J m^-2 K^-1 s^-1/2", "rango": 800.0, "peso": 1 / 5,
+     "grupo": "fisico", "valor_min": 0.0, "valor_max": 2500.0},
+    {"nombre": "Elevación", "unidad": "m", "rango": 30000.0, "peso": 2 / 5,
+     "grupo": "terreno", "valor_min": -12000.0, "valor_max": 22000.0},
+    {"nombre": "Profundidad Óptica de Polvo", "unidad": "tau", "rango": 5.0, "peso": 2 / 15,
+     "grupo": "fisico", "valor_min": 0.0, "valor_max": 10.0},
+    {"nombre": "Hielo/Agua Superficial", "unidad": "%", "rango": 100.0, "peso": 1 / 5,
+     "grupo": "fisico", "valor_min": 0.0, "valor_max": 100.0},
+    {"nombre": "Rugosidad del Terreno", "unidad": "m", "rango": 100.0, "peso": 3 / 5,
+     "grupo": "terreno", "valor_min": 0.0, "valor_max": 1000.0},
 ]
 
-# Mediciones mineralógicas reales/de referencia por sitio (% wt)
+# Composición mineral de cada sitio (% wt). No son variables físicas: se guardan en
+# composicion_celda y solo las usa el análisis geológico.
 MEDICIONES_MINERALOGICAS = {
     "Desierto de Atacama (Yungay)": {
         "dataset": "GLiM (Global Lithological Map)",
@@ -279,13 +293,35 @@ def _cargar_mediciones_reales() -> dict[str, dict[str, dict]]:
     return json.loads(_REALES.read_text(encoding="utf-8")).get("sitios", {})
 
 
+VERSION_SEED = "v2-grupos"
+
+
+def _slug(texto: str) -> str:
+    """Texto en minúsculas, sin acentos y con guiones: para el código de un sitio."""
+    base = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode()
+    return re.sub(r"[^a-z0-9]+", "-", base.lower()).strip("-")
+
+
+def _normalizar(valor: float, car: CaracteristicaModel) -> float:
+    """Valor en [0, 1] según el rango físico de la característica."""
+    minimo, maximo = car.valor_min, car.valor_max
+    if minimo is None or maximo is None:
+        minimo, maximo = 0.0, car.rango
+    return max(0.0, min(1.0, (valor - minimo) / (maximo - minimo)))
+
+
 def _seed_sitios_y_mediciones(session: Session) -> None:
-    """Crea sitios, mediciones y analogías persistidas si no existen."""
+    """Crea sitios, mediciones, composición mineral y la corrida de analogías.
+
+    Cada dato se valida con las entidades de dominio antes de guardarse: un valor fuera de su
+    rango físico lanza ``InvalidMedicionDataException`` y nunca se sustituye por otro.
+    """
     from app.modules.analogia.application.queries.ranking_query import (
         mejor_coincidencia,
     )
     from app.modules.analogia.domain.services.similarity import (
         METODO,
+        PESOS_GRUPO,
         CaracteristicaSpec,
     )
     from app.modules.analogia.infrastructure.persistence.models.analogia_model import (
@@ -305,20 +341,35 @@ def _seed_sitios_y_mediciones(session: Session) -> None:
     orden = [c["nombre"] for c in CARACTERISTICAS]
 
     for cuerpo, nombre, tipo, lon, lat, valores in SITIOS:
+        codigo = "R_" + _slug(nombre)
         sitio = session.exec(
             select(SitioModel).where(
                 SitioModel.nombre == nombre, SitioModel.cuerpo_id == cuerpos[cuerpo]
             )
         ).first()
         if sitio is None:
-            sitio = SitioModel(
+            valido = Sitio.create(
                 cuerpo_id=cuerpos[cuerpo],
                 nombre=nombre,
                 tipo=tipo,
                 geom={"type": "Point", "coordinates": [lon, lat]},
+                clase="referencia",
+                codigo=codigo,
+            )
+            sitio = SitioModel(
+                cuerpo_id=valido.cuerpo_id,
+                nombre=valido.nombre,
+                tipo=valido.tipo,
+                geom=valido.geom,
+                clase=valido.clase,
+                codigo=valido.codigo,
             )
             session.add(sitio)
             session.flush()
+        elif sitio.codigo is None:
+            sitio.codigo = codigo
+            session.add(sitio)
+
         for car_nombre, valor in zip(orden, valores):
             car = cars[car_nombre]
             dataset_nombre = _DATASET_POR_CUERPO[cuerpo]
@@ -327,8 +378,14 @@ def _seed_sitios_y_mediciones(session: Session) -> None:
                 valor = real["valor"]
                 dataset_nombre = real["dataset"]
             dataset_id = datasets[dataset_nombre]
-            minimo = _MINIMO.get(car_nombre, 0.0)
-            normalizado = max(0.0, min(1.0, (valor - minimo) / car.rango))
+            valida = Medicion.create(
+                sitio_id=sitio.id,
+                caracteristica_id=car.id,
+                dataset_id=dataset_id,
+                valor=valor,
+                valor_normalizado=_normalizar(valor, car),
+                rango_fisico=(car.valor_min, car.valor_max),
+            )
             existente = session.exec(
                 select(MedicionModel).where(
                     MedicionModel.sitio_id == sitio.id,
@@ -336,25 +393,82 @@ def _seed_sitios_y_mediciones(session: Session) -> None:
                 )
             ).first()
             if existente:
-                existente.valor = float(valor)
+                existente.valor = valida.valor
                 existente.dataset_id = dataset_id
-                existente.valor_normalizado = normalizado
+                existente.valor_normalizado = valida.valor_normalizado
                 session.add(existente)
             else:
                 session.add(
                     MedicionModel(
-                        sitio_id=sitio.id,
-                        caracteristica_id=car.id,
-                        dataset_id=dataset_id,
-                        valor=float(valor),
-                        valor_normalizado=normalizado,
+                        sitio_id=valida.sitio_id,
+                        caracteristica_id=valida.caracteristica_id,
+                        dataset_id=valida.dataset_id,
+                        valor=valida.valor,
+                        valor_normalizado=valida.valor_normalizado,
                     )
                 )
+
+        minerales = MEDICIONES_MINERALOGICAS.get(nombre)
+        if minerales:
+            dataset_id = datasets[minerales["dataset"]]
+            for mineral, porcentaje in minerales["minerales"].items():
+                comp = ComposicionCelda.create(
+                    sitio_id=sitio.id,
+                    dataset_id=dataset_id,
+                    tipo="mineral",
+                    nombre=mineral,
+                    porcentaje=porcentaje,
+                )
+                existente = session.exec(
+                    select(ComposicionCeldaModel).where(
+                        ComposicionCeldaModel.sitio_id == comp.sitio_id,
+                        ComposicionCeldaModel.dataset_id == comp.dataset_id,
+                        ComposicionCeldaModel.tipo == comp.tipo,
+                        ComposicionCeldaModel.nombre == comp.nombre,
+                    )
+                ).first()
+                if existente:
+                    existente.porcentaje = comp.porcentaje
+                    session.add(existente)
+                else:
+                    session.add(
+                        ComposicionCeldaModel(
+                            sitio_id=comp.sitio_id,
+                            dataset_id=comp.dataset_id,
+                            tipo=comp.tipo,
+                            nombre=comp.nombre,
+                            porcentaje=comp.porcentaje,
+                        )
+                    )
     session.commit()
 
-    # Analogías persistidas: cada sitio terrestre contra su mejor destino por cuerpo.
+    # Corrida del seed: se identifica por versión y método, así que no crece en cada arranque.
+    parametros = {"pesos_grupo": PESOS_GRUPO, "origen": "seed"}
+    corrida = session.exec(
+        select(CorridaAnalisisModel).where(
+            CorridaAnalisisModel.version == VERSION_SEED,
+            CorridaAnalisisModel.metodo == METODO,
+        )
+    ).first()
+    if corrida is None:
+        corrida = CorridaAnalisisModel(
+            version=VERSION_SEED, metodo=METODO, parametros=parametros
+        )
+    else:
+        corrida.fecha = datetime.now(timezone.utc)
+        corrida.parametros = parametros
+    session.add(corrida)
+    session.flush()
+    # Las analogías de esta corrida se recalculan con los datos vigentes; las de otras
+    # corridas (por ejemplo la inicial de la migración) se conservan como historial.
+    for vieja in session.exec(
+        select(AnalogiaModel).where(AnalogiaModel.corrida_id == corrida.id)
+    ).all():
+        session.delete(vieja)
+    session.flush()
+
     specs = [
-        CaracteristicaSpec(c.id, c.nombre, c.unidad, c.rango, c.peso)
+        CaracteristicaSpec(c.id, c.nombre, c.unidad, c.rango, c.peso, c.grupo)
         for c in cars.values()
     ]
     valores_por_sitio: dict[int, dict[int, float]] = {}
@@ -362,12 +476,6 @@ def _seed_sitios_y_mediciones(session: Session) -> None:
         valores_por_sitio.setdefault(m.sitio_id, {})[m.caracteristica_id] = m.valor
     sitios = session.exec(select(SitioModel)).all()
     tierra = [s for s in sitios if s.cuerpo_id == cuerpos["Tierra"]]
-    # Las analogías sembradas se recalculan siempre con los datos vigentes.
-    for vieja in session.exec(
-        select(AnalogiaModel).where(AnalogiaModel.metodo == METODO)
-    ).all():
-        session.delete(vieja)
-    session.flush()
     for destino in ("Marte", "Luna"):
         destinos = [s for s in sitios if s.cuerpo_id == cuerpos[destino]]
         for t in tierra:
@@ -375,18 +483,14 @@ def _seed_sitios_y_mediciones(session: Session) -> None:
             if par is None:
                 continue
             sitio_destino, r = par
-            if session.exec(
-                select(AnalogiaModel).where(
-                    AnalogiaModel.sitio_tierra_id == t.id,
-                    AnalogiaModel.sitio_destino_id == sitio_destino.id,
-                )
-            ).first():
-                continue
             session.add(
                 AnalogiaModel(
+                    corrida_id=corrida.id,
                     sitio_tierra_id=t.id,
                     sitio_destino_id=sitio_destino.id,
                     similitud=r.similitud,
+                    sim_fisica=r.por_grupo.get("fisico"),
+                    sim_terreno=r.por_grupo.get("terreno"),
                     cobertura=r.cobertura,
                     metodo=r.metodo,
                     coincide=r.coincide,
@@ -394,4 +498,3 @@ def _seed_sitios_y_mediciones(session: Session) -> None:
                 )
             )
     session.commit()
-

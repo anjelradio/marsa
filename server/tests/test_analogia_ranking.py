@@ -17,8 +17,11 @@ from app.modules.analogia.domain.services.similarity import (
 from app.shared.infrastructure.db.seed import CARACTERISTICAS, seed_initial_data
 
 
-def test_pesos_de_caracteristicas_suman_uno() -> None:
-    assert sum(c["peso"] for c in CARACTERISTICAS) == pytest.approx(1.0)
+def test_pesos_de_cada_grupo_suman_uno() -> None:
+    grupos = {c["grupo"] for c in CARACTERISTICAS}
+    assert grupos == {"fisico", "terreno"}
+    for grupo in grupos:
+        assert sum(c["peso"] for c in CARACTERISTICAS if c["grupo"] == grupo) == pytest.approx(1.0)
 
 
 def test_similitud_caracteristica_extremos_y_acotado() -> None:
@@ -67,7 +70,10 @@ def test_ranking_ordenado_y_con_explicacion(client: TestClient, destino: str) ->
     for f in filas:
         assert 0 <= f["similitud"] <= 1
         assert f["cobertura"] == pytest.approx(1.0)
-        assert f["metodo"] == "ponderado-v1"
+        assert set(f["por_grupo"]) == {"fisico", "terreno"}  # sin geología todavía
+        assert all(0 <= s <= 1 for s in f["por_grupo"].values())
+        assert {d["grupo"] for d in f["detalle"]} == {"fisico", "terreno"}
+        assert f["metodo"] == "grupos-v1"
         assert f["geom"]["type"] == "Point"
         assert f["geom_destino"]["type"] == "Point"
         assert len(f["detalle"]) == len(CARACTERISTICAS)
@@ -120,4 +126,4 @@ def test_seed_usa_mediciones_reales_con_su_dataset() -> None:
 def test_seed_es_idempotente_y_persiste_analogias(client: TestClient) -> None:
     primera = client.get("/api/analogia/").json()
     assert len(primera) == 10  # 5 sitios terrestres x (Marte, Luna)
-    assert all(a["coincide"] is not None and a["metodo"] == "ponderado-v1" for a in primera)
+    assert all(a["coincide"] is not None and a["metodo"] == "grupos-v1" for a in primera)

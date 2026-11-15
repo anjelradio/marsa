@@ -1,5 +1,7 @@
 """Esquemas Pydantic para la API HTTP de medicion."""
 
+from datetime import date
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -10,6 +12,10 @@ class CreateMedicionRequest(BaseModel):
     valor: float
     resolucion: float | None = None
     valor_normalizado: float | None = Field(default=None, ge=0, le=1)
+    periodo_inicio: date | None = None
+    periodo_fin: date | None = None
+    incertidumbre: float | None = Field(default=None, ge=0)
+    n_muestras: int | None = Field(default=None, ge=1)
 
 
 class MedicionResponse(BaseModel):
@@ -22,6 +28,10 @@ class MedicionResponse(BaseModel):
     valor: float
     resolucion: float | None
     valor_normalizado: float | None
+    periodo_inicio: date | None = None
+    periodo_fin: date | None = None
+    incertidumbre: float | None = None
+    n_muestras: int | None = None
 
 
 class ExtraerSatelitalRequest(BaseModel):

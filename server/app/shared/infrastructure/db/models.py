@@ -32,3 +32,9 @@ from app.modules.medicion.infrastructure.persistence.models.medicion_model impor
 from app.modules.analogia.infrastructure.persistence.models.analogia_model import (
     AnalogiaModel,
 )
+from app.modules.composicion_celda.infrastructure.persistence.models.composicion_celda_model import (
+    ComposicionCeldaModel,
+)
+from app.modules.corrida_analisis.infrastructure.persistence.models.corrida_analisis_model import (
+    CorridaAnalisisModel,
+)

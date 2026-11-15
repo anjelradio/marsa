@@ -48,10 +48,22 @@ from app.modules.sitio.domain.exceptions import InvalidSitioDataException
 from app.modules.sitio.infrastructure.persistence.models.sitio_model import SitioModel
 
 
-def test_metadata_registers_all_six_tables_and_columns() -> None:
+def test_metadata_registers_all_tables_and_columns() -> None:
     expected_columns = {
-        "cuerpo_celeste": {"id", "nombre"},
-        "sitio": {"id", "cuerpo_id", "nombre", "tipo", "geom"},
+        "cuerpo_celeste": {"id", "nombre", "radio_km"},
+        "sitio": {
+            "id",
+            "cuerpo_id",
+            "nombre",
+            "tipo",
+            "clase",
+            "codigo",
+            "geom",
+            "lat_min",
+            "lat_max",
+            "lon_min",
+            "lon_max",
+        },
         "dataset": {
             "id",
             "nombre",
@@ -60,7 +72,16 @@ def test_metadata_registers_all_six_tables_and_columns() -> None:
             "resolucion",
             "fecha_descarga",
         },
-        "caracteristica": {"id", "nombre", "unidad", "rango", "peso"},
+        "caracteristica": {
+            "id",
+            "nombre",
+            "unidad",
+            "rango",
+            "peso",
+            "grupo",
+            "valor_min",
+            "valor_max",
+        },
         "medicion": {
             "id",
             "sitio_id",
@@ -69,13 +90,31 @@ def test_metadata_registers_all_six_tables_and_columns() -> None:
             "valor",
             "resolucion",
             "valor_normalizado",
+            "periodo_inicio",
+            "periodo_fin",
+            "incertidumbre",
+            "n_muestras",
         },
+        "composicion_celda": {
+            "id",
+            "sitio_id",
+            "dataset_id",
+            "tipo",
+            "nombre",
+            "porcentaje",
+        },
+        "corrida_analisis": {"id", "version", "metodo", "fecha", "parametros"},
         "analogia": {
             "id",
+            "corrida_id",
             "sitio_tierra_id",
             "sitio_destino_id",
             "similitud",
+            "sim_fisica",
+            "sim_terreno",
+            "sim_geologica",
             "cobertura",
+            "estabilidad",
             "metodo",
             "coincide",
             "difiere",
@@ -104,7 +143,12 @@ def test_foreign_keys_checks_unique_and_postgresql_ddl() -> None:
     } == {
         ("sitio_tierra_id", "sitio.id"),
         ("sitio_destino_id", "sitio.id"),
+        ("corrida_id", "corrida_analisis.id"),
     }
+    assert {
+        (fk.parent.name, fk.target_fullname)
+        for fk in tables["composicion_celda"].foreign_keys
+    } == {("sitio_id", "sitio.id"), ("dataset_id", "dataset.id")}
 
     caract_checks = {
         c.name
@@ -114,6 +158,8 @@ def test_foreign_keys_checks_unique_and_postgresql_ddl() -> None:
     assert caract_checks == {
         "ck_caracteristica_rango_positivo",
         "ck_caracteristica_peso_rango",
+        "ck_caracteristica_grupo_valido",
+        "ck_caracteristica_rango_fisico_orden",
     }
 
     medicion_uniques = [
@@ -128,7 +174,9 @@ def test_foreign_keys_checks_unique_and_postgresql_ddl() -> None:
         for c in tables["analogia"].constraints
         if isinstance(c, UniqueConstraint)
     ]
-    assert ("sitio_tierra_id", "sitio_destino_id") in analogia_uniques
+    assert ("corrida_id", "sitio_tierra_id", "sitio_destino_id") in analogia_uniques
+    # la clave única ahora depende de la corrida
+    assert ("sitio_tierra_id", "sitio_destino_id") not in analogia_uniques
 
     ddl_by_table = {
         t.name: str(CreateTable(t).compile(dialect=pg_dialect()))

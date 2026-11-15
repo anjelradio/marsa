@@ -2,7 +2,7 @@
 
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import JSON
+from sqlalchemy import JSON, CheckConstraint, Double
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -22,11 +22,24 @@ class SitioModel(SQLModel, table=True):
     """Sitio de estudio terrestre, lunar o marciano."""
 
     __tablename__ = "sitio"
+    __table_args__ = (
+        CheckConstraint(
+            "clase IN ('referencia', 'celda')", name="ck_sitio_clase_valida"
+        ),
+    )
 
     id: int | None = Field(default=None, primary_key=True)
     cuerpo_id: int = Field(foreign_key="cuerpo_celeste.id", nullable=False)
     nombre: str = Field(max_length=100, nullable=False)
     tipo: str | None = Field(default=None, max_length=50, nullable=True)
+    # 'referencia' = sitio con nombre propio; 'celda' = celda de la malla global.
+    clase: str = Field(default="referencia", max_length=20, nullable=False)
+    # Identificador único: celda (T_S20_W070) o referencia (R_atacama-yungay).
+    codigo: str | None = Field(default=None, max_length=60, nullable=True, unique=True)
+    lat_min: float | None = Field(default=None, sa_type=Double, nullable=True)
+    lat_max: float | None = Field(default=None, sa_type=Double, nullable=True)
+    lon_min: float | None = Field(default=None, sa_type=Double, nullable=True)
+    lon_max: float | None = Field(default=None, sa_type=Double, nullable=True)
     # Almacena GeoJSON EPSG:4326 en JSONB mientras PostGIS no esté instalado en PostgreSQL 18.
     geom: dict[str, Any] | None = Field(
         default=None,

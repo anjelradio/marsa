@@ -8,6 +8,9 @@ class CreateCaracteristicaRequest(BaseModel):
     unidad: str | None = Field(default=None, max_length=20)
     rango: float = Field(gt=0)
     peso: float = Field(ge=0, le=1)
+    grupo: str = Field(default="fisico", pattern="^(fisico|terreno)$")
+    valor_min: float | None = None
+    valor_max: float | None = None
 
 
 class CaracteristicaResponse(BaseModel):
@@ -18,3 +21,6 @@ class CaracteristicaResponse(BaseModel):
     unidad: str | None
     rango: float
     peso: float
+    grupo: str = "fisico"
+    valor_min: float | None = None
+    valor_max: float | None = None

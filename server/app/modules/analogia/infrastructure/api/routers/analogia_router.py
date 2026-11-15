@@ -4,6 +4,7 @@ from collections.abc import Sequence
 from typing import Annotated, Any, Dict, List, Literal, Optional
 
 from fastapi import APIRouter, HTTPException, Query
+from sqlalchemy import func
 from sqlmodel import select
 
 from app.core.dependencies import DBSession
@@ -34,9 +35,21 @@ router = APIRouter()
 
 
 @router.get("/", response_model=list[AnalogiaResponse], summary="Listar analogías")
-def list_analogias(db: DBSession) -> Sequence[AnalogiaModel]:
-    """Devuelve las analogías registradas en la base de datos."""
-    return db.exec(select(AnalogiaModel)).all()
+def list_analogias(
+    db: DBSession,
+    corrida_id: Annotated[
+        int | None,
+        Query(gt=0, description="Corrida del análisis; por defecto, la más reciente."),
+    ] = None,
+) -> Sequence[AnalogiaModel]:
+    """Devuelve las analogías de una corrida (la más reciente si no se indica otra)."""
+    if corrida_id is None:
+        corrida_id = db.exec(select(func.max(AnalogiaModel.corrida_id))).one()
+    if corrida_id is None:
+        return []
+    return db.exec(
+        select(AnalogiaModel).where(AnalogiaModel.corrida_id == corrida_id)
+    ).all()
 
 
 @router.get(

@@ -25,7 +25,7 @@ class DestinoNoEncontrado(Exception):
 
 def _especificaciones(session: Session) -> list[CaracteristicaSpec]:
     return [
-        CaracteristicaSpec(c.id, c.nombre, c.unidad, c.rango, c.peso)
+        CaracteristicaSpec(c.id, c.nombre, c.unidad, c.rango, c.peso, c.grupo)
         for c in session.exec(select(CaracteristicaModel)).all()
         if c.id is not None
     ]
@@ -91,6 +91,7 @@ def ranking_analogos(session: Session, destino: str) -> list[dict]:
                 "geom_destino": sitio_destino.geom,
                 "similitud": r.similitud,
                 "cobertura": r.cobertura,
+                "por_grupo": r.por_grupo,
                 "metodo": r.metodo,
                 "coincide": r.coincide,
                 "difiere": r.difiere,
