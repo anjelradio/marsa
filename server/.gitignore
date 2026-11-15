@@ -4,6 +4,7 @@ venv
 # Python
 **/__pycache__/
 *.pyc
-# Local DB
-server/*.db
-server/*.sqlite3
+# Local DB (la base de desarrollo se recrea al arrancar y no se versiona)
+*.db
+*.db.bak
+*.sqlite3
