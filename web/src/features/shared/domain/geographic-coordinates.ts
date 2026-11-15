@@ -30,6 +30,11 @@ export function latLonToVector3(
   return new THREE.Vector3(x, y, z);
 }
 
+export interface GeoPoint {
+  latitude: number;
+  longitude: number;
+}
+
 export interface GeographicLandmark {
   id: string;
   name: string;
